@@ -1,0 +1,452 @@
+{
+  "usableSessionsCount": 12,
+  "retiredSessionsCount": 0,
+  "sessions": [
+    {
+      "id": "session_GXa5zT077f",
+      "cookieJar": {
+        "version": "tough-cookie@6.0.1",
+        "storeType": "MemoryCookieStore",
+        "rejectPublicSuffixes": true,
+        "enableLooseMode": false,
+        "allowSpecialUseDomain": true,
+        "prefixSecurity": "silent",
+        "cookies": []
+      },
+      "userData": {},
+      "maxErrorScore": 3,
+      "errorScoreDecrement": 0.5,
+      "expiresAt": "2026-05-14T14:35:42.123Z",
+      "createdAt": "2026-05-14T13:45:42.123Z",
+      "usageCount": 0,
+      "maxUsageCount": 50,
+      "errorScore": 0
+    },
+    {
+      "id": "session_QAy42HpBhd",
+      "cookieJar": {
+        "version": "tough-cookie@6.0.1",
+        "storeType": "MemoryCookieStore",
+        "rejectPublicSuffixes": true,
+        "enableLooseMode": false,
+        "allowSpecialUseDomain": true,
+        "prefixSecurity": "silent",
+        "cookies": [
+          {
+            "key": "XSRF-TOKEN",
+            "value": "eyJpdiI6InEwakhRKzEwOGhuL3RUbzgwMUpLREE9PSIsInZhbHVlIjoibFluZTJ6aW9rK3NHdU1qUFQySnU1dTRBQmdMR1FvNjZ3VzFuUkd0aEtiS3oyRWM2K2FRNGk2OHZHb0pBcGFhYVZiSys0dkdqb3QxOFRKMjYzbWU4YWh1UUcyOFN5U3dCZGpIZWNzU0k4dVpVcm5JeVRkaUtnQlRLSXhjQnlOYjYiLCJtYWMiOiJiMzRlNDBlOGNmMzY4ZDBjOWY3NGM3MDAzNTQ2YjQ3ZGYzMzI3YmRhNTNlOWMzNDdmYjI1NzY0ZDQzMDMwOTQxIiwidGFnIjoiIn0%3D",
+            "expires": "2026-05-15T13:45:46.455Z",
+            "domain": "marketdragon.ph",
+            "path": "/",
+            "secure": true,
+            "hostOnly": true,
+            "creation": "2026-05-14T13:45:44.213Z",
+            "lastAccessed": "2026-05-14T13:45:46.913Z"
+          },
+          {
+            "key": "market_dragon_session",
+            "value": "eyJpdiI6Inc5NGpiRlNST0tQSmF0elBmUlo2NlE9PSIsInZhbHVlIjoiYlovZHdqY2Y2ZTJCa3ZLYU5CN1JnbDFCMGxHdThPK2c3YXNKWC9KYlZhRHBPa24vc21VTTlGeU0zM0NOcnM4N0Jhb2p6SitRTGJNOUNEM2xINFpxam56dWp1Vm9IT3R3dGMyWmFmQUZQMDdsREpnVUQzY1hFaHlvalpuRTlxRDMiLCJtYWMiOiJmNDRkYWE3ODJhNDI1ODQ0ZDRkZWRiNTc4YWU4M2E2NzM4M2M5ZjUxZTQ4ZmMzMDc4MDdkNTZmMzJmNDdhYTA0IiwidGFnIjoiIn0%3D",
+            "expires": "2026-05-15T13:45:46.455Z",
+            "domain": "marketdragon.ph",
+            "path": "/",
+            "secure": true,
+            "httpOnly": true,
+            "hostOnly": true,
+            "creation": "2026-05-14T13:45:44.214Z",
+            "lastAccessed": "2026-05-14T13:45:46.913Z"
+          },
+          {
+            "key": "_fbp",
+            "value": "fb.1.1778766343852.195658469327748736",
+            "expires": "2026-08-12T13:45:46.000Z",
+            "domain": "marketdragon.ph",
+            "path": "/",
+            "hostOnly": false,
+            "creation": "2026-05-14T13:45:44.214Z",
+            "lastAccessed": "2026-05-14T13:45:46.913Z"
+          },
+          {
+            "key": "_clck",
+            "value": "u4ehvi%5E2%5Eg61%5E0%5E2325",
+            "expires": "2027-05-14T13:45:44.000Z",
+            "domain": "marketdragon.ph",
+            "path": "/",
+            "hostOnly": false,
+            "creation": "2026-05-14T13:45:44.214Z",
+            "lastAccessed": "2026-05-14T13:45:46.913Z"
+          },
+          {
+            "key": "_clsk",
+            "value": "qx0zn8%5E1778766345825%5E1%5E1%5Ej.clarity.ms%2Fcollect",
+            "expires": "2026-05-15T13:45:45.000Z",
+            "domain": "marketdragon.ph",
+            "path": "/",
+            "hostOnly": false,
+            "creation": "2026-05-14T13:45:46.913Z",
+            "lastAccessed": "2026-05-14T13:45:46.913Z"
+          }
+        ]
+      },
+      "userData": {},
+      "maxErrorScore": 3,
+      "errorScoreDecrement": 0.5,
+      "expiresAt": "2026-05-14T14:35:42.127Z",
+      "createdAt": "2026-05-14T13:45:42.127Z",
+      "usageCount": 2,
+      "maxUsageCount": 50,
+      "errorScore": 0
+    },
+    {
+      "id": "session_4g47eat2Oz",
+      "cookieJar": {
+        "version": "tough-cookie@6.0.1",
+        "storeType": "MemoryCookieStore",
+        "rejectPublicSuffixes": true,
+        "enableLooseMode": false,
+        "allowSpecialUseDomain": true,
+        "prefixSecurity": "silent",
+        "cookies": []
+      },
+      "userData": {},
+      "maxErrorScore": 3,
+      "errorScoreDecrement": 0.5,
+      "expiresAt": "2026-05-14T14:35:46.290Z",
+      "createdAt": "2026-05-14T13:45:46.290Z",
+      "usageCount": 0,
+      "maxUsageCount": 50,
+      "errorScore": 0
+    },
+    {
+      "id": "session_2AAgEpMJQ7",
+      "cookieJar": {
+        "version": "tough-cookie@6.0.1",
+        "storeType": "MemoryCookieStore",
+        "rejectPublicSuffixes": true,
+        "enableLooseMode": false,
+        "allowSpecialUseDomain": true,
+        "prefixSecurity": "silent",
+        "cookies": []
+      },
+      "userData": {},
+      "maxErrorScore": 3,
+      "errorScoreDecrement": 0.5,
+      "expiresAt": "2026-05-14T14:36:42.391Z",
+      "createdAt": "2026-05-14T13:46:42.391Z",
+      "usageCount": 0,
+      "maxUsageCount": 50,
+      "errorScore": 0
+    },
+    {
+      "id": "session_33ez6PXhHc",
+      "cookieJar": {
+        "version": "tough-cookie@6.0.1",
+        "storeType": "MemoryCookieStore",
+        "rejectPublicSuffixes": true,
+        "enableLooseMode": false,
+        "allowSpecialUseDomain": true,
+        "prefixSecurity": "silent",
+        "cookies": [
+          {
+            "key": "XSRF-TOKEN",
+            "value": "eyJpdiI6IjJCOWdGSGc5MVlWamJmQytWQlpzREE9PSIsInZhbHVlIjoibENaWktaQWR4OFIraWxpc1B3WmYyNVljcmxVZTZBbjlWMHpkbmh4amFnSmovd0NtVCtHWDc3K1lsVTBpa1pUbno3aGVCc2k0RUpEejVGQktOdCs4Mk1ObENrS1VuUHU4dU5LcVEwdkZyaUJRY3lac3duekZRNGJLRHRoY1dmWmkiLCJtYWMiOiJhZjY5NThhZGQ3MzZjYjM0MWMxMDk0ZjdlNzMxYjdkY2QyNDlmN2U1ZmNlYzAyYzUxNmRjN2FmZGUyZDM4OGZhIiwidGFnIjoiIn0%3D",
+            "expires": "2026-05-15T13:46:46.713Z",
+            "domain": "marketdragon.ph",
+            "path": "/",
+            "secure": true,
+            "hostOnly": true,
+            "creation": "2026-05-14T13:46:44.195Z",
+            "lastAccessed": "2026-05-14T13:46:47.053Z"
+          },
+          {
+            "key": "market_dragon_session",
+            "value": "eyJpdiI6IjJMYXczanJ0dzFpTExCazQ1WTlqRlE9PSIsInZhbHVlIjoiQjlKa2I1am1QWjR1LzRQUVpzYmNNS2xOY1lSaElrVjJZWXZlVkZ6R0Iwd0RxV2FmYS91c3B0MkZyb3M5Z2laZ0pkdy9hbkF1YjQ5emRIVHYzYkJSTHRKd2NWRGxEZ0RGcHVkSTJlaVZiYTRoOXptNjhtd1pEbitPWWRMOUNuUXciLCJtYWMiOiI4Y2VlYTA0YmMwNWM0MTdjMmM1NmM0ZDc0ZTE3NjJjNWI1ODVmZjNjNDFhNjliNTAyNmUwYTkyOTkzN2Y3MGE1IiwidGFnIjoiIn0%3D",
+            "expires": "2026-05-15T13:46:46.713Z",
+            "domain": "marketdragon.ph",
+            "path": "/",
+            "secure": true,
+            "httpOnly": true,
+            "hostOnly": true,
+            "creation": "2026-05-14T13:46:44.195Z",
+            "lastAccessed": "2026-05-14T13:46:47.053Z"
+          },
+          {
+            "key": "_fbp",
+            "value": "fb.1.1778766403875.84431888735372782",
+            "expires": "2026-08-12T13:46:46.000Z",
+            "domain": "marketdragon.ph",
+            "path": "/",
+            "hostOnly": false,
+            "creation": "2026-05-14T13:46:44.195Z",
+            "lastAccessed": "2026-05-14T13:46:47.053Z"
+          },
+          {
+            "key": "_clck",
+            "value": "atbqwa%5E2%5Eg61%5E0%5E2325",
+            "expires": "2027-05-14T13:46:44.000Z",
+            "domain": "marketdragon.ph",
+            "path": "/",
+            "hostOnly": false,
+            "creation": "2026-05-14T13:46:44.195Z",
+            "lastAccessed": "2026-05-14T13:46:47.053Z"
+          }
+        ]
+      },
+      "userData": {},
+      "maxErrorScore": 3,
+      "errorScoreDecrement": 0.5,
+      "expiresAt": "2026-05-14T14:36:42.392Z",
+      "createdAt": "2026-05-14T13:46:42.392Z",
+      "usageCount": 2,
+      "maxUsageCount": 50,
+      "errorScore": 0
+    },
+    {
+      "id": "session_2U6VO1V7tA",
+      "cookieJar": {
+        "version": "tough-cookie@6.0.1",
+        "storeType": "MemoryCookieStore",
+        "rejectPublicSuffixes": true,
+        "enableLooseMode": false,
+        "allowSpecialUseDomain": true,
+        "prefixSecurity": "silent",
+        "cookies": []
+      },
+      "userData": {},
+      "maxErrorScore": 3,
+      "errorScoreDecrement": 0.5,
+      "expiresAt": "2026-05-14T14:36:46.563Z",
+      "createdAt": "2026-05-14T13:46:46.563Z",
+      "usageCount": 0,
+      "maxUsageCount": 50,
+      "errorScore": 0
+    },
+    {
+      "id": "session_K1M80MC8H0",
+      "cookieJar": {
+        "version": "tough-cookie@6.0.1",
+        "storeType": "MemoryCookieStore",
+        "rejectPublicSuffixes": true,
+        "enableLooseMode": false,
+        "allowSpecialUseDomain": true,
+        "prefixSecurity": "silent",
+        "cookies": []
+      },
+      "userData": {},
+      "maxErrorScore": 3,
+      "errorScoreDecrement": 0.5,
+      "expiresAt": "2026-05-14T14:37:42.742Z",
+      "createdAt": "2026-05-14T13:47:42.742Z",
+      "usageCount": 0,
+      "maxUsageCount": 50,
+      "errorScore": 0
+    },
+    {
+      "id": "session_gU9oFIksfO",
+      "cookieJar": {
+        "version": "tough-cookie@6.0.1",
+        "storeType": "MemoryCookieStore",
+        "rejectPublicSuffixes": true,
+        "enableLooseMode": false,
+        "allowSpecialUseDomain": true,
+        "prefixSecurity": "silent",
+        "cookies": [
+          {
+            "key": "XSRF-TOKEN",
+            "value": "eyJpdiI6Illld01OVFZ4WkROUlYwRUFKMEVYd3c9PSIsInZhbHVlIjoiVVdCYkZCZkYxUVBZRG8wWnpIK1lqSmxCcC81QVJZZENhWlNEQ3pFU3RPVWUrTnFPbGlxZ2xmNVF3VTVCMlpNZjc0MVNYZTF0ZzFGOWZSOEdVZ2RKZnVDdDEwUWs4Z1BkK3FMeFh1amJZL2xsVVhTTVhvTzN0TDVkQUFQUFQ3VDAiLCJtYWMiOiI1YjhhMjA0NjE3YzEwMWZhYjA5YzQ1YzRkNTg4YTc3NTM1Yzg1NjI3YTE3OGY4NjJkZWRkNTU0ZDUxYTg2MzEyIiwidGFnIjoiIn0%3D",
+            "expires": "2026-05-15T13:47:46.575Z",
+            "domain": "marketdragon.ph",
+            "path": "/",
+            "secure": true,
+            "hostOnly": true,
+            "creation": "2026-05-14T13:47:44.887Z",
+            "lastAccessed": "2026-05-14T13:47:46.912Z"
+          },
+          {
+            "key": "market_dragon_session",
+            "value": "eyJpdiI6IlpCcHRIcXA4ZFZLVFoxT2FBNCt0SFE9PSIsInZhbHVlIjoiM0JGd0dwdEF2c0pPWHgySWlxQ1JkN0xxbWxoS1FKaUNEOWxMUzVRNUxxc1owejE4dVpWelpGd1ZoQ2s1YUJsTlV5UVYxM2VBMmZMZzhUS0xSWGxMVTI4UC8yOGVKd2VUVjlVaU9lem8xVWJDZkNhbHRCUlNCckpEU0FQSTJsNUUiLCJtYWMiOiI2ZWExODYyOTllZDdlNjhmZWYzMDE0YzM5YjQ2NjgxMTBkYTkwYjRlZWFjNjkxMDM5NmFkNDAyZjU0NDBjOGVmIiwidGFnIjoiIn0%3D",
+            "expires": "2026-05-15T13:47:46.575Z",
+            "domain": "marketdragon.ph",
+            "path": "/",
+            "secure": true,
+            "httpOnly": true,
+            "hostOnly": true,
+            "creation": "2026-05-14T13:47:44.887Z",
+            "lastAccessed": "2026-05-14T13:47:46.912Z"
+          },
+          {
+            "key": "_fbp",
+            "value": "fb.1.1778766464404.68235660114547771",
+            "expires": "2026-08-12T13:47:46.000Z",
+            "domain": "marketdragon.ph",
+            "path": "/",
+            "hostOnly": false,
+            "creation": "2026-05-14T13:47:44.887Z",
+            "lastAccessed": "2026-05-14T13:47:46.912Z"
+          },
+          {
+            "key": "_clck",
+            "value": "331802%5E2%5Eg61%5E0%5E2325",
+            "expires": "2027-05-14T13:47:44.000Z",
+            "domain": "marketdragon.ph",
+            "path": "/",
+            "hostOnly": false,
+            "creation": "2026-05-14T13:47:44.887Z",
+            "lastAccessed": "2026-05-14T13:47:46.912Z"
+          },
+          {
+            "key": "_clsk",
+            "value": "146tnr7%5E1778766466247%5E1%5E1%5Ej.clarity.ms%2Fcollect",
+            "expires": "2026-05-15T13:47:46.000Z",
+            "domain": "marketdragon.ph",
+            "path": "/",
+            "hostOnly": false,
+            "creation": "2026-05-14T13:47:46.912Z",
+            "lastAccessed": "2026-05-14T13:47:46.912Z"
+          }
+        ]
+      },
+      "userData": {},
+      "maxErrorScore": 3,
+      "errorScoreDecrement": 0.5,
+      "expiresAt": "2026-05-14T14:37:42.742Z",
+      "createdAt": "2026-05-14T13:47:42.742Z",
+      "usageCount": 2,
+      "maxUsageCount": 50,
+      "errorScore": 0
+    },
+    {
+      "id": "session_96VdE6wFfy",
+      "cookieJar": {
+        "version": "tough-cookie@6.0.1",
+        "storeType": "MemoryCookieStore",
+        "rejectPublicSuffixes": true,
+        "enableLooseMode": false,
+        "allowSpecialUseDomain": true,
+        "prefixSecurity": "silent",
+        "cookies": []
+      },
+      "userData": {},
+      "maxErrorScore": 3,
+      "errorScoreDecrement": 0.5,
+      "expiresAt": "2026-05-14T14:37:46.407Z",
+      "createdAt": "2026-05-14T13:47:46.407Z",
+      "usageCount": 0,
+      "maxUsageCount": 50,
+      "errorScore": 0
+    },
+    {
+      "id": "session_su7ItSHgg7",
+      "cookieJar": {
+        "version": "tough-cookie@6.0.1",
+        "storeType": "MemoryCookieStore",
+        "rejectPublicSuffixes": true,
+        "enableLooseMode": false,
+        "allowSpecialUseDomain": true,
+        "prefixSecurity": "silent",
+        "cookies": []
+      },
+      "userData": {},
+      "maxErrorScore": 3,
+      "errorScoreDecrement": 0.5,
+      "expiresAt": "2026-05-14T14:38:42.559Z",
+      "createdAt": "2026-05-14T13:48:42.559Z",
+      "usageCount": 0,
+      "maxUsageCount": 50,
+      "errorScore": 0
+    },
+    {
+      "id": "session_Z9vYqOVAD7",
+      "cookieJar": {
+        "version": "tough-cookie@6.0.1",
+        "storeType": "MemoryCookieStore",
+        "rejectPublicSuffixes": true,
+        "enableLooseMode": false,
+        "allowSpecialUseDomain": true,
+        "prefixSecurity": "silent",
+        "cookies": [
+          {
+            "key": "XSRF-TOKEN",
+            "value": "eyJpdiI6IjRXbWtlM1NuNjQzVk52QU5ZenBrR1E9PSIsInZhbHVlIjoiNmpONTF5TU1JaFZnU21UQmpNbktvNS9MbzRISEFSdkE5MGgrZ0RMYVN4K0FVc0lRMUZnT0VHSDdZNzZqTXU4V0h6MkRvNjN2bXJHTndVbnRScGszTlhVenBoQ1VZVGQwZVAxTUh4b1YyUVZHdkRUaGJ5ZDFEd0dhQ2E2UzVUMTEiLCJtYWMiOiI3NGMyNDU3NWJjNGE3NWQ0NWJjNjk4OGU1MzkwYTNjNTJhZDQ2MjNmYThiOTlhYmYyZGZjOWFhYzQzZDU0MjU5IiwidGFnIjoiIn0%3D",
+            "expires": "2026-05-15T13:48:47.346Z",
+            "domain": "marketdragon.ph",
+            "path": "/",
+            "secure": true,
+            "hostOnly": true,
+            "creation": "2026-05-14T13:48:45.415Z",
+            "lastAccessed": "2026-05-14T13:48:48.677Z"
+          },
+          {
+            "key": "market_dragon_session",
+            "value": "eyJpdiI6ImRpdVYxNHFwek44ai90Q25oQzFlL0E9PSIsInZhbHVlIjoiMVYzeERsaVdKcVdaZDhNWVRPY3dFNVZpLzZ1a2lxaHJDWmFnam1JVi9LRU9vMlQzUk5FaWtMN3FUQ1FVdWRSazQyR1ZNdWhpbnA3aWd2eTcvejlXRVhwQmw0cWFVZFpVQUd3SWlWTm9OMWJHY3pwd3gybXhveENRaHBHWnBRVlQiLCJtYWMiOiIzMzU5MjliYzcwNmM4ZmIzOWE1YjcxNzA0YTRiNTM2YzkzZGIzMzYwOWJjM2U1YzhkNDU3NDcxMzRjOTMxMjg1IiwidGFnIjoiIn0%3D",
+            "expires": "2026-05-15T13:48:47.346Z",
+            "domain": "marketdragon.ph",
+            "path": "/",
+            "secure": true,
+            "httpOnly": true,
+            "hostOnly": true,
+            "creation": "2026-05-14T13:48:45.415Z",
+            "lastAccessed": "2026-05-14T13:48:48.677Z"
+          },
+          {
+            "key": "_fbp",
+            "value": "fb.1.1778766524649.881149769604034829",
+            "expires": "2026-08-12T13:48:47.000Z",
+            "domain": "marketdragon.ph",
+            "path": "/",
+            "hostOnly": false,
+            "creation": "2026-05-14T13:48:45.415Z",
+            "lastAccessed": "2026-05-14T13:48:48.677Z"
+          },
+          {
+            "key": "_clck",
+            "value": "ona28d%5E2%5Eg61%5E0%5E2325",
+            "expires": "2027-05-14T13:48:44.000Z",
+            "domain": "marketdragon.ph",
+            "path": "/",
+            "hostOnly": false,
+            "creation": "2026-05-14T13:48:45.415Z",
+            "lastAccessed": "2026-05-14T13:48:48.677Z"
+          },
+          {
+            "key": "_clsk",
+            "value": "1buvzel%5E1778766528283%5E2%5E1%5Ej.clarity.ms%2Fcollect",
+            "expires": "2026-05-15T13:48:48.000Z",
+            "domain": "marketdragon.ph",
+            "path": "/",
+            "hostOnly": false,
+            "creation": "2026-05-14T13:48:48.677Z",
+            "lastAccessed": "2026-05-14T13:48:48.677Z"
+          }
+        ]
+      },
+      "userData": {},
+      "maxErrorScore": 3,
+      "errorScoreDecrement": 0.5,
+      "expiresAt": "2026-05-14T14:38:42.559Z",
+      "createdAt": "2026-05-14T13:48:42.559Z",
+      "usageCount": 2,
+      "maxUsageCount": 50,
+      "errorScore": 0
+    },
+    {
+      "id": "session_VHKdm1s40M",
+      "cookieJar": {
+        "version": "tough-cookie@6.0.1",
+        "storeType": "MemoryCookieStore",
+        "rejectPublicSuffixes": true,
+        "enableLooseMode": false,
+        "allowSpecialUseDomain": true,
+        "prefixSecurity": "silent",
+        "cookies": []
+      },
+      "userData": {},
+      "maxErrorScore": 3,
+      "errorScoreDecrement": 0.5,
+      "expiresAt": "2026-05-14T14:38:46.750Z",
+      "createdAt": "2026-05-14T13:48:46.750Z",
+      "usageCount": 0,
+      "maxUsageCount": 50,
+      "errorScore": 0
+    }
+  ]
+}

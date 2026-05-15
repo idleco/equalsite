@@ -1,0 +1,9 @@
+{
+	"id": "yApdH7k2lw2sRHU",
+	"json": "{\"id\":\"yApdH7k2lw2sRHU\",\"url\":\"https://marketdragon.ph/features/flow\",\"loadedUrl\":\"https://marketdragon.ph/features/flow\",\"uniqueKey\":\"https://marketdragon.ph/features/flow\",\"method\":\"GET\",\"noRetry\":false,\"retryCount\":0,\"errorMessages\":[],\"headers\":{},\"userData\":{\"__crawlee\":{\"crawlDepth\":1,\"enqueueStrategy\":\"same-hostname\",\"state\":4}},\"handledAt\":\"2026-05-14T13:48:49.787Z\"}",
+	"method": "GET",
+	"orderNo": null,
+	"retryCount": 0,
+	"uniqueKey": "https://marketdragon.ph/features/flow",
+	"url": "https://marketdragon.ph/features/flow"
+}

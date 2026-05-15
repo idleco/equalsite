@@ -1,0 +1,125 @@
+services:
+    web:
+        build:
+            context: .
+            dockerfile: ./apps/web/docker/8.5/Dockerfile
+            args:
+                WWWGROUP: '${WWWGROUP:-1000}'
+        image: equalsite-web
+        extra_hosts:
+            - 'host.docker.internal:host-gateway'
+        ports:
+            - '${APP_PORT:-80}:80'
+            - '${VITE_PORT:-5173}:${VITE_PORT:-5173}'
+        environment:
+            WWWUSER: '${WWWUSER:-1000}'
+            LARAVEL_SAIL: 1
+            XDEBUG_MODE: '${SAIL_XDEBUG_MODE:-off}'
+            XDEBUG_CONFIG: '${SAIL_XDEBUG_CONFIG:-client_host=host.docker.internal}'
+            IGNITION_LOCAL_SITES_PATH: '${PWD}'
+        volumes:
+            - './apps/web:/var/www/html'
+            - './.env:/var/www/html/.env'
+        networks:
+            - equalsite
+        depends_on:
+            - mysql
+            - redis
+            - soketi
+            - memcached
+
+    crawler:
+        build:
+            context: .
+            dockerfile: ./services/playwright-spider/Dockerfile
+        image: equalsite-crawler
+        working_dir: /app/services/playwright-spider
+        ports:
+            - '${CRAWLER_PORT:-3000}:${CRAWLER_PORT:-3000}'
+        volumes:
+            - '.:/app'
+            - 'crawler-node-modules:/app/node_modules'
+        environment:
+            NODE_ENV: development
+            PORT: ${CRAWLER_PORT:-3000}
+            REDIS_HOST: '${REDIS_HOST:-redis}'
+            REDIS_PORT: '${REDIS_PORT:-6379}'
+            REDIS_PREFIX: '${REDIS_PREFIX:-equalsite-database-}'
+        depends_on:
+            - redis
+        networks:
+            - equalsite
+
+    mysql:
+        image: 'mysql:8.4'
+        ports:
+            - '${FORWARD_DB_PORT:-3306}:3306'
+        environment:
+            MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
+            MYSQL_ROOT_HOST: '%'
+            MYSQL_DATABASE: '${DB_DATABASE}'
+            MYSQL_USER: '${DB_USERNAME}'
+            MYSQL_PASSWORD: '${DB_PASSWORD}'
+            MYSQL_ALLOW_EMPTY_PASSWORD: 1
+            MYSQL_EXTRA_OPTIONS: '${MYSQL_EXTRA_OPTIONS:-}'
+        volumes:
+            - 'mysql-data:/var/lib/mysql'
+            - './apps/web/docker/mysql/create-testing-database.sh:/docker-entrypoint-initdb.d/10-create-testing-database.sh'
+        networks:
+            - equalsite
+        healthcheck:
+            test:
+                - CMD
+                - mysqladmin
+                - ping
+                - '-p${DB_PASSWORD}'
+            retries: 3
+            timeout: 5s
+
+    redis:
+        image: 'redis:alpine'
+        ports:
+            - '${FORWARD_REDIS_PORT:-6379}:6379'
+        volumes:
+            - 'redis-data:/data'
+        networks:
+            - equalsite
+        healthcheck:
+            test:
+                - CMD
+                - redis-cli
+                - ping
+            retries: 3
+            timeout: 5s
+
+    soketi:
+        image: 'quay.io/soketi/soketi:latest-16-alpine'
+        environment:
+            SOKETI_DEBUG: '${SOKETI_DEBUG:-1}'
+            SOKETI_METRICS_SERVER_PORT: '9601'
+            SOKETI_DEFAULT_APP_ID: '${PUSHER_APP_ID}'
+            SOKETI_DEFAULT_APP_KEY: '${PUSHER_APP_KEY}'
+            SOKETI_DEFAULT_APP_SECRET: '${PUSHER_APP_SECRET}'
+        ports:
+            - '${PUSHER_PORT:-6001}:6001'
+            - '${PUSHER_METRICS_PORT:-9601}:9601'
+        networks:
+            - equalsite
+
+    memcached:
+        image: 'memcached:alpine'
+        ports:
+            - '${FORWARD_MEMCACHED_PORT:-11211}:11211'
+        networks:
+            - equalsite
+networks:
+    equalsite:
+        driver: bridge
+
+volumes:
+    mysql-data:
+        driver: local
+    redis-data:
+        driver: local
+    crawler-node-modules:
+        driver: local

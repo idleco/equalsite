@@ -1,0 +1,4 @@
+{
+    "extends": "@equalsite/tsconfig/node.json",
+    "include": ["src"]
+}

@@ -1,0 +1,29 @@
+{
+    "name": "@equalsite/playwright-spider",
+    "type": "module",
+    "scripts": {
+        "dev": "tsx watch src/index.ts",
+        "build": "tsup src/index.ts --format esm --dts",
+        "lint": "eslint . --fix",
+        "lintcheck": "eslint .",
+        "test": "vitest",
+        "typecheck": "tsc --noEmit"
+    },
+    "dependencies": {
+        "@axe-core/playwright": "^4.11.3",
+        "crawlee": "^3.16.0",
+        "express": "^5.2.1",
+        "ioredis": "^5.10.1",
+        "playwright": "^1.59.1"
+    },
+    "devDependencies": {
+        "@equalsite/tsconfig": "workspace:*",
+        "@equalsite/eslint-config": "workspace:*",
+        "@types/node": "^25.8.0",
+        "eslint": "^10.3.0",
+        "tsup": "^8.5.1",
+        "tsx": "^4.22.0",
+        "typescript": "^6.0.3",
+        "vitest": "^4.1.6"
+    }
+}

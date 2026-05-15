@@ -1,0 +1,14 @@
+{
+    "name": "@equalsite/eslint-config",
+    "type": "module",
+    "private": true,
+    "version": "1.0.0",
+    "exports": {
+        "./base": "./base.js",
+        "./node": "./node.js",
+        "./react": "./react.js"
+    },
+    "peerDependencies": {
+        "eslint": "^9.0.0"
+    }
+}

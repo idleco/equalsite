@@ -1,0 +1,13 @@
+.turbo
+
+node_modules/
+.pnpm-store
+
+apps/web/vendor
+apps/web/node_modules
+
+.env
+
+docker-data
+
+.DS_Store
