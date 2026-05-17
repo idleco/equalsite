@@ -35,13 +35,14 @@ services:
         image: equalsite-crawler
         working_dir: /app/services/playwright-spider
         ports:
-            - '${CRAWLER_PORT:-3000}:${CRAWLER_PORT:-3000}'
+            - '${CRAWLER_PORT:-3000}'
         volumes:
             - '.:/app'
             - 'crawler-node-modules:/app/node_modules'
         environment:
             NODE_ENV: development
-            PORT: ${CRAWLER_PORT:-3000}
+            CRAWLER_SECRET: '${CRAWLER_SECRET}'
+            CRAWLER_PORT: ${CRAWLER_PORT:-3000}
             REDIS_HOST: '${REDIS_HOST:-redis}'
             REDIS_PORT: '${REDIS_PORT:-6379}'
             REDIS_PREFIX: '${REDIS_PREFIX:-equalsite-database-}'

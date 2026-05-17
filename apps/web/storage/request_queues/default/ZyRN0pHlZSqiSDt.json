@@ -1,9 +1,0 @@
-{
-	"id": "ZyRN0pHlZSqiSDt",
-	"json": "{\"id\":\"ZyRN0pHlZSqiSDt\",\"url\":\"https://marketdragon.ph/features/spaces\",\"loadedUrl\":\"https://marketdragon.ph/features/spaces\",\"uniqueKey\":\"https://marketdragon.ph/features/spaces\",\"method\":\"GET\",\"noRetry\":false,\"retryCount\":0,\"errorMessages\":[],\"headers\":{},\"userData\":{\"__crawlee\":{\"crawlDepth\":1,\"enqueueStrategy\":\"same-hostname\",\"state\":4}},\"handledAt\":\"2026-05-14T13:47:47.965Z\"}",
-	"method": "GET",
-	"orderNo": null,
-	"retryCount": 0,
-	"uniqueKey": "https://marketdragon.ph/features/spaces",
-	"url": "https://marketdragon.ph/features/spaces"
-}

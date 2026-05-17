@@ -180,6 +180,21 @@ crawler-test: ## Test crawler
 crawler-lint: ## Lint crawler
 	pnpm --filter @equalsite/playwright-spider lint
 
+crawler-secret: ## Generate crawler secret env
+	@SECRET=$$(openssl rand -hex 32); \
+	if grep -q '^CRAWLER_SECRET=' .env; then \
+		VALUE=$$(grep '^CRAWLER_SECRET=' .env | cut -d '=' -f2-); \
+		if [ -z "$$VALUE" ]; then \
+			sed -i "s|^CRAWLER_SECRET=.*|CRAWLER_SECRET=$$SECRET|" .env; \
+			echo "Filled empty CRAWLER_SECRET"; \
+		else \
+			echo "CRAWLER_SECRET already exists"; \
+		fi; \
+	else \
+		echo "\nCRAWLER_SECRET=$$SECRET" >> .env; \
+		echo "Added CRAWLER_SECRET"; \
+	fi
+
 # =========================================================
 # Project Setup
 # =========================================================
@@ -192,6 +207,7 @@ setup: ## Initial project setup
 	$(DOCKER) exec web composer install
 	$(DOCKER) exec web php artisan key:generate
 	$(DOCKER) exec web php artisan migrate
+	crawler-secret
 
 # =========================================================
 # Helpers
@@ -206,6 +222,7 @@ fix-permissions: ## Fix Laravel storage permissions
 # =========================================================
 
 .PHONY: \
+	crawler-secret \
 	lint lint-fix \
 	web-lint web-lint-fix \
 	crawler-lint crawler-lint-fix \

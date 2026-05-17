@@ -1,14 +1,24 @@
 <?php
 
 use App\Http\Controllers\AnalyzeController;
+use App\Services\CrawlerService;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
-Route::get('/spider', function () {
-    $response = Http::get('http://crawler:3000/health');
-
+Route::get('/health', function () {
+    $response = Http::withToken(config('services.crawler.secret'))
+        ->get('http://crawler:3000/health');
     dd($response->json());
+});
+
+Route::get('/spider', function () {
+    $host = config('services.crawler.host');
+    $port = config('services.crawler.port');
+    $secret = config('services.crawler.secret');
+
+    $crawler = new CrawlerService($host, $port, $secret);
+    $crawler->crawl('https://marketdragon.ph');
 });
 
 Route::inertia('/', 'welcome', [
@@ -21,4 +31,4 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 Route::post('/analyze', AnalyzeController::class);
 
-require __DIR__.'/settings.php';
+require __DIR__ . '/settings.php';

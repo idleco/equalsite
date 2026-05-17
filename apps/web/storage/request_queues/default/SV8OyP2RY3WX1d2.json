@@ -1,9 +1,0 @@
-{
-	"id": "SV8OyP2RY3WX1d2",
-	"json": "{\"id\":\"SV8OyP2RY3WX1d2\",\"url\":\"https://marketdragon.ph/features/viral-strategy\",\"loadedUrl\":\"https://marketdragon.ph/features/viral-strategy\",\"uniqueKey\":\"https://marketdragon.ph/features/viral-strategy\",\"method\":\"GET\",\"noRetry\":false,\"retryCount\":0,\"errorMessages\":[],\"headers\":{},\"userData\":{\"__crawlee\":{\"crawlDepth\":1,\"enqueueStrategy\":\"same-hostname\",\"state\":4}},\"handledAt\":\"2026-05-14T13:47:46.397Z\"}",
-	"method": "GET",
-	"orderNo": null,
-	"retryCount": 0,
-	"uniqueKey": "https://marketdragon.ph/features/viral-strategy",
-	"url": "https://marketdragon.ph/features/viral-strategy"
-}

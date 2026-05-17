@@ -8,15 +8,44 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
 
-#[Signature('redis:subscribe-node')]
+#[Signature('spider:listen')]
 #[Description('Subscribe to events published by Node.js')]
 class SubscribeToNodeEvents extends Command
 {
     public function handle()
     {
-        Redis::connection('crawler')->subscribe(['laravel_events'], function ($message) {
-            $data = json_decode($message, true);
-            Log::info('Received from Node.js:', $data);
-        });
+        while (true) {
+            try {
+                $this->info("Connecting to redis subcriber...");
+
+                $connection = Redis::connection('crawler');
+
+                $connection->subscribe(
+                    ['laravel_events'],
+                    function (string $payload, string $channel) {
+                        $this->handleMessage($payload, $channel);
+                    }
+                );
+            } catch (\Throwable $e) {
+                Log::error(
+                    'Spider listener crashed',
+                    [
+                        'message' => $e->getMessage()
+                    ]
+                );
+
+                sleep(5);
+            }
+        }
+    }
+
+    private function handleMessage(string $payload, string $channel): void
+    {
+        $data = json_decode($payload, true);
+
+        Log::channel('crawler')->info('Received from Node.js:', [
+            'channel' => $channel,
+            'payload' => $data,
+        ]);
     }
 }

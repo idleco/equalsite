@@ -1,14 +1,11 @@
-/**
- * Central JSON error response for the API (Express 4-arg error middleware).
- */
+import type { Request, Response, NextFunction } from 'express';
 
-/**
- * @param {unknown} err
- * @param {import('express').Request} _req
- * @param {import('express').Response} res
- * @param {import('express').NextFunction} next
- */
-export function errorHandler(err, _req, res, next) {
+export function errorHandler(
+    err: Error,
+    _req: Request,
+    res: Response,
+    next: NextFunction
+) {
     if (res.headersSent) {
       return next(err);
     }
