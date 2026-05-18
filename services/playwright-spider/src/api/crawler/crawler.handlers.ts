@@ -1,13 +1,12 @@
 import type { Request, RequestHandler, Response } from "express";
 import { asyncHandler } from "../../middleware/asyncHandler";
-import { parseCrawlerInputs } from "./crawlerRequest";
 import { randomUUID } from "node:crypto";
 import { activeCrawlers, createCrawler } from "./crawler";
 import type { PlaywrightCrawler } from "crawlee";
 import fs from 'node:fs';
 import { zipArtifacts } from "../../utils/filesystem";
 import { authorizationHeader } from "../../config/http";
-import { ensureCallbackUrlIsAlive } from "../../utils/http";
+import { safeCallbackUrlIsAlive } from "../../utils/http";
 
 export const cancelCrawl: RequestHandler = asyncHandler(async (
     request: Request,
@@ -36,22 +35,28 @@ export const postCrawl: RequestHandler = asyncHandler(async (
     request: Request,
     response: Response
 ) => {
-    const inputs = parseCrawlerInputs(request);
+    const url = request.body.url as string;
+    const callback = request.query.callback as string;
 
-    await ensureCallbackUrlIsAlive(inputs.callbackUrl);
+    if (! await safeCallbackUrlIsAlive(callback)) {
+        return response.status(403).json({
+            error: 'The callback url is unreachable.'
+        });
+    }
 
     const uniqueId = randomUUID();
     const crawler = createCrawler(uniqueId);
 
     void runCrawler(crawler, {
         id: uniqueId,
-        url: inputs.url,
-        callbackUrl: inputs.callbackUrl
+        url,
+        callbackUrl: callback
     })
 
     return response.status(202).json({
-        id: uniqueId,
-        accepted: true,
+        crawlId: uniqueId,
+        status: 'queued',
+        timestamp: (new Date()).toISOString(),
     });
 });
 
@@ -62,6 +67,7 @@ async function runCrawler(
 ) {
     activeCrawlers.set(payload.id, {
         crawler,
+        startingUrl: payload.url,
         startedAt: new Date(),
     });
 

@@ -17,6 +17,8 @@ export async function ensureCallbackUrlIsAlive(
         headers: { ...authorizationHeader },
     });
 
+    console.log(response);
+
     if (!response.ok) {
         throw new Error("Callback URL is unavailable.");
     }

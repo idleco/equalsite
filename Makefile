@@ -67,6 +67,9 @@ redis-shell: ## Open Redis container shell
 # Laravel Commands
 # =========================================================
 
+tinker: ## Enter artisan tinker
+	$(DOCKER) exec web php artisan tinker
+
 artisan: ## Run artisan command (usage: make artisan cmd="migrate")
 	$(DOCKER) exec web php artisan $(cmd)
 
@@ -123,11 +126,25 @@ crawler-typecheck: ## Run crawler TypeScript type checking
 # Composer
 # =========================================================
 
+composer-require: ## Install new composer dependency
+	@if [ -z "$(pkg)" ]; then \
+		echo "Usage: make composer-require pkg=\"vendor/package\""; \
+		exit 1; \
+	fi
+	$(DOCKER) exec web composer require $(pkg)
+
+composer-remove: ## Remove composer dependency
+	@if [ -z "$(pkg)" ]; then \
+		echo "Usage: make composer-remove pkg=\"vendor/package\""; \
+		exit 1; \
+	fi
+	$(DOCKER) exec web composer remove $(pkg)
+
 composer-install: ## Install composer dependencies
 	$(DOCKER) exec web composer install
 
 composer-update: ## Update composer dependencies
-	$(DOCKER) exec web composer update
+	$(DOCKER) exec web composer Update
 
 composer-dump: ## Dump composer autoload
 	$(DOCKER) exec web composer dump-autoload
@@ -230,8 +247,8 @@ fix-permissions: ## Fix Laravel storage permissions
 	help \
 	up build down restart logs ps destroy prune \
 	shell crawler-shell mysql-shell redis-shell \
-	artisan migrate fresh seed rollback tinker test queue queue-work pint \
-	composer-install composer-update composer-dump \
+	tinker artisan migrate fresh seed rollback tinker test queue queue-work pint \
+	composer-require composer-remove composer-install composer-update composer-dump \
 	pnpm-install dev build-assets lint test-js \
 	web-dev web-build web-lint \
 	crawler-dev crawler-build crawler-test crawler-lint \

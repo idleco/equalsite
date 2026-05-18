@@ -1,11 +1,11 @@
-import type { Request, Response, NextFunction } from "express";
+import type { NextFunction, Request, Response } from "express";
 
 export function handleInternalRequestAuthentication(
     req: Request,
     res: Response,
     next: NextFunction
 ) {
-    const authToken = req.headers['authorization'];
+    const authToken = req.headers.authorization;
 
     if (!authToken?.startsWith('Bearer ')) {
         return res.status(401).json({

@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\AnalyzeController;
+use App\Http\Controllers\WebsiteScanController;
 use App\Services\CrawlerService;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
@@ -12,14 +12,14 @@ Route::get('/health', function () {
     dd($response->json());
 });
 
-Route::get('/spider', function () {
-    $host = config('services.crawler.host');
-    $port = config('services.crawler.port');
-    $secret = config('services.crawler.secret');
+// Route::get('/spider', function () {
+//     $host = config('services.crawler.host');
+//     $port = config('services.crawler.port');
+//     $secret = config('services.crawler.secret');
 
-    $crawler = new CrawlerService($host, $port, $secret);
-    $crawler->crawl('https://marketdragon.ph');
-});
+//     $crawler = new CrawlerService($host, $port, $secret);
+//     $crawler->crawl('https://marketdragon.ph');
+// });
 
 Route::inertia('/', 'welcome', [
     'canRegister' => Features::enabled(Features::registration()),
@@ -29,6 +29,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'dashboard')->name('dashboard');
 });
 
-Route::post('/analyze', AnalyzeController::class);
+Route::post('/website-scan', [WebsiteScanController::class, 'store'])->name('website-scan.store');
 
 require __DIR__ . '/settings.php';

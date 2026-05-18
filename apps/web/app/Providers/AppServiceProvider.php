@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Support\CrawlerHttpClient;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -15,7 +16,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(CrawlerHttpClient::class, function ($app) {
+            $config = $app->make('config')->get('services.crawler');
+            return new CrawlerHttpClient(
+                host: $config['host'],
+                port: $config['port'],
+                secret: $config['secret']
+            );
+        });
     }
 
     /**
@@ -37,14 +45,15 @@ class AppServiceProvider extends ServiceProvider
             app()->isProduction(),
         );
 
-        Password::defaults(fn (): ?Password => app()->isProduction()
-            ? Password::min(12)
+        Password::defaults(
+            fn(): ?Password => app()->isProduction()
+                ? Password::min(12)
                 ->mixedCase()
                 ->letters()
                 ->numbers()
                 ->symbols()
                 ->uncompromised()
-            : null,
+                : null,
         );
     }
 }

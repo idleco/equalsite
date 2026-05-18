@@ -1,10 +1,10 @@
 import type { PlaywrightCrawlerOptions } from "crawlee";
 import path from "node:path"
 
+export const redisStreamChannel = process.env.CRAWLER_CHANNEL || 'crawler.streams'
+
 const storageDir = path.join(process.cwd(), 'storage');
-
 export const artifactsDir = path.join(storageDir, 'artifacts');
-
 export const archivesDir = path.join(storageDir, 'archives');
 
 export const crawlerOptions: PlaywrightCrawlerOptions = {

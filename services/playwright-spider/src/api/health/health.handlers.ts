@@ -1,4 +1,4 @@
-import { Request, RequestHandler, Response } from "express";
+import type { Request, RequestHandler, Response } from "express";
 import { asyncHandler } from "../../middleware/asyncHandler";
 
 export const showHealth: RequestHandler = asyncHandler(async (

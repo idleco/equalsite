@@ -5,5 +5,5 @@ const redisPrefix = process.env.REDIS_PREFIX || '';
 export default {
     redisHost,
     redisPort,
-    redisPrefix
+    redisPrefix,
 }

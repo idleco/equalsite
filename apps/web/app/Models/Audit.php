@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Value\Status;
+use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 
@@ -11,29 +12,60 @@ class Audit extends Model
     protected $fillable = [
         'url',
         'domain',
-        'status', // pending, started, cancelled, failed, completed
+        'status', // queued, started, cancelled, failed, completed
         'failure_reason',
-        'logs',
-        'custom_data',
+        'crawler_id',
     ];
 
     protected $casts = [
-        'custom_data' => 'array',
-        'logs' => 'array',
         'status' => Status::class,
+        'custom_data' => 'array',
     ];
 
-    public function getData(string $key, $default = null)
+    protected static function booted(): void
+    {
+        static::saving(function (self $audit) {
+            if ($audit->isDirty('status')) {
+                $now = now();
+                match ($this->status) {
+                    Status::Started => $this->forceFill(['started_at' => $this->started_at ?? $now]),
+                    Status::Cancelled => $this->forceFill(['cancelled_at' => $this->cancelled_at ?? $now]),
+                    Status::Completed => $this->forceFill(['completed_at' => $this->completed_at ?? $now])
+                };
+            }
+        });
+    }
+
+    public function getCustomData(string $key, $default = null)
     {
         return Arr::get($this->custom_data ?? [], $key, $default);
     }
 
-    public function setData(string $key, mixed $value): self
+    public function setCustomData(string $key, mixed $value): self
     {
         $customData = $this->custom_data ?? [];
-        $customData[$key] = $value;
 
-        $this->fill(['custom_data' => $customData])->save();
+        Arr::set($customData, $key, $value);
+
+        $this->forceFill(['custom_data' => $customData]);
+
+        return $this;
+    }
+
+    public function patchCustomData(string $key, Closure $callback): self
+    {
+        return $this->setCustomData($key, $callback($this->getCustomData($key)));
+    }
+
+    public function forgetCustomData(string $key): self
+    {
+        $customData = $this->custom_data ?? [];
+
+        if (isset($customData[$key])) {
+            unset($customData[$key]);
+        }
+
+        $this->forceFill(['custom_data' => $customData]);
 
         return $this;
     }
@@ -43,6 +75,6 @@ class Audit extends Model
         $this->fill([
             'status' => Status::Failed,
             'failure_reason' => $reason
-        ]);
+        ])->save();
     }
 }
