@@ -11,7 +11,7 @@ export const crawlerOptions: PlaywrightCrawlerOptions = {
     /** Concurrency */
     minConcurrency: 1,
     maxConcurrency: 2,
-    maxRequestsPerCrawl: 5,
+    maxRequestsPerCrawl: 10,
 
     /** Retry behavior */
     maxRequestRetries: 2,

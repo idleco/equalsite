@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use App\Support\CrawlerArtifacts;
 use App\Value\Status;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Arr;
 
 class Audit extends Model
@@ -15,25 +17,22 @@ class Audit extends Model
         'status', // queued, started, cancelled, failed, completed
         'failure_reason',
         'crawler_id',
+        'cancelled_at',
+        'started_at',
+        'completed_at'
     ];
 
     protected $casts = [
         'status' => Status::class,
         'custom_data' => 'array',
+        'cancelled_at' => 'datetime',
+        'completed_at' => 'datetime',
+        'started_at' => 'datetime'
     ];
 
-    protected static function booted(): void
+    public function artifacts(): CrawlerArtifacts
     {
-        static::saving(function (self $audit) {
-            if ($audit->isDirty('status')) {
-                $now = now();
-                match ($this->status) {
-                    Status::Started => $this->forceFill(['started_at' => $this->started_at ?? $now]),
-                    Status::Cancelled => $this->forceFill(['cancelled_at' => $this->cancelled_at ?? $now]),
-                    Status::Completed => $this->forceFill(['completed_at' => $this->completed_at ?? $now])
-                };
-            }
-        });
+        return new CrawlerArtifacts($this->crawler_id);
     }
 
     public function getCustomData(string $key, $default = null)
@@ -76,5 +75,10 @@ class Audit extends Model
             'status' => Status::Failed,
             'failure_reason' => $reason
         ])->save();
+    }
+
+    public function violations(): HasMany
+    {
+        return $this->hasMany(Violation::class);
     }
 }

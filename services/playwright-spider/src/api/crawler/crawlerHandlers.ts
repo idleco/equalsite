@@ -44,17 +44,17 @@ export const postCrawl: RequestHandler = asyncHandler(async (
         });
     }
 
-    const uniqueId = randomUUID();
-    const crawler = createCrawler(uniqueId);
+    const crawlId = randomUUID();
+    const crawler = createCrawler(crawlId);
 
     void runCrawler(crawler, {
-        id: uniqueId,
+        crawlId,
         url,
         callbackUrl: callback
     })
 
     return response.status(202).json({
-        crawlId: uniqueId,
+        crawlId,
         status: 'queued',
         timestamp: (new Date()).toISOString(),
     });
@@ -63,9 +63,9 @@ export const postCrawl: RequestHandler = asyncHandler(async (
 
 async function runCrawler(
     crawler: PlaywrightCrawler,
-    payload: { id: string; url: string, callbackUrl: string }
+    payload: { crawlId: string; url: string, callbackUrl: string }
 ) {
-    activeCrawlers.set(payload.id, {
+    activeCrawlers.set(payload.crawlId, {
         crawler,
         startingUrl: payload.url,
         startedAt: new Date(),
@@ -76,11 +76,11 @@ async function runCrawler(
 
         // handle completion
         void sendAuditArtifact({
-            uniqueId: payload.id,
+            uniqueId: payload.crawlId,
             callbackUrl: payload.callbackUrl
         });
     } finally {
-        activeCrawlers.delete(payload.id);
+        activeCrawlers.delete(payload.crawlId);
     }
 }
 
@@ -94,7 +94,7 @@ async function sendAuditArtifact({
     const zipPath = await zipArtifacts(uniqueId);
 
     const form = new FormData();
-    form.append('uniqueId', uniqueId);
+    form.append('crawlId', uniqueId);
     form.append(
         'artifact',
         new Blob([fs.readFileSync(zipPath)]),

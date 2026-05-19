@@ -1,1 +1,1 @@
-export { default } from './health.routes'
+export { default } from './healthRoutes'

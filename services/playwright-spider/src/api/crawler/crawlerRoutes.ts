@@ -1,5 +1,5 @@
 import { Router } from "express";
-import * as handlers from './crawler.handlers'
+import * as handlers from './crawlerHandlers'
 import { handleInternalRequestAuthentication } from "../../middleware/authenticateInternalRequest";
 
 const router: Router = Router();

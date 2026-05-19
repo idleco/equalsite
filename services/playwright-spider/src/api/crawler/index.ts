@@ -1,1 +1,1 @@
-export { default } from './crawler.routes'
+export { default } from './crawlerRoutes'

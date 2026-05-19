@@ -22,7 +22,7 @@ return new class extends Migration
             $table->timestamp('started_at')->nullable();
             $table->timestamp('cancelled_at')->nullable();
             $table->timestamp('completed_at')->nullable();
-            $table->$table->timestamps();
+            $table->timestamps();
         });
     }
 

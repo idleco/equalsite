@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\CreateAudit;
 use Illuminate\Http\Request;
 use App\Support\CrawlerHttpClient;
-use Illuminate\Support\Carbon;
 
 class WebsiteScanController extends Controller
 {
     public function __construct(
-        protected CrawlerHttpClient $client
+        protected CrawlerHttpClient $client,
+        protected CreateAudit $auditCreator
     ) {}
 
     public function store(Request $request)
@@ -23,12 +24,10 @@ class WebsiteScanController extends Controller
             callback: 'http://web' . route('api.crawler.callback', absolute: false)
         );
 
-        $crawlId = $response['crawlId'];
-        $status = $response['status'];
-        $timestamp = Carbon::parse($response['timestamp']);
+        $crawlerId = $response['crawlId'];
 
-        dd($crawlId, $timestamp, $status);
+        $this->auditCreator->create($validated['url'], $crawlerId);
 
-        throw new \Exception('Not implemented');
+        return back()->with('crawler_id', $crawlerId);
     }
 }

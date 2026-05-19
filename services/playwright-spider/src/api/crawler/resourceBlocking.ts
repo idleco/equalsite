@@ -1,4 +1,4 @@
-import { PlaywrightHook } from "crawlee";
+import type { PlaywrightHook } from "crawlee";
 
 export function setupResourceBlocking(): PlaywrightHook {
     return async ({ page }) => {

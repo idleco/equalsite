@@ -32,16 +32,16 @@ export async function reportCompleted({
 }
 
 export async function reportStarted({
-    uniqueId,
+    crawlId,
     url
 } : {
-    uniqueId: string;
+    crawlId: string;
     url: string
 }) {
-    const active = activeCrawlers.get(uniqueId);
+    const active = activeCrawlers.get(crawlId);
     if (active && url === active.startingUrl) {
         await streamer('started', {
-            crawlId: uniqueId,
+            crawlId,
             timestamp: (new Date()).toISOString()
         })
     }
@@ -49,12 +49,12 @@ export async function reportStarted({
 
 export async function reportProgress({
     crawler,
-    uniqueId,
+    crawlId,
     url,
     axeResults
 } : {
     crawler: PlaywrightCrawler;
-    uniqueId: string;
+    crawlId: string;
     url: string;
     axeResults: AxeResults;
 }) {
@@ -62,7 +62,7 @@ export async function reportProgress({
             const info = await requestQueue.getInfo();
 
     await streamer('progress', {
-        crawlId: uniqueId,
+        crawlId,
         url,
         violations: axeResults.violations.length,
         stats: {
@@ -76,11 +76,11 @@ export async function reportProgress({
 }
 
 export function createCrawler(
-    uniqueId: string
+    crawlId: string
 ): PlaywrightCrawler {
     const storageDir = path.join(
         artifactsDir,
-        String(uniqueId),
+        String(crawlId),
     );
 
     const config = new Configuration({
@@ -95,13 +95,13 @@ export function createCrawler(
         log
     }) => {
         log.error('Request failed', {
-            uniqueId,
+            crawlId,
             url: request.url,
             errors: request.errorMessages
         });
 
         await streamer('failed', {
-            id: uniqueId,
+            crawlId,
             url: request.url,
             errors: request.errorMessages,
         });
@@ -122,7 +122,7 @@ export function createCrawler(
             pushData,
         }) {
             await reportStarted({
-                uniqueId,
+                crawlId,
                 url: request.url
             });
 
@@ -133,12 +133,12 @@ export function createCrawler(
             await reportProgress({
                 url: request.url,
                 crawler,
-                uniqueId,
+                crawlId,
                 axeResults
             })
 
             await pushData({
-                uniqueId,
+                crawlId,
                 url: request.url,
                 violations: axeResults.violations
             });

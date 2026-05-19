@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Services;
+namespace App\Support;
 
 use App\Contracts\StreamBus;
 use Illuminate\Redis\Connections\Connection;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
 use Throwable;
 

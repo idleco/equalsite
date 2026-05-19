@@ -3,12 +3,10 @@
 namespace App\Console\Commands;
 
 use App\Events\CrawlerMessageReceived;
-use App\Services\RedisStream;
+use App\Support\RedisStream;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Redis;
 
 #[Signature('crawler:listen')]
 #[Description('Command description')]
@@ -51,8 +49,6 @@ class ConsumeCrawlerStreams extends Command
                 $payload = $message['payload'] ?? [];
 
                 event(new CrawlerMessageReceived($type, $payload));
-
-                // Log::channel('crawler')->debug('Stream message received', $message);
             }
         );
 
