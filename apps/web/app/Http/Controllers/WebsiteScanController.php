@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\CreateAudit;
 use Illuminate\Http\Request;
 use App\Support\CrawlerHttpClient;
+use Inertia\Inertia;
 
 class WebsiteScanController extends Controller
 {
@@ -26,8 +27,13 @@ class WebsiteScanController extends Controller
 
         $crawlerId = $response['crawlId'];
 
-        $this->auditCreator->create($validated['url'], $crawlerId);
+        $created = $this->auditCreator->create(
+            url: $validated['url'],
+            crawlId: $crawlerId
+        );
 
-        return back()->with('crawler_id', $crawlerId);
+        return redirect()->route('audit.scanning', [
+            'id' => $created->crawler_id
+        ]);
     }
 }

@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Actions\UnzipCrawlerArtifacts;
 use App\Http\Controllers\Controller;
-use App\Jobs\ProcessCrawlerArtifacts;
+use App\Jobs\ExtractCrawlerArtifacts;
 use Illuminate\Http\Request;
 
 class CrawlerCallbackController extends Controller
@@ -21,7 +21,7 @@ class CrawlerCallbackController extends Controller
             $zipFile = $request->file('artifact');
             $this->unzipper->unzip($crawlId, $zipFile->getRealPath());
 
-            ProcessCrawlerArtifacts::dispatch($crawlId);
+            ExtractCrawlerArtifacts::dispatch($crawlId);
         }
 
         return response()->json([

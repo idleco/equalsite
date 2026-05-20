@@ -1,25 +1,20 @@
-import { authorizationHeader } from "../config/http";
 
-export async function safeCallbackUrlIsAlive(url: string): Promise<boolean> {
-    try {
-        await ensureCallbackUrlIsAlive(url);
-        return true;
-    } catch {
-        return false;
+export function withAuthorization(
+    headers?: Record<string, string>
+): Record<string, string> {
+    return {
+        ...headers,
+        Authorization: `Bearer ${process.env.CRAWLER_SECRET}`,
     }
 }
 
-export async function ensureCallbackUrlIsAlive(
-    url: string
-): Promise<void> {
+export async function urlIsReachable(
+    url: string,
+    options: { headers: Record<string, string> }
+): Promise<boolean> {
     const response = await fetch(url, {
         method: 'POST',
-        headers: { ...authorizationHeader },
+        headers: { ...options.headers },
     });
-
-    console.log(response);
-
-    if (!response.ok) {
-        throw new Error("Callback URL is unavailable.");
-    }
+    return Boolean(response.ok);
 }

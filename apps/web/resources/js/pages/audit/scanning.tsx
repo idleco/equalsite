@@ -9,18 +9,36 @@ import InputError from '@/components/input-error';
 import { store } from '@/actions/App/Http/Controllers/WebsiteScanController';
 import { useEchoPublic } from '@laravel/echo-react';
 
-export default function Welcome({
+type Status = 'queued' | 'started' | 'cancelled' | 'failed' | 'completed';
+
+type Props = {
+    canRegister?: boolean
+    audit: {
+        id: string;
+        url: string;
+        urls: {url: string, violations: number}[];
+        failureReason?: string;
+        startedAt?: string;
+        completedAt?: string;
+        cancelledAt?: string;
+        createdAt: string;
+        status: { value: Status  }
+    }
+}
+
+export default function Scanning({
+    audit,
     canRegister = true,
-}: {
-    canRegister?: boolean;
-}) {
+}: Props) {
     const { auth } = usePage().props;
+    console.log(audit)
     useEchoPublic(
-        'test',
-        'TestEvent',
+        `audits.${audit.id}`,
+        ['.audit.updated', '.audit.progress'],
         (e) => {
-            console.log('received', e);
-        }
+            console.log(e);
+        },
+        [audit]
     );
     return (
         <>

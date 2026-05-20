@@ -1,5 +1,7 @@
 .turbo
 
+.cursor/
+
 node_modules/
 .pnpm-store
 

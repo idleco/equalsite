@@ -5,7 +5,7 @@ namespace App\Events;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class CrawlerMessageReceived
+class MessageReceived
 {
     use Dispatchable, SerializesModels;
 
@@ -13,7 +13,9 @@ class CrawlerMessageReceived
      * Create a new event instance.
      */
     public function __construct(
+        public string $channel,
         public string $type,
         public array $payload,
+        public string $version,
     ) {}
 }

@@ -22,6 +22,15 @@ class CrawlerHttpClient
         return "http://$this->host:$this->port/{$path}";
     }
 
+    public function stats()
+    {
+        $response = $this->client->get(
+            $this->endpoint("queue/stats")
+        )->throw();
+
+        return $response->json();
+    }
+
     public function health()
     {
         $response = $this->client->get(

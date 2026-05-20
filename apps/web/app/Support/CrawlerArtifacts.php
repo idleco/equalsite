@@ -23,7 +23,7 @@ class CrawlerArtifacts
             ->all();
     }
 
-    public function path(?string $path): string
+    public function path(?string $path = ''): string
     {
         return Storage::path("audits/{$this->crawlId}/" . ($path ?? ''));
     }

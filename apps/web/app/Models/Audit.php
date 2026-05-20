@@ -46,14 +46,21 @@ class Audit extends Model
 
         Arr::set($customData, $key, $value);
 
-        $this->forceFill(['custom_data' => $customData]);
+        $this->forceFill([
+            'custom_data' => $customData
+        ])->save();
 
         return $this;
     }
 
     public function patchCustomData(string $key, Closure $callback): self
     {
-        return $this->setCustomData($key, $callback($this->getCustomData($key)));
+        $this->setCustomData(
+            $key,
+            $callback($this->getCustomData($key))
+        )->save();
+
+        return $this;
     }
 
     public function forgetCustomData(string $key): self
@@ -64,7 +71,9 @@ class Audit extends Model
             unset($customData[$key]);
         }
 
-        $this->forceFill(['custom_data' => $customData]);
+        $this->forceFill([
+            'custom_data' => $customData
+        ])->save();
 
         return $this;
     }

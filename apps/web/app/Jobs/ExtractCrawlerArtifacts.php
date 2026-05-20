@@ -8,7 +8,7 @@ use App\Value\Status;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
-class ProcessCrawlerArtifacts implements ShouldQueue
+class ExtractCrawlerArtifacts implements ShouldQueue
 {
     use Queueable;
 
@@ -40,10 +40,5 @@ class ProcessCrawlerArtifacts implements ShouldQueue
                 );
             }
         }
-
-        $audit->update([
-            'status' => Status::Completed,
-            'completed_at' => now()
-        ]);
     }
 }

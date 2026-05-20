@@ -1,11 +1,13 @@
 import type { Request, RequestHandler, Response } from "express";
 import { asyncHandler } from "../../middleware/asyncHandler";
+import { crawlQueue } from "../../queue/crawlQueue";
 
-export const showHealth: RequestHandler = asyncHandler((
+export const showStats: RequestHandler = asyncHandler((
     _request: Request,
     response: Response
 ) => {
     return response.json({
-        ok: true,
+        size: crawlQueue.size,
+        pending: crawlQueue.pending
     });
 });

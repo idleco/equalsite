@@ -8,4 +8,5 @@ enum MessageType: string
     case Failed = 'failed';
     case Progress = 'progress';
     case Completed = 'completed';
+    case Cancelled = 'cancelled';
 }
