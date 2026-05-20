@@ -18,6 +18,6 @@ class BroadcastAuditStatusUpdate
             return;
         }
 
-        broadcast(new StatusUpdated($audit));
+        broadcast(new StatusUpdated($audit, $event->getStats()));
     }
 }

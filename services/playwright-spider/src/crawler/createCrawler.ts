@@ -67,12 +67,6 @@ export default function createCrawler(
                 .withTags(['wcag2a', 'wcag2aa', 'wcag22aa'])
                 .analyze();
 
-            await emitProgress({
-                url,
-                crawlId,
-                axeResults
-            })
-
             await pushData({
                 crawlId,
                 url,
@@ -82,6 +76,12 @@ export default function createCrawler(
             await enqueueLinks({
                 strategy: EnqueueStrategy.SameHostname,
                 selector: 'a'
+            });
+
+            await emitProgress({
+                url,
+                crawlId,
+                axeResults
             });
         }
     };

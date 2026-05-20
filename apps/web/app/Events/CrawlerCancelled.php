@@ -6,7 +6,6 @@ use App\Value\CrawlerStats;
 use App\Value\Status;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-use Override;
 
 class CrawlerCancelled implements StatusChangeEvent
 {
@@ -21,13 +20,16 @@ class CrawlerCancelled implements StatusChangeEvent
         public CrawlerStats $stats,
     ) {}
 
-    #[Override]
+    public function getStats(): ?CrawlerStats
+    {
+        return $this->stats;
+    }
+
     public function crawlerId(): string
     {
         return $this->crawlId;
     }
 
-    #[Override]
     public function getStatus(): Status
     {
         return Status::Cancelled;

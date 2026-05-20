@@ -21,15 +21,18 @@ class CrawlerCompleted implements StatusChangeEvent
         public CrawlerStats $stats,
     ) {}
 
-    #[Override]
     public function crawlerId(): string
     {
         return $this->crawlId;
     }
 
-    #[Override]
     public function getStatus(): Status
     {
         return Status::Completed;
+    }
+
+    public function getStats(): ?CrawlerStats
+    {
+        return $this->stats;
     }
 }

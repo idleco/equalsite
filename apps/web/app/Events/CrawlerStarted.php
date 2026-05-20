@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Value\CrawlerStats;
 use App\Value\Status;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
@@ -18,6 +19,11 @@ class CrawlerStarted implements StatusChangeEvent
         public string $crawlId,
         public string $timestamp
     ) {}
+
+    public function getStats(): ?CrawlerStats
+    {
+        return null;
+    }
 
     #[Override]
     public function crawlerId(): string

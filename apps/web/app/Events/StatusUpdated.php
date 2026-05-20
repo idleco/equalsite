@@ -3,6 +3,7 @@
 namespace App\Events;
 
 use App\Models\Audit;
+use App\Value\CrawlerStats;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
@@ -13,7 +14,8 @@ class StatusUpdated implements ShouldBroadcastNow
     use Dispatchable, SerializesModels;
 
     public function __construct(
-        public Audit $audit
+        public Audit $audit,
+        public ?CrawlerStats $stats,
     ) {}
 
     public function broadcastOn(): array
@@ -40,6 +42,7 @@ class StatusUpdated implements ShouldBroadcastNow
                 'cancelledAt' => $this->audit->cancelled_at?->toDateTimeString(),
                 'completedAt' => $this->audit->completed_at?->toDateTimeString(),
                 'startedAt' => $this->audit->started_at?->toDateTimeString(),
+                'stats' => $this->stats,
             ]
         ];
     }

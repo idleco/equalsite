@@ -8,35 +8,109 @@ import { LoaderCircle } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { store } from '@/actions/App/Http/Controllers/WebsiteScanController';
 import { useEchoPublic } from '@laravel/echo-react';
+import { useState } from 'react';
 
 type Status = 'queued' | 'started' | 'cancelled' | 'failed' | 'completed';
+
+type EventType = 'audit.progress' | 'audit.updated';
+interface EventData<T> {
+    event: EventType;
+    data: T;
+}
+
+interface Stats {
+    concurrency: number;
+    failedRequests: number;
+    pendingRequests: number;
+    processedRequests: number;
+    totalRequests: number;
+}
+
+interface AuditUpdated {
+    cancelledAt?: string;
+    completedAt?: string;
+    id: string;
+    startedAt?: string;
+    status: { value: Status };
+    stats?: Stats
+}
+
+interface AuditProgress {
+    violations: number;
+    id: string;
+    url: string;
+    stats: Stats
+}
+
+type UrlData = {
+    url: string;
+    violations: number;
+}
 
 type Props = {
     canRegister?: boolean
     audit: {
         id: string;
         url: string;
-        urls: {url: string, violations: number}[];
+        urls: UrlData[];
         failureReason?: string;
         startedAt?: string;
         completedAt?: string;
         cancelledAt?: string;
         createdAt: string;
-        status: { value: Status  }
+        status: { value: Status };
     }
+}
+
+function unique(urls: UrlData[]) {
+    return [
+        ...new Map(urls.map((i) => [i.url, i])).values()
+    ];
 }
 
 export default function Scanning({
     audit,
     canRegister = true,
 }: Props) {
+    const { urls, ...restAudit } = audit;
     const { auth } = usePage().props;
-    console.log(audit)
-    useEchoPublic(
+    const [data, setData] = useState(restAudit);
+    const [output, setOutput] = useState<UrlData[]>(urls);
+    const [stats, setStats] = useState<Stats>({
+        concurrency: 0,
+        failedRequests: 0,
+        pendingRequests: 0,
+        processedRequests: 0,
+        totalRequests: 0,
+    })
+
+    useEchoPublic<EventData<AuditUpdated | AuditProgress>>(
         `audits.${audit.id}`,
         ['.audit.updated', '.audit.progress'],
         (e) => {
-            console.log(e);
+            if (e.event === 'audit.updated') {
+                const data = e.data as AuditUpdated;
+                if (data.stats) {
+                    setStats({ ...data.stats });
+                }
+
+                setData((prev) => ({
+                    ...prev,
+                    cancelledAt: data.cancelledAt,
+                    completedAt: data.completedAt,
+                    startedAt: data.startedAt,
+                    status: data.status
+                }));
+            }
+
+            else if (e.event === 'audit.progress') {
+                const data = e.data as AuditProgress;
+                setStats({ ...data.stats });
+                setOutput(prev => unique([
+                    ...prev,
+                    { url: data.url, violations: data.violations }
+                ]));
+            }
         },
         [audit]
     );
@@ -78,11 +152,28 @@ export default function Scanning({
                         <div className="flex-1 rounded-lg bg-white p-6 pb-12 text-[13px] leading-[20px] shadow-[inset_0px_0px_0px_1px_rgba(26,26,0,0.16)] dark:bg-[#161615] dark:text-[#EDEDEC] dark:shadow-[inset_0px_0px_0px_1px_#fffaed2d]">
                             <Stack direction="col">
                                 <h2 className="mt-4 text-xl font-bold tracking-tight sm:text-2xl">
-                                    Test your site
+                                    {data.status.value}
                                 </h2>
                                 <p className="mt-2 text-sm leading-relaxed sm:text-base">
-                                    Enter your website to get a free accessibility report.
+                                    Started: {data.startedAt} <br />
+                                    Completed: {data.completedAt} <br />
+                                    Cancelled: {data.cancelledAt} <br />
+                                    Created: {data.createdAt} <br />
                                 </p>
+                                <p className="mt-2 text-sm leading-relaxed sm:text-base">
+                                    Total: {stats.totalRequests} <br />
+                                    Pending: {stats.pendingRequests} <br />
+                                    Processed: {stats.processedRequests} <br />
+                                    Failures: {stats.failedRequests} <br />
+                                </p>
+                                <Stack direction="col">
+                                    {output.map(i => (
+                                        <Stack direction="row" key={i.url}>
+                                            <div className="border flex-1">{i.url}</div>
+                                            <div>{i.violations}</div>
+                                        </Stack>
+                                    ))}
+                                </Stack>
                                 <Form action={store().url} method={store().method}>
                                     {({ processing, errors }) => (
                                         <Stack
