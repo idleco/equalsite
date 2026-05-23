@@ -5,13 +5,13 @@ namespace App\Console\Commands;
 use App\Events\CrawlerCancelled;
 use App\Events\CrawlerCompleted;
 use App\Events\CrawlerFailed;
-use App\Events\CrawlerMessageReceived;
 use App\Events\CrawlerProgress;
 use App\Events\CrawlerStarted;
 use App\Events\MessageReceived;
 use App\Support\RedisStream;
 use App\Value\CrawlerStats;
 use App\Value\MessageType;
+use App\Value\SeverityBreakdown;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
@@ -57,9 +57,9 @@ class ConsumeCrawlerStreams extends Command
                 $timestamp = Arr::get($message, 'payload.timestamp', now()->toDateTimeString());
 
                 $stats = $this->resolveStats($message);
+                $severityBreakdown = $this->resolveSeverityBreakdown($message);
 
                 $type = MessageType::tryFrom($message['type']);
-
                 event(match ($type) {
                     MessageType::Started => new CrawlerStarted(
                         crawlId: $crawlId,
@@ -89,7 +89,9 @@ class ConsumeCrawlerStreams extends Command
                         crawlId: $crawlId,
                         url: Arr::get($message, 'payload.url'),
                         violations: Arr::get($message, 'payload.violations', 0),
-                        stats: $stats
+                        timestamp: $timestamp,
+                        stats: $stats,
+                        severityBreakdown: $severityBreakdown
                     ),
 
                     default => new MessageReceived(
@@ -105,13 +107,21 @@ class ConsumeCrawlerStreams extends Command
         return self::SUCCESS;
     }
 
+    protected function resolveSeverityBreakdown(array $message)
+    {
+        $breakdown = Arr::get($message, 'payload.severityBreakdown', []);
+
+        return new SeverityBreakdown(
+            critical: Arr::get($breakdown, 'critical', 0),
+            serious: Arr::get($breakdown, 'serious', 0),
+            moderate: Arr::get($breakdown, 'moderate', 0),
+            minor: Arr::get($breakdown, 'minor', 0),
+        );
+    }
+
     protected function resolveStats(array $message)
     {
-        $stats = Arr::get($message, 'payload.stats');
-
-        if (! $stats) {
-            return null;
-        }
+        $stats = Arr::get($message, 'payload.stats', []);
 
         return new CrawlerStats(
             totalRequests: Arr::get($stats, 'totalRequests', 0),

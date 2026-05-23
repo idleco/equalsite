@@ -1,39 +1,53 @@
 import { createCrawler } from "../crawler";
 import { zipArtifacts } from "../utils/filesystem";
-import activeJobs from './activeJobs'
-import { withAuthorization } from "../utils/http";
+import { activeCrawlers, cancelledCrawls } from '../queue';
 import fs from 'node:fs';
 import { emitCompleted } from "../crawler/streams";
+import type { Job } from "bullmq";
+import { AUTH_HEADER } from "./constants";
 
-type JobPayload = {
+export type JobPayload = {
     crawlId: string;
     url: string;
     callbackUrl: string;
 }
 
-export async function runCrawlJob(job: JobPayload) {
-    const crawler = createCrawler(job.crawlId);
+export async function runAuditJob(
+    job: Job<{
+        crawlId: string;
+        url: string;
+        callbackUrl: string;
+    }>
+) {
+    const {crawlId, url, callbackUrl } = job.data;
 
-    activeJobs.set(job.crawlId, {
+    const crawler = createCrawler(crawlId);
+
+    activeCrawlers.set(crawlId, {
         crawler,
-        startingUrl: job.url,
+        crawlId,
+        startingUrl: url,
         startedAt: new Date(),
     });
 
+    if (cancelledCrawls.has(crawlId)) {
+        return;
+    }
+
     try {
-        await crawler.run([job.url]);
+        await crawler.run([url]);
 
-        void emitCompleted({ crawlId: job.crawlId });
+        void emitCompleted({ crawlId });
 
-        const zippedArtifactsPath = await zipArtifacts(job.crawlId);
-
+        const zippedArtifactsPath = await zipArtifacts(crawlId);
         await callbackWithArtifacts({
             zippedArtifactsPath,
-            crawlId: job.crawlId,
-            callbackUrl: job.callbackUrl,
+            crawlId,
+            callbackUrl,
         });
     } finally {
-        activeJobs.delete(job.crawlId);
+        activeCrawlers.delete(crawlId);
+        cancelledCrawls.delete(crawlId)
     }
 }
 
@@ -55,7 +69,7 @@ async function callbackWithArtifacts({
     );
     return await fetch(callbackUrl, {
         method: 'POST',
-        headers: withAuthorization(),
+        headers: { ...AUTH_HEADER },
         body: form,
     });
 }

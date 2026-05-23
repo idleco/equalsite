@@ -14,7 +14,7 @@ export default function ScanningCrawlOverview() {
             </CardHeader>
             <CardContent className="grid grid-cols-4 gap-2">
                 <Item variant="outline">
-                    <ItemMedia>
+                    <ItemMedia variant="icon">
                         <Globe className="size-4 text-blue-500" />
                     </ItemMedia>
                     <ItemContent>
@@ -24,7 +24,7 @@ export default function ScanningCrawlOverview() {
                     </ItemContent>
                 </Item>
                 <Item variant="outline">
-                    <ItemMedia>
+                    <ItemMedia variant="icon">
                         <Hourglass className="size-4 text-indigo-500" />
                     </ItemMedia>
                     <ItemContent>
@@ -34,7 +34,7 @@ export default function ScanningCrawlOverview() {
                     </ItemContent>
                 </Item>
                 <Item variant="outline">
-                    <ItemMedia>
+                    <ItemMedia variant="icon">
                         <CircleCheck className="size-4 text-green-500" />
                     </ItemMedia>
                     <ItemContent>
@@ -44,7 +44,7 @@ export default function ScanningCrawlOverview() {
                     </ItemContent>
                 </Item>
                 <Item variant="outline">
-                    <ItemMedia>
+                    <ItemMedia variant="icon">
                         <CircleX className="size-4 text-red-500" />
                     </ItemMedia>
                     <ItemContent>
@@ -60,7 +60,7 @@ export default function ScanningCrawlOverview() {
                         <span>Progress</span>
                         <span className="ml-auto">66%</span>
                     </FieldLabel>
-                    <Progress value={66} id="progress-upload" />
+                    <Progress value={66} id="progress-upload" className="h-2" />
                     <FieldDescription>
                         0 of 0 requests processed
                     </FieldDescription>

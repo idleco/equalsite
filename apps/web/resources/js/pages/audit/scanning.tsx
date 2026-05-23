@@ -15,6 +15,7 @@ import ScanningDetails from '@/components/scanning-details';
 import ScanningCrawlOverview from '@/components/scanning-crawl-overview';
 import ScanningProcessedUrls from '@/components/scanning-processed-urls';
 import ScanningTimeline from '@/components/scanning-timeline';
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 
 type Status = 'queued' | 'started' | 'cancelled' | 'failed' | 'completed';
 
@@ -69,9 +70,7 @@ type Props = {
 }
 
 function unique(urls: UrlData[]) {
-    return [
-        ...new Map(urls.map((i) => [i.url, i])).values()
-    ];
+    return [...new Map(urls.map((i) => [i.url, i])).values()];
 }
 
 export default function Scanning({
@@ -112,10 +111,12 @@ export default function Scanning({
             else if (e.event === 'audit.progress') {
                 const data = e.data as AuditProgress;
                 setStats({ ...data.stats });
-                setOutput(prev => unique([
-                    ...prev,
-                    { url: data.url, violations: data.violations }
-                ]));
+                setOutput(
+                    prev => unique([
+                        ...prev,
+                        { url: data.url, violations: data.violations }
+                    ])
+                );
             }
         },
         [audit]
@@ -124,6 +125,19 @@ export default function Scanning({
         <>
             <Head title="Welcome" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+                <Breadcrumb>
+                    <BreadcrumbList>
+                        <BreadcrumbItem>
+                            <BreadcrumbLink asChild>
+                                <Link href="/">Scan</Link>
+                            </BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator />
+                        <BreadcrumbItem>
+                            <BreadcrumbPage>8222</BreadcrumbPage>
+                        </BreadcrumbItem>
+                    </BreadcrumbList>
+                </Breadcrumb>
                 <ScanningDetails />
                 <ScanningCrawlOverview />
                 <ScanningProcessedUrls />

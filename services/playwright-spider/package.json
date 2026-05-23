@@ -1,6 +1,7 @@
 {
     "name": "@equalsite/playwright-spider",
     "type": "module",
+    "packageManager": "pnpm@11.2.2",
     "scripts": {
         "dev": "tsx watch src/server.ts",
         "build": "tsup src/server.ts --format esm --dts",
@@ -12,6 +13,8 @@
     "dependencies": {
         "@axe-core/playwright": "^4.11.3",
         "archiver": "^8.0.0",
+        "axe-core": "^4.11.4",
+        "bullmq": "^5.77.0",
         "crawlee": "^3.16.0",
         "express": "^5.2.1",
         "ioredis": "^5.10.1",

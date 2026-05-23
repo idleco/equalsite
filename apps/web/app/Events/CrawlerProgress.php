@@ -3,6 +3,7 @@
 namespace App\Events;
 
 use App\Value\CrawlerStats;
+use App\Value\SeverityBreakdown;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
@@ -14,6 +15,8 @@ class CrawlerProgress
         public string $crawlId,
         public string $url,
         public int $violations,
-        public CrawlerStats $stats
+        public string $timestamp,
+        public CrawlerStats $stats,
+        public SeverityBreakdown $severityBreakdown
     ) {}
 }

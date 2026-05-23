@@ -85,9 +85,6 @@ seed: ## Seed database
 rollback: ## Rollback migrations
 	$(DOCKER) exec web php artisan migrate:rollback
 
-tinker: ## Open Laravel tinker
-	$(DOCKER) exec web php artisan tinker
-
 test: ## Run Laravel tests
 	$(DOCKER) exec web php artisan test
 
@@ -250,7 +247,7 @@ fix-permissions: ## Fix Laravel storage permissions
 	help \
 	up build down restart logs ps destroy prune \
 	shell crawler-shell mysql-shell redis-shell \
-	tinker artisan migrate fresh seed rollback tinker test queue queue-work pint \
+	tinker artisan migrate fresh seed rollback test queue queue-work pint \
 	composer-require composer-remove composer-install composer-update composer-dump \
 	pnpm-install dev build-assets lint test-js \
 	web-dev web-build web-lint \

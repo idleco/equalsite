@@ -1,7 +1,7 @@
 {
   "name": "equalsite",
   "private": true,
-  "packageManager": "pnpm@10.33.2",
+  "packageManager": "pnpm@11.2.2",
   "scripts": {
     "dev": "turbo run dev --parallel",
     "build": "turbo run build",

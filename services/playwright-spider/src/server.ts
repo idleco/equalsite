@@ -1,6 +1,8 @@
 import app from "./routes";
-import config from './config/server'
 
-app.listen(config.serverPort, config.serverHost, () => {
-    console.log(`Server listening on http://${config.serverHost}:${config.serverPort}`);
+const HOST = '0.0.0.0';
+const PORT = Number(process.env.CRAWLER_PORT) || 3000;
+
+app.listen(PORT, HOST, () => {
+    console.log(`Server listening on http://${HOST}:${PORT}`);
 });

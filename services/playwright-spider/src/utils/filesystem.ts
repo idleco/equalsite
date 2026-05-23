@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { ZipArchive } from 'archiver';
-import { archivesDir, artifactsDir } from '../config/crawlee';
+import { ARCHIVES_DIRECTORY, ARTIFACTS_DIRECTORY } from '../crawler/constants';
 
 export async function deleteDirectoryIfExists(
     dir: string
@@ -18,10 +18,10 @@ export async function deleteDirectoryIfExists(
 }
 
 export async function zipArtifacts(
-    uniqueId: string
+    crawlId: string
 ): Promise<string> {
-    const sourceDir = path.join(artifactsDir, uniqueId);
-    const zipPath = path.join(archivesDir, `${uniqueId}.zip`);
+    const sourceDir = path.join(ARTIFACTS_DIRECTORY, crawlId);
+    const zipPath = path.join(ARCHIVES_DIRECTORY, `${crawlId}.zip`);
 
     const result = await zipDirectory(sourceDir, zipPath);
 

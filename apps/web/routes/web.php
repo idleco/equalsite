@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Audit\CancelAuditController;
 use App\Http\Controllers\Audit\ScanController;
 use App\Http\Controllers\WebsiteScanController;
 use App\Support\CrawlerHttpClient;
@@ -14,12 +15,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'dashboard')->name('dashboard');
 });
 
-Route::get('/stats', function (CrawlerHttpClient $client) {
-    dd($client->stats());
-});
+Route::delete('/audit/{id}/cancel', CancelAuditController::class)
+    ->name('audit.scan.cancel');
 
-Route::get('/audit/{id}/scanning', ScanController::class)->name('audit.scanning');
+Route::get('/audit/{id}', ScanController::class)
+    ->name('audit.scan.progress');
 
-Route::post('/website-scan', [WebsiteScanController::class, 'store'])->name('website-scan.store');
+
+Route::post('/website-scan', [WebsiteScanController::class, 'store'])
+    ->name('website-scan.store');
 
 require __DIR__ . '/settings.php';

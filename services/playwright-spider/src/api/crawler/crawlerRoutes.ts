@@ -10,6 +10,12 @@ router.post(
     handlers.postCrawl
 );
 
+router.get(
+    '/crawler/:id',
+    handleInternalRequestAuthentication,
+    handlers.showCrawlState
+)
+
 router.delete(
     '/crawler/:id/cancel',
     handleInternalRequestAuthentication,

@@ -2,7 +2,7 @@ FROM mcr.microsoft.com/playwright:v1.60.0-jammy
 
 WORKDIR /app
 
-RUN npm install -g pnpm@10.33.2
+RUN npm install -g pnpm@11.2.2
 
 RUN pnpm config set store-dir /pnpm-store
 

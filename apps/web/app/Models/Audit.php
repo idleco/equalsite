@@ -30,6 +30,11 @@ class Audit extends Model
         'started_at' => 'datetime'
     ];
 
+    public function running(): bool
+    {
+        return $this->status->started();
+    }
+
     public function artifacts(): CrawlerArtifacts
     {
         return new CrawlerArtifacts($this->crawler_id);
@@ -53,12 +58,17 @@ class Audit extends Model
         return $this;
     }
 
-    public function patchCustomData(string $key, Closure $callback): self
+    /**
+     * @param string[] | string $key
+     * @param \Closure $callback
+     */
+    public function patchCustomData($key, Closure $callback): self
     {
-        $this->setCustomData(
-            $key,
-            $callback($this->getCustomData($key))
-        )->save();
+        tap($this, function () use ($key, $callback) {
+            foreach (Arr::wrap($key) as $k) {
+                $this->setCustomData($k, $callback($this->getCustomData($k), $k));
+            }
+        })->save();
 
         return $this;
     }

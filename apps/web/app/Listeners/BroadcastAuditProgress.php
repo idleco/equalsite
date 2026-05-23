@@ -18,18 +18,6 @@ class BroadcastAuditProgress
             return;
         }
 
-        $audit->patchCustomData(
-            'urls',
-            function ($urls) use ($event) {
-                $urls = collect($urls ?? []);
-                $urls->push([
-                    'url' => $event->url,
-                    'violations' => $event->violations
-                ]);
-                return $urls->unique('url')->values()->all();
-            }
-        );
-
         broadcast(new ProgressEvent(
             audit: $audit,
             url: $event->url,

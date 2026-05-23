@@ -32,7 +32,7 @@ class WebsiteScanController extends Controller
             crawlId: $crawlerId
         );
 
-        return redirect()->route('audit.scanning', [
+        return redirect()->route('audit.scan.progress', [
             'id' => $created->crawler_id
         ]);
     }

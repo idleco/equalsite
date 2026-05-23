@@ -14,6 +14,17 @@ class CrawlerStats implements Arrayable
         public readonly int $concurrency
     ) {}
 
+    public static function default(): static
+    {
+        return new static(
+            totalRequests: 0,
+            pendingRequests: 0,
+            processedRequests: 0,
+            failedRequests: 0,
+            concurrency: 0
+        );
+    }
+
     public function toArray(): array
     {
         return [

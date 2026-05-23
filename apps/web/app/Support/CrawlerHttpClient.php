@@ -22,10 +22,10 @@ class CrawlerHttpClient
         return "http://$this->host:$this->port/{$path}";
     }
 
-    public function stats()
+    public function stats(string $id)
     {
         $response = $this->client->get(
-            $this->endpoint("queue/stats")
+            $this->endpoint("crawler/{$id}")
         )->throw();
 
         return $response->json();
