@@ -15,6 +15,7 @@
         "typecheck": "tsc --noEmit"
     },
     "devDependencies": {
+        "@equalsite/types": "workspace:*",
         "@equalsite/eslint-config": "workspace:*",
         "@equalsite/tsconfig": "workspace:*",
         "@eslint/js": "^9.19.0",

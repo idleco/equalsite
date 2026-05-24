@@ -17,7 +17,7 @@ class WebsiteScanController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'url' => ['required']
+            'url' => ['required', 'active_url']
         ]);
 
         $response = $this->client->queue(

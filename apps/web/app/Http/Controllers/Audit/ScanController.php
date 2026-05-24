@@ -17,30 +17,28 @@ class ScanController extends Controller
 
     public function __invoke(Request $request)
     {
-        $id = $request->route('id');
+        $crawlId = $request->route('id');
 
         $audit = Audit::query()
-            ->where('crawler_id', $id)
+            ->where('crawler_id', $crawlId)
             ->firstOrFail();
 
-        $stats = $this->client->stats($id);
-
         return Inertia::render('audit/scanning', [
-            'stats' => $stats,
+            'queueStatus' => fn() => $this->client->stats($crawlId),
+            'stats' => $audit->getCustomData('stats', CrawlerStats::default()),
+            'processedUrls' => $audit->getCustomData('urls', []),
             'audit' => [
-                'id' => $audit->crawler_id,
-                'url' => $audit->url,
-                'urls' => $audit->getCustomData('urls', []),
-                'stats' => $audit->getCustomData('stats', CrawlerStats::default()),
+                'siteUrl' => $audit->url,
+                'id' => $audit->id,
+                'crawlId' => $crawlId,
+                'isActive' => $audit->isActive(),
                 'failureReason' => $audit->failure_reason,
+                'status' => $audit->status->value,
                 'startedAt' => $audit->started_at?->toDateTimeString(),
                 'completedAt' => $audit->completed_at?->toDateTimeString(),
                 'cancelledAt' => $audit->cancelled_at?->toDateTimeString(),
                 'createdAt' => $audit->created_at->toDateTimeString(),
-                'status' => [
-                    'value' => $audit->status->value,
-                ],
-            ]
+            ],
         ]);
     }
 }

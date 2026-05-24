@@ -6,6 +6,7 @@ import AppLayout from '@/layouts/app-layout';
 import AuthLayout from '@/layouts/auth-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { configureEcho } from '@laravel/echo-react';
+import PublicLayout from './layouts/public-layout';
 
 configureEcho({
     broadcaster: 'pusher',
@@ -24,6 +25,8 @@ createInertiaApp({
         switch (true) {
             case name === 'welcome':
                 return null;
+            case name.startsWith('audit/'):
+                return PublicLayout;
             case name.startsWith('auth/'):
                 return AuthLayout;
             case name.startsWith('settings/'):

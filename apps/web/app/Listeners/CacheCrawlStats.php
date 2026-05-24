@@ -4,7 +4,6 @@ namespace App\Listeners;
 
 use App\Events\StatusChangeEvent;
 use App\Models\Audit;
-use App\Value\CrawlerStats;
 
 class CacheCrawlStats
 {

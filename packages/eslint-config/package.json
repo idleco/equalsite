@@ -1,6 +1,5 @@
 {
     "name": "@equalsite/eslint-config",
-    "type": "module",
     "private": true,
     "version": "1.0.0",
     "exports": {

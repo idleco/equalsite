@@ -1,8 +1,0 @@
-{
-    "name": "@equalsite/shared-events",
-    "private": true,
-    "version": "1.0.0",
-    "exports": {
-        "./event.ts": "./event.ts"
-    }
-}

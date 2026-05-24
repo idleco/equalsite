@@ -15,11 +15,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'dashboard')->name('dashboard');
 });
 
+Route::inertia('/audit/create', 'audit/scan-request')
+    ->name('audit.scan.create');
+
 Route::delete('/audit/{id}/cancel', CancelAuditController::class)
     ->name('audit.scan.cancel');
 
 Route::get('/audit/{id}', ScanController::class)
     ->name('audit.scan.progress');
+
 
 
 Route::post('/website-scan', [WebsiteScanController::class, 'store'])

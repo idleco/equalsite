@@ -30,9 +30,9 @@ class Audit extends Model
         'started_at' => 'datetime'
     ];
 
-    public function running(): bool
+    public function isActive(): bool
     {
-        return $this->status->started();
+        return $this->status->queued() || $this->status->started();
     }
 
     public function artifacts(): CrawlerArtifacts

@@ -7,7 +7,11 @@ export { crawlWorker } from './worker';
 function registerEventsListener() {
     crawlEvents.on('completed', (args, id) => {
         console.log('crawl events completed', { args, id });
-    })
+    });
+
+    crawlEvents.on('active', (args, id) => {
+        console.log('crawl events active', { args, id });
+    });
 }
 
 registerEventsListener();

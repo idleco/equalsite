@@ -1,14 +1,6 @@
 {
     "extends": "@equalsite/tsconfig/node.json",
-    "compilerOption": {
-        "baseUrl": ".",
-        "paths": {
-            "@/*": [
-                "src/*"
-            ]
-        }
-    },
     "include": [
-        "src",
+        "src"
     ]
 }

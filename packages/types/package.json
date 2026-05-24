@@ -1,0 +1,31 @@
+{
+    "name": "@equalsite/types",
+    "private": true,
+    "version": "1.0.0",
+    "main": "./dist/index.js",
+    "types": "./src/index.ts",
+    "packageManager": "pnpm@11.2.2",
+    "exports": {
+        ".": {
+            "types": "./src/index.ts",
+            "source": "./src/index.ts",
+            "import": "./dist/index.mjs",
+            "require": "./dist/index.js",
+            "default": "./dist/index.mjs"
+        }
+    },
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "build": "tsup",
+        "dev": "tsup --watch",
+        "clean": "rm -rf dist",
+        "prepare": "pnpm run build"
+    },
+    "devDependencies": {
+        "@equalsite/tsconfig": "workspace:*",
+        "tsup": "^8.5.1",
+        "typescript": "^6.0.3"
+    }
+}

@@ -36,9 +36,8 @@ class StatusUpdated implements ShouldBroadcastNow
             'event' => $this->broadcastAs(),
             'data' => [
                 'id' => $this->audit->crawler_id,
-                'status' => [
-                    'value' => $this->audit->status->value
-                ],
+                'status' => $this->audit->status->value,
+                'failureReason' => $this->audit->failureReason,
                 'cancelledAt' => $this->audit->cancelled_at?->toDateTimeString(),
                 'completedAt' => $this->audit->completed_at?->toDateTimeString(),
                 'startedAt' => $this->audit->started_at?->toDateTimeString(),

@@ -22,7 +22,9 @@ class BroadcastAuditProgress
             audit: $audit,
             url: $event->url,
             violations: $event->violations,
-            stats: $event->stats
+            stats: $event->stats,
+            severityBreakdown: $event->severityBreakdown,
+            timestamp: $event->timestamp
         ));
     }
 }

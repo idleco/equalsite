@@ -28,32 +28,32 @@ RUN apt-get update && apt-get upgrade -y \
     && echo "deb [signed-by=/etc/apt/keyrings/ppa_ondrej_php.gpg] https://ppa.launchpadcontent.net/ondrej/php/ubuntu noble main" > /etc/apt/sources.list.d/ppa_ondrej_php.list \
     && apt-get update \
     && apt-get install -y \
-        libgd3 \
-        php8.5-cli \
-        php8.5-dev \
-        php8.5-pgsql \
-        php8.5-sqlite3 \
-        php8.5-gd \
-        php8.5-curl \
-        php8.5-mongodb \
-        php8.5-imap \
-        php8.5-mysql \
-        php8.5-mbstring \
-        php8.5-xml \
-        php8.5-zip \
-        php8.5-bcmath \
-        php8.5-soap \
-        php8.5-intl \
-        php8.5-readline \
-        php8.5-ldap \
-        php8.5-msgpack \
-        php8.5-igbinary \
-        php8.5-redis \
-        php8.5-swoole \
-        php8.5-memcached \
-        php8.5-pcov \
-        php8.5-imagick \
-        php8.5-xdebug \
+    libgd3 \
+    php8.5-cli \
+    php8.5-dev \
+    php8.5-pgsql \
+    php8.5-sqlite3 \
+    php8.5-gd \
+    php8.5-curl \
+    php8.5-mongodb \
+    php8.5-imap \
+    php8.5-mysql \
+    php8.5-mbstring \
+    php8.5-xml \
+    php8.5-zip \
+    php8.5-bcmath \
+    php8.5-soap \
+    php8.5-intl \
+    php8.5-readline \
+    php8.5-ldap \
+    php8.5-msgpack \
+    php8.5-igbinary \
+    php8.5-redis \
+    php8.5-swoole \
+    php8.5-memcached \
+    php8.5-pcov \
+    php8.5-imagick \
+    php8.5-xdebug \
     && curl -sLS https://getcomposer.org/installer | php -- --install-dir=/usr/bin/ --filename=composer \
     && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
     && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_VERSION.x nodistro main" > /etc/apt/sources.list.d/nodesource.list \
@@ -89,14 +89,14 @@ RUN chmod +x /usr/local/bin/start-container
 
 # Copy workspace manifests first (better caching)
 COPY package.json /workspace/package.json
-COPY pnpm-lock.yaml /workspace/pnpm-lock.yaml
+# COPY pnpm-lock.yaml /workspace/pnpm-lock.yaml
 COPY pnpm-workspace.yaml /workspace/pnpm-workspace.yaml
 
 # Copy Laravel package manifests
 COPY apps/web/package.json /var/www/html/package.json
 
 # Optional future shared packages
-COPY packages/shared-events/package.json /workspace/packages/shared-events/package.json
+COPY packages/types/package.json /workspace/packages/types/package.json
 COPY packages/eslint-config/package.json /workspace/packages/eslint-config/package.json
 COPY packages/tsconfig/package.json /workspace/packages/tsconfig/package.json
 

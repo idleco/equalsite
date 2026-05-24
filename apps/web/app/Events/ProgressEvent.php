@@ -4,6 +4,7 @@ namespace App\Events;
 
 use App\Models\Audit;
 use App\Value\CrawlerStats;
+use App\Value\SeverityBreakdown;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
@@ -19,6 +20,8 @@ class ProgressEvent implements ShouldBroadcastNow
         public string $url,
         public int $violations,
         public CrawlerStats $stats,
+        public SeverityBreakdown $severityBreakdown,
+        public string $timestamp
     ) {}
 
     public function broadcastOn(): array
@@ -42,6 +45,8 @@ class ProgressEvent implements ShouldBroadcastNow
                 'url' => $this->url,
                 'violations' => $this->violations,
                 'stats' => $this->stats,
+                'severityBreakdown' => $this->severityBreakdown->toArray(),
+                'timestamp' => $this->timestamp
             ]
         ];
     }

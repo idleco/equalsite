@@ -1,7 +1,7 @@
 import Publisher from './publisher';
 import Client from './client';
 import type { AxeResults } from 'axe-core';
-import activeJobs from '../queue/activeJobs'
+import {activeCrawlers} from '../queue'
 import type { Stats } from './types';
 
 const client = Client({
@@ -17,7 +17,7 @@ export async function emitStarted({
     crawlId: string;
     url: string
 }) {
-    const active = activeJobs.get(crawlId);
+    const active = activeCrawlers.get(crawlId);
     if (active && url === active.startingUrl) {
         await publisher.publish('started', {
             url,
@@ -101,16 +101,16 @@ export async function emitProgress({
 async function getStats(
     crawlId: string
 ) : Promise<Stats> {
-    const activeJob = activeJobs.get(crawlId)
+    const activeCrawler = activeCrawlers.get(crawlId)
 
-    const requestQueue = await activeJob?.crawler.getRequestQueue();
+    const requestQueue = await activeCrawler?.crawler.getRequestQueue();
     const info = await requestQueue?.getInfo();
 
     const totalRequests = info?.totalRequestCount || 0;
     const pendingRequests = info?.pendingRequestCount || 0;
     const processedRequests = info?.handledRequestCount || 0;
-    const failedRequests = activeJob?.crawler?.stats.state.requestsFailed || 0;
-    const concurrency = activeJob?.crawler.autoscaledPool?.currentConcurrency || 0;
+    const failedRequests = activeCrawler?.crawler?.stats.state.requestsFailed || 0;
+    const concurrency = activeCrawler?.crawler.autoscaledPool?.currentConcurrency || 0;
 
     return {
         totalRequests,

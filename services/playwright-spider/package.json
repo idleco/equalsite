@@ -3,7 +3,7 @@
     "type": "module",
     "packageManager": "pnpm@11.2.2",
     "scripts": {
-        "dev": "tsx watch src/server.ts",
+        "dev": "NODE_OPTIONS='--conditions=source' tsx watch src/server.ts",
         "build": "tsup src/server.ts --format esm --dts",
         "lint": "eslint . --fix",
         "lintcheck": "eslint .",
@@ -11,6 +11,7 @@
         "typecheck": "tsc --noEmit"
     },
     "dependencies": {
+        "@equalsite/types": "workspace:*",
         "@axe-core/playwright": "^4.11.3",
         "archiver": "^8.0.0",
         "axe-core": "^4.11.4",

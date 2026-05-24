@@ -1,9 +1,8 @@
 import type {
     CancelledPayload, Client, CompletedPayload,
-    FailedPayload, ProgressPayload, StartedPayload
+    EventType, FailedPayload, ProgressPayload,
+    StartedPayload
 } from "./types";
-
-type EventType = 'started' | 'progress' | 'completed' | 'cancelled' | 'failed';
 
 type EventPayloadMap = {
     started: StartedPayload;
