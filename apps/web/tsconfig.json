@@ -1,14 +1,14 @@
 {
     "extends": "@equalsite/tsconfig/react.json",
-
     "compilerOptions": {
-      "paths": {
-        "@/*": ["./resources/js/*"]
-      }
+        "paths": {
+            "@/*": [
+                "./resources/js/*"
+            ]
+        }
     },
-
     "include": [
-      "resources/**/*.ts",
-      "resources/**/*.tsx",
+        "resources/**/*.ts",
+        "resources/**/*.tsx",
     ]
-  }
+}

@@ -5,17 +5,16 @@ namespace App\Events;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class MessageReceived
+class CrawlerStreamEvent
 {
     use Dispatchable, SerializesModels;
 
-    /**
-     * Create a new event instance.
-     */
     public function __construct(
-        public string $channel,
+        public string $id,
+        public string $streamName,
         public string $type,
         public array $payload,
+        public string $timestamp,
         public string $version,
     ) {}
 }

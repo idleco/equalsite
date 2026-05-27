@@ -14,8 +14,8 @@ export interface Audit {
 }
 
 export interface ProcessedUrl {
-    url: string;
+    currentUrl: string;
     violations: number;
-    severityBreakdown: ServerityBreakdown;
-    timestamp: string
+    // severityBreakdown: ServerityBreakdown;
+    receivedAt: string
 }

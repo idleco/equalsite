@@ -7,6 +7,7 @@ use App\Models\Audit;
 use App\Support\CrawlerHttpClient;
 use App\Value\CrawlerStats;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Inertia\Inertia;
 
 class ScanController extends Controller
@@ -23,10 +24,25 @@ class ScanController extends Controller
             ->where('crawler_id', $crawlId)
             ->firstOrFail();
 
+        $logs = collect($audit->getCustomData('progress'));
+
+        $recentLogs = $logs->sortByDesc('receivedAt')->first();
+        $totalPages = $recentLogs['pagesTotal'] ?? 0;
+        $pagesCompleted = $recentLogs['pagesCompleted'] ?? 0;
+        $stats = new CrawlerStats(
+            totalRequests: $totalPages,
+            pendingRequests: $totalPages - $pagesCompleted,
+            processedRequests: $pagesCompleted,
+            failedRequests: 0,
+            concurrency: 0
+        );
+
         return Inertia::render('audit/scanning', [
             'queueStatus' => fn() => $this->client->stats($crawlId),
-            'stats' => $audit->getCustomData('stats', CrawlerStats::default()),
-            'processedUrls' => $audit->getCustomData('urls', []),
+            'stats' => $stats->toArray(),
+            'processedUrls' => $logs->map(fn($i) => Arr::only($i, ['currentUrl', 'violations', 'receivedAt']))
+                ->sortBy('receivedAt')
+                ->all(),
             'audit' => [
                 'siteUrl' => $audit->url,
                 'id' => $audit->id,

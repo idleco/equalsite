@@ -127,7 +127,6 @@ class RedisStream implements StreamBus
                     [$id, $fields] = $message;
                     $parsed = $this->parseFields($fields);
                     $data = json_decode($parsed['data'] ?? '{}', true);
-
                     try {
                         $handler([
                             'id' => $id,
@@ -135,10 +134,13 @@ class RedisStream implements StreamBus
                             'type' => $data['type'] ?? null,
                             'payload' => $data['payload'] ?? [],
                             'version' => $data['version'] ?? 1,
+                            'timestamp' => $data['timestamp'] ?? null
                         ]);
                         $this->ack($stream, $group, $id);
                     } catch (Throwable $e) {
                         report($e);
+
+                        sleep(2);
                     }
                 }
             }

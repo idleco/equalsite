@@ -1,8 +1,7 @@
 import { createCrawler } from "../crawler";
 import { zipArtifacts } from "../utils/filesystem";
-import { activeCrawlers, cancelledCrawls } from '../queue';
+import { activeCrawlers, cancelledCrawls } from '../queue/activeCrawlers';
 import fs from 'node:fs';
-import { emitCompleted } from "../crawler/streams";
 import type { Job } from "bullmq";
 import { AUTH_HEADER } from "./constants";
 
@@ -36,9 +35,6 @@ export async function runAuditJob(
 
     try {
         await crawler.run([url]);
-
-        void emitCompleted({ crawlId });
-
         const zippedArtifactsPath = await zipArtifacts(crawlId);
         await callbackWithArtifacts({
             zippedArtifactsPath,

@@ -186,7 +186,7 @@ crawler-dev: ## Run crawler dev watcher
 	pnpm --filter @equalsite/playwright-spider dev
 
 crawler-pnpm: ## Add crawler dependency
-	docker compose exec crawler pnpm $(cmd) --filter @equalsite/playwright-spider
+	$(DOCKER) exec crawler-api pnpm $(cmd) --filter @equalsite/playwright-spider
 
 crawler-build: ## Build crawler
 	pnpm --filter @equalsite/playwright-spider build

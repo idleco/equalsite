@@ -1,13 +1,56 @@
 import type { Request, RequestHandler, Response } from "express";
 import { asyncHandler } from "../../middleware/asyncHandler";
 import { randomUUID } from "node:crypto";
-import { activeCrawlers, cancelledCrawls, crawlQueue } from "../../queue";
-import { emitCancelled } from "../../crawler/streams";
+import { activeCrawlers, cancelledCrawls } from "../../queue/activeCrawlers";
+import { crawlQueue } from '../../queue/crawlQueue';
 import { ensureCallbackUrlReachable } from "./validation";
 import path from "node:path";
 import { ARTIFACTS_DIRECTORY } from "../../crawler/constants";
 import { deleteDirectoryIfExists } from "../../utils/filesystem";
+import { publishQueuePositions } from "../../events/publishQueuePositions";
 
+/**
+ * Add new audit job to the queue
+ */
+export const postCrawl: RequestHandler = asyncHandler(async (
+    request: Request,
+    response: Response
+) => {
+    const url = request.body.url as string;
+    const callbackUrl = request.query.callback as string;
+
+    try {
+        await ensureCallbackUrlReachable(callbackUrl);
+    } catch {
+        return response.status(403).json({
+            error: 'The callback url is unreachable.'
+        });
+    }
+
+    const crawlId = randomUUID();
+    const job = await crawlQueue.add(
+        'audit',
+        {
+            crawlId,
+            url,
+            callbackUrl
+        },
+        {
+            jobId: crawlId
+        }
+    );
+
+    await publishQueuePositions();
+
+    return response.status(202).json({
+        accepted: true,
+        crawlId: job.id,
+    });
+});
+
+/**
+ * Show audit job info
+ */
 export const showCrawlState: RequestHandler = asyncHandler(async (
     request: Request<{ id: string }>,
     response: Response
@@ -34,6 +77,10 @@ export const showCrawlState: RequestHandler = asyncHandler(async (
     });
 });
 
+/**
+ * Remove the 'waiting' job to the queue, teardown crawlee instance,
+ * and clean-up storage
+ */
 export const cancelCrawl: RequestHandler = asyncHandler(async (
     request: Request<{ id: string }>,
     response: Response
@@ -76,41 +123,11 @@ export const cancelCrawl: RequestHandler = asyncHandler(async (
         console.error('Crawler cleanup failed', err);
     }
 
-    // Publish event
-    await emitCancelled({ crawlId });
+    // publih event
 
     return response.json({
         cancelled: true,
         crawlId,
         timestamp: new Date().toISOString()
-    });
-});
-
-export const postCrawl: RequestHandler = asyncHandler(async (
-    request: Request,
-    response: Response
-) => {
-    const url = request.body.url as string;
-    const callbackUrl = request.query.callback as string;
-
-    try {
-        await ensureCallbackUrlReachable(callbackUrl);
-    } catch {
-        return response.status(403).json({
-            error: 'The callback url is unreachable.'
-        });
-    }
-
-    const crawlId = randomUUID();
-    const job = await crawlQueue.add(
-        'audit',
-        { crawlId, url, callbackUrl },
-        { jobId: crawlId }
-    );
-
-    return response.status(202).json({
-        crawlId: job.id,
-        status: 'queued',
-        timestamp: (new Date()).toISOString(),
     });
 });

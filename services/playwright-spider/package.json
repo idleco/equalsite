@@ -1,10 +1,13 @@
 {
     "name": "@equalsite/playwright-spider",
     "type": "module",
-    "packageManager": "pnpm@11.2.2",
     "scripts": {
         "dev": "NODE_OPTIONS='--conditions=source' tsx watch src/server.ts",
-        "build": "tsup src/server.ts --format esm --dts",
+        "dev:worker": "NODE_OPTIONS='--conditions=source' tsx watch src/worker.ts",
+        "build": "pnpm clean && tsup src/server.ts src/worker.ts --format esm --dts",
+        "start": "node dist/server.js",
+        "start:worker": "node dist/worker.js",
+        "clean": "rm -rf dist",
         "lint": "eslint . --fix",
         "lintcheck": "eslint .",
         "test": "vitest",

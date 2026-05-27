@@ -6,7 +6,7 @@ import { AxeBuilder } from '@axe-core/playwright';
 import { setupResourceBlocking } from './resourceBlocking';
 import { ARTIFACTS_DIRECTORY } from './constants';
 
-import { emitFailed, emitProgress, emitStarted } from './streams';
+import { publishAuditProgress } from '../events/publishAuditProgress';
 
 export const crawlerOptions: PlaywrightCrawlerOptions = {
     /** Concurrency */
@@ -67,25 +67,25 @@ export default function createCrawler(
         },
     });
 
-    const failedRequestHandler: PlaywrightCrawlerOptions['failedRequestHandler'] = async ({
-        request,
-        log
-    }) => {
-        const url = request.url;
-        const errors = request.errorMessages;
+    // const failedRequestHandler: PlaywrightCrawlerOptions['failedRequestHandler'] = async ({
+    //     request,
+    //     log
+    // }) => {
+    //     const url = request.url;
+    //     const errors = request.errorMessages;
 
-        log.error('Request failed', {
-            crawlId,
-            url,
-            errors
-        });
+    //     log.error('Request failed', {
+    //         crawlId,
+    //         url,
+    //         errors
+    //     });
 
-        await emitFailed({
-            crawlId,
-            url,
-            errors,
-        });
-    }
+    //     await emitFailed({
+    //         crawlId,
+    //         url,
+    //         errors,
+    //     });
+    // }
 
     const options: PlaywrightCrawlerOptions = {
         ...crawlerOptions,
@@ -94,7 +94,7 @@ export default function createCrawler(
             setupResourceBlocking()
         ],
 
-        failedRequestHandler,
+        // failedRequestHandler,
 
         /** Main handler */
         async requestHandler({
@@ -102,10 +102,9 @@ export default function createCrawler(
             request,
             enqueueLinks,
             pushData,
+            crawler
         }) {
             const url = request.url;
-
-            await emitStarted({ crawlId, url });
 
             const axeResults = await new AxeBuilder({ page })
                 .withTags(['wcag2a', 'wcag2aa', 'wcag22aa'])
@@ -122,11 +121,15 @@ export default function createCrawler(
                 selector: 'a'
             });
 
-            await emitProgress({
-                url,
+            const requestQueue = await crawler.getRequestQueue();
+            const requestQueueInfo = await requestQueue.getInfo();
+            await publishAuditProgress({
                 crawlId,
-                axeResults
-            });
+                currentUrl: url,
+                pagesTotal: requestQueueInfo?.totalRequestCount || 0,
+                pagesCompleted: requestQueueInfo?.handledRequestCount || 0,
+                violations: axeResults.violations.length
+            })
         }
     };
 

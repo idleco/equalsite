@@ -13,6 +13,7 @@ export default function ScanOverview() {
         processedRequests,
         failedRequests
     } = audit.stats;
+    const progressPercentage = Math.floor(processedRequests / totalRequests * 100);
     return (
         <Card>
             <CardHeader>
@@ -65,11 +66,11 @@ export default function ScanOverview() {
                 <Field>
                     <FieldLabel htmlFor="progress-upload">
                         <span>Progress</span>
-                        <span className="ml-auto">66%</span>
+                        <span className="ml-auto">{`${progressPercentage}%`}</span>
                     </FieldLabel>
-                    <Progress value={66} id="progress-upload" className="h-2" />
+                    <Progress value={progressPercentage} id="progress-upload" className="h-2" />
                     <FieldDescription>
-                        0 of 0 requests processed
+                        {processedRequests} of {totalRequests} requests processed
                     </FieldDescription>
                 </Field>
             </CardFooter>

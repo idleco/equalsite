@@ -60,17 +60,20 @@ export default function ProcessedUrls() {
                     </TableHeader>
                     <TableBody>
                         {audit.processedUrls.map(item => (
-                            <TableRow key={item.url}>
-                                <TableCell className="font-medium">
+                            <TableRow key={item.currentUrl}>
+                                <TableCell className="font-medium min-w-2xl">
                                     <Stack direction="row" gap="xs" align="center">
                                         <CheckCircle className="size-4 text-green-500" />
-                                        <div className="max-w-lg overflow-hidden text-ellipsis">{item.url}</div>
+                                        <div className="max-w-lg overflow-hidden text-ellipsis">{item.currentUrl}</div>
                                     </Stack>
                                 </TableCell>
                                 <TableCell>
-                                    <Stack direction="row" gap="xs">
-                                        {renderSeverityBreakdown(item)}
-                                    </Stack>
+                                    <Badge className="bg-chart-3/20 text-chart-3">
+                                        <span className="font-medium">
+                                            {item.violations}
+                                        </span>
+                                        Found
+                                    </Badge>
                                 </TableCell>
                                 <TableCell className="text-right">
                                     <Button variant="ghost" size="sm">

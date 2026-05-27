@@ -1,50 +1,57 @@
-declare enum EventType {
-    started = "started",
-    completed = "completed",
-    cancelled = "cancelled",
-    failed = "failed",
-    progress = "progress"
-}
-interface StreamPublisherParams<T> {
-    channel: string;
-    type: EventType;
-    payload: T;
-    version: string;
-}
-interface CrawlStats {
+type ImpactLevel = 'critical' | 'serious' | 'moderate' | 'minor';
+type ImpactKey = Exclude<ImpactLevel, null>;
+type AllKeysRequired<T extends Record<ImpactKey, number>> = Pick<T, ImpactKey> & Partial<Record<Exclude<keyof T, ImpactKey>, never>>;
+type ServerityBreakdown = AllKeysRequired<Record<ImpactKey, number>>;
+interface Stats {
     totalRequests: number;
     pendingRequests: number;
     processedRequests: number;
     failedRequests: number;
     concurrency: number;
 }
-interface StartedEvent {
+
+type Status = 'queued' | 'started' | 'cancelled' | 'failed' | 'completed';
+type WebSocketEventType = 'audit.progress' | 'audit.updated';
+interface WebSocketEvent<T> {
+    event: WebSocketEventType;
+    data: T;
+}
+type UpdatedWebSocketEvent = WebSocketEvent<{
+    cancelledAt?: string;
+    completedAt?: string;
+    id: string;
+    failureReason?: string;
+    startedAt?: string;
+    status: Status;
+    stats?: Stats;
+}>;
+type ProgressWebSocketEvent = WebSocketEvent<{
+    violations: number;
+    id: string;
+    url: string;
+    stats: Stats;
+    timestamp: string;
+    severityBreakdown: ServerityBreakdown;
+}>;
+
+type EventType = 'started' | 'progress' | 'completed' | 'cancelled' | 'failed';
+interface BasePayload {
+    url: string;
     crawlId: string;
     timestamp: string;
+    stats: Stats;
 }
-interface CancelledEvent {
-    crawlId: string;
-    timestamp: string;
-    stats: CrawlStats;
+type StartedPayload = Omit<BasePayload, 'stats'>;
+type CompletedPayload = Omit<BasePayload, 'url'>;
+type CancelledPayload = Omit<BasePayload, 'url'>;
+interface ProgressPayload extends BasePayload {
+    url: string;
+    violations: number;
+    severityBreakdown: ServerityBreakdown;
 }
-interface FailedEvent {
-    crawlId: string;
+interface FailedPayload extends BasePayload {
     url: string;
     errors: string[];
-    stats: CrawlStats;
-    timestamp: string;
-}
-interface CompletedEvent {
-    crawlId: string;
-    timestamp: string;
-    stats: CrawlStats;
-}
-interface ProgressEvent {
-    crawlId: string;
-    url: string;
-    timestamp: string;
-    violations: number;
-    status: CrawlStats;
 }
 
-export { type CancelledEvent, type CompletedEvent, type CrawlStats, EventType, type FailedEvent, type ProgressEvent, type StartedEvent, type StreamPublisherParams };
+export type { CancelledPayload, CompletedPayload, EventType, FailedPayload, ImpactKey, ImpactLevel, ProgressPayload, ProgressWebSocketEvent, ServerityBreakdown, StartedPayload, Stats, Status, UpdatedWebSocketEvent, WebSocketEventType };
