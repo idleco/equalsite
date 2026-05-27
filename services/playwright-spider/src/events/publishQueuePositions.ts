@@ -8,7 +8,7 @@ export async function publishQueuePositions() {
             await publishEvent({
                 type: 'audit.queued',
                 payload: {
-                    crawlId: job.id,
+                    crawlId: job?.id,
                     position: index + 1,
                     ahead: index,
                     waiting: waiting.length

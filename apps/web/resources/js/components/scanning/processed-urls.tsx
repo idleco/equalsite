@@ -7,8 +7,7 @@ import { ButtonGroup, ButtonGroupSeparator } from "@/components/ui/button-group"
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { str } from "@/lib/utils";
-import { useScanningContext } from "./scanning-context";
-import type { ProcessedUrl } from "./types";
+import type { ServerityBreakdown } from "@equalsite/types";
 
 enum ImpactLevel {
     critical = 0,
@@ -19,16 +18,20 @@ enum ImpactLevel {
 
 type ImpactLevelKey = keyof typeof ImpactLevel;
 
-function sortSeverityBreakdown(breakdown: ProcessedUrl['severityBreakdown']): ImpactLevelKey[] {
+function sortSeverityBreakdown(breakdown: ServerityBreakdown): ImpactLevelKey[] {
     const impactLevels = Object.keys(breakdown) as ImpactLevelKey[];
     return impactLevels.sort((a, b) => ImpactLevel[a] - ImpactLevel[b]);
 }
 
-export default function ProcessedUrls() {
-    const { audit } = useScanningContext();
+type Props = {
+    processedUrls: Record<string, ServerityBreakdown>;
+}
 
-    const renderSeverityBreakdown = (item: ProcessedUrl) => {
-        return sortSeverityBreakdown(item.severityBreakdown).map(k => (
+export default function ProcessedUrls({
+    processedUrls
+}: Props) {
+    const renderSeverityBreakdown = (item: ServerityBreakdown) => {
+        return sortSeverityBreakdown(item).map(k => (
             <Badge key={k} className={({
                 'critical': 'bg-chart-5/20 text-chart-5',
                 'serious':  'bg-chart-3/20 text-chart-3',
@@ -36,13 +39,12 @@ export default function ProcessedUrls() {
                 'minor': 'bg-chart-2/20 text-chart-2',
             })[k]}>
                 <span className="font-medium w-2">
-                    {item.severityBreakdown[k]}
+                    {item[k]}
                 </span>
                 {str.title(k)}
             </Badge>
         ));
     }
-
     return (
         <Card>
             <CardHeader>
@@ -59,21 +61,18 @@ export default function ProcessedUrls() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {audit.processedUrls.map(item => (
-                            <TableRow key={item.currentUrl}>
+                        {Object.keys(processedUrls).reverse().map(url => (
+                            <TableRow key={url}>
                                 <TableCell className="font-medium min-w-2xl">
                                     <Stack direction="row" gap="xs" align="center">
                                         <CheckCircle className="size-4 text-green-500" />
-                                        <div className="max-w-lg overflow-hidden text-ellipsis">{item.currentUrl}</div>
+                                        <div className="max-w-lg overflow-hidden text-ellipsis">{url}</div>
                                     </Stack>
                                 </TableCell>
                                 <TableCell>
-                                    <Badge className="bg-chart-3/20 text-chart-3">
-                                        <span className="font-medium">
-                                            {item.violations}
-                                        </span>
-                                        Found
-                                    </Badge>
+                                    <Stack direction="row" gap="xs">
+                                        {renderSeverityBreakdown(processedUrls[url] as ServerityBreakdown)}
+                                    </Stack>
                                 </TableCell>
                                 <TableCell className="text-right">
                                     <Button variant="ghost" size="sm">

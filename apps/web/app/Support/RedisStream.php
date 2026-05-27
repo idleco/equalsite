@@ -3,7 +3,9 @@
 namespace App\Support;
 
 use App\Contracts\StreamBus;
+use App\Value\RedisStreamData;
 use Illuminate\Redis\Connections\Connection;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Redis;
 use Throwable;
 
@@ -90,7 +92,7 @@ class RedisStream implements StreamBus
      * @param string $stream Stream name.
      * @param string $group Consumer group name.
      * @param string $consumer Unique consumer name.
-     * @param callable $handler Message handler callback.
+     * @param callable(RedisStreamData): void $handler Message handler callback.
      * @param int $blockMs Blocking timeout in milliseconds.
      * @param int $count Number of messages per read.
      */
@@ -128,14 +130,16 @@ class RedisStream implements StreamBus
                     $parsed = $this->parseFields($fields);
                     $data = json_decode($parsed['data'] ?? '{}', true);
                     try {
-                        $handler([
-                            'id' => $id,
-                            'stream' => $streamName,
-                            'type' => $data['type'] ?? null,
-                            'payload' => $data['payload'] ?? [],
-                            'version' => $data['version'] ?? 1,
-                            'timestamp' => $data['timestamp'] ?? null
-                        ]);
+                        $handler(
+                            new RedisStreamData(
+                                id: $id,
+                                streamName: $streamName,
+                                type: $data['type'] ?? null,
+                                payload: $data['payload'] ?? [],
+                                version: $data['version'] ?? 1,
+                                timestamp: (int) $data['timestamp'] ?? now()->getTimestampMs()
+                            )
+                        );
                         $this->ack($stream, $group, $id);
                     } catch (Throwable $e) {
                         report($e);

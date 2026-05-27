@@ -2,18 +2,22 @@
 
 namespace App\Http\Controllers\Audit;
 
+use App\Contracts\CacheProgressRepository;
 use App\Http\Controllers\Controller;
 use App\Models\Audit;
 use App\Support\CrawlerHttpClient;
+use App\Value\AuditProgress;
 use App\Value\CrawlerStats;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 
 class ScanController extends Controller
 {
     public function __construct(
-        protected CrawlerHttpClient $client
+        protected CrawlerHttpClient $client,
+        protected CacheProgressRepository $cacher,
     ) {}
 
     public function __invoke(Request $request)
@@ -24,25 +28,10 @@ class ScanController extends Controller
             ->where('crawler_id', $crawlId)
             ->firstOrFail();
 
-        $logs = collect($audit->getCustomData('progress'));
-
-        $recentLogs = $logs->sortByDesc('receivedAt')->first();
-        $totalPages = $recentLogs['pagesTotal'] ?? 0;
-        $pagesCompleted = $recentLogs['pagesCompleted'] ?? 0;
-        $stats = new CrawlerStats(
-            totalRequests: $totalPages,
-            pendingRequests: $totalPages - $pagesCompleted,
-            processedRequests: $pagesCompleted,
-            failedRequests: 0,
-            concurrency: 0
-        );
-
         return Inertia::render('audit/scanning', [
-            'queueStatus' => fn() => $this->client->stats($crawlId),
-            'stats' => $stats->toArray(),
-            'processedUrls' => $logs->map(fn($i) => Arr::only($i, ['currentUrl', 'violations', 'receivedAt']))
-                ->sortBy('receivedAt')
-                ->all(),
+            'queueStatus' => $this->getQueueStatus($audit),
+            'progress' => $this->getProgress($audit),
+            'processedUrls' => $audit->getCustomData('scanned_urls', []),
             'audit' => [
                 'siteUrl' => $audit->url,
                 'id' => $audit->id,
@@ -56,5 +45,30 @@ class ScanController extends Controller
                 'createdAt' => $audit->created_at->toDateTimeString(),
             ],
         ]);
+    }
+
+    protected function getProgress(Audit $audit)
+    {
+        return Cache::get(
+            "audit-{$audit->crawl_id}:progress",
+            [
+                'totalRequests' => 0,
+                'pendingRequests' => 0,
+                'completedRequests' => 0,
+                'progressPercentage' => 0,
+            ]
+        );
+    }
+
+    protected function getQueueStatus(Audit $audit)
+    {
+        return Cache::get(
+            "audit-{$audit->crawler_id}:queue-status",
+            [
+                'position' => -1,
+                'ahead' => 0,
+                'waiting' => 0
+            ]
+        );
     }
 }

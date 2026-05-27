@@ -18,7 +18,7 @@ export async function runAuditJob(
         callbackUrl: string;
     }>
 ) {
-    const {crawlId, url, callbackUrl } = job.data;
+    const { crawlId, url, callbackUrl } = job.data;
 
     const crawler = createCrawler(crawlId);
 

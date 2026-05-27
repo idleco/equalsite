@@ -2,21 +2,22 @@
 
 namespace App\Events;
 
-use DateTimeInterface;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class AuditProgress implements ShouldBroadcastNow
+class AuditWebsocketEvent implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public function __construct(
+        public string $type,
         public array $payload,
-        public DateTimeInterface $receivedAt,
         public string $version,
+        public int $timestamp,
     ) {}
 
     public function broadcastOn(): array
@@ -28,24 +29,16 @@ class AuditProgress implements ShouldBroadcastNow
 
     public function broadcastAs(): string
     {
-        return 'audit.progress';
+        return 'audit.ws-event';
     }
 
     public function broadcastWith(): array
     {
         return [
+            'type' => $this->type,
             'version' => $this->version,
-            'type' => $this->broadcastAs(),
-            'payload' => [
-                'crawlId' => $this->payload['crawlId'],
-                'pagesCompleted' => $this->payload['pagesCompleted'],
-                'pagesTotal' => $this->payload['pagesTotal'],
-                'currentUrl' => $this->payload['currentUrl'],
-                'violations' => $this->payload['violations'],
-                'progress' => $this->payload['progress'],
-                'severityBreakdown' => $this->payload['severityBreakdown'],
-                'receivedAt' => $this->receivedAt,
-            ],
+            'payload' => $this->payload,
+            'timestamp' => $this->timestamp,
         ];
     }
 }

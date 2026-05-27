@@ -7,28 +7,28 @@ import { usePage, usePoll } from "@inertiajs/react";
 import { useEffect } from "react";
 import TimeElapsed from "./time-elapsed";
 import { cn, str } from "@/lib/utils";
-import { useScanningContext } from "./scanning-context";
+import type { Audit } from "./types";
+import type { QueueStatus } from "@equalsite/types";
 
-function QueuePosition() {
-    const { queueStatus } = usePage<{
-        queueStatus: {
-            position: number;
-            waiting: number;
-        }
-    }>().props;
-
+function QueuePosition(
+    props: { queueStatus: QueueStatus }
+) {
+    const {
+        position,
+        waiting,
+        ahead
+    } = props.queueStatus;
     const { start, stop } = usePoll(2000, { only: ['queueStatus'] }, {
         autoStart: false,
     });
-
     useEffect(() => {
-        if (queueStatus.position !== -1) {
+        if (position > 0) {
             start();
         }
-        return stop;
-    });
-
-    console.log(queueStatus)
+        return () => {
+            stop();
+        }
+    }, [position, start, stop]);
     return (
         <Item variant="outline">
             <ItemMedia variant="icon">
@@ -36,8 +36,16 @@ function QueuePosition() {
             </ItemMedia>
             <ItemContent>
                 <ItemTitle>Your place in queue</ItemTitle>
-                <ItemTitle className="text-2xl">{queueStatus.position} / {queueStatus.waiting}</ItemTitle>
-                <ItemDescription>Jobs ahead of you: 4</ItemDescription>
+                {position > 0 ? (
+                    <ItemTitle className="text-2xl">
+                        {position} / {waiting}
+                    </ItemTitle>
+                ) : (
+                    <ItemTitle className="text-2xl">
+                        Next
+                    </ItemTitle>
+                )}
+                <ItemDescription>Jobs ahead of you: {ahead}</ItemDescription>
             </ItemContent>
         </Item>
     )
@@ -60,17 +68,15 @@ function formatDate(dateString?: string): string {
     });
 }
 
-export default function ScanDetails() {
-    const {audit} = useScanningContext();
-    const {
-        id,
-        status,
-        siteUrl,
-        createdAt,
-        cancelledAt,
-        completedAt,
-        startedAt
-    } = audit.details;
+type Props = {
+    audit: Audit;
+    queueStatus: QueueStatus;
+};
+
+export default function ScanDetails({
+    audit,
+    queueStatus
+}: Props) {
     return (
         <Card>
             <CardHeader>
@@ -83,7 +89,7 @@ export default function ScanDetails() {
                             'completed': 'bg-chart-2/20 text-chart-2',
                             'cancelled': 'bg-chart-5/20 text-chart-5',
                             'failed': 'bg-chart-5/20 text-chart-5'
-                        })[status]
+                        })[audit.status]
                     )}
                 >
                     <CircleSmall
@@ -94,26 +100,28 @@ export default function ScanDetails() {
                             'completed': 'fill-chart-2',
                             'cancelled': 'fill-chart-5',
                             'failed': 'fill-chart-5'
-                        })[status]}
+                        })[audit.status]}
                     />
-                    {status.toUpperCase()}
+                    {audit.status.toUpperCase()}
                 </Badge>
             </CardHeader>
 
             <CardContent className="grid grid-cols-2 gap-2 min-h-24">
                 <div className="border flex flex-col justify-between rounded-md py-2 px-3">
-                    <CardTitle className="font-bold text-2xl tracking-wider">Scan #{id}</CardTitle>
+                    <CardTitle className="font-bold text-2xl tracking-wider">
+                        {`Scan #${String(audit.id).padStart(6, '0')}`}
+                    </CardTitle>
                     <div>
                         <div className="text-xs">Target URL</div>
                         <Button size="sm" variant="link" className="text-indigo-500">
-                            {siteUrl}
+                            {audit.siteUrl}
                             <ExternalLink data-icon="inline-end" />
                         </Button>
                     </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2">
-                    <QueuePosition />
+                    <QueuePosition queueStatus={queueStatus} />
                     <div className="rounded-md border text-center text-xs flex flex-col justify-center gap-2 py-2 px-3">
                         <div>
                             <Button variant="destructive">
@@ -129,7 +137,7 @@ export default function ScanDetails() {
             </CardContent>
 
             <CardFooter className="grid grid-cols-6 gap-2">
-                <TimeElapsed createdAt={createdAt} startedAt={startedAt} />
+                <TimeElapsed createdAt={audit.createdAt} startedAt={audit.startedAt} />
                 <Item variant="outline">
                     <ItemMedia variant="icon">
                         <CircleDot className="size-4" />
@@ -139,7 +147,7 @@ export default function ScanDetails() {
                         <ItemDescription>
                             <span className="inline-flex gap-1">
                                 <CircleSmall className="text-chart-3 size-3 fill-chart-3 self-center" data-icon="inline-start" />
-                                <span>{str.title(status)}</span>
+                                <span>{str.title(audit.status)}</span>
                             </span>
                         </ItemDescription>
                     </ItemContent>
@@ -151,7 +159,7 @@ export default function ScanDetails() {
                     <ItemContent>
                         <ItemTitle>Created At</ItemTitle>
                         <ItemDescription>
-                            {formatDate(createdAt)}
+                            {formatDate(audit.createdAt)}
                         </ItemDescription>
                     </ItemContent>
                 </Item>
@@ -162,7 +170,7 @@ export default function ScanDetails() {
                     <ItemContent>
                         <ItemTitle>Started At</ItemTitle>
                         <ItemDescription>
-                            {formatDate(startedAt)}
+                            {formatDate(audit.startedAt)}
                         </ItemDescription>
                     </ItemContent>
                 </Item>
@@ -173,7 +181,7 @@ export default function ScanDetails() {
                     <ItemContent>
                         <ItemTitle>Completed At</ItemTitle>
                         <ItemDescription>
-                            {formatDate(completedAt)}
+                            {formatDate(audit.completedAt)}
                         </ItemDescription>
                     </ItemContent>
                 </Item>
@@ -184,7 +192,7 @@ export default function ScanDetails() {
                     <ItemContent>
                         <ItemTitle>Cancelled At</ItemTitle>
                         <ItemDescription>
-                            {formatDate(cancelledAt)}
+                            {formatDate(audit.cancelledAt)}
                         </ItemDescription>
                     </ItemContent>
                 </Item>

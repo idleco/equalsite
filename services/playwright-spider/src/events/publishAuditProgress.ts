@@ -1,12 +1,15 @@
 import { throttleAsync } from "./throttleAsync";
 import { publishEvent } from "./publishEvent";
+import type { ServerityBreakdown } from "@equalsite/types";
 
 interface PublishAuditProgressOptions {
     crawlId: string;
+    pagesPending: number;
     pagesCompleted: number;
     pagesTotal: number;
     currentUrl?: string;
     violations: number;
+    severityBreakdown: ServerityBreakdown;
 }
 
 const THROTTLE_DELAY = 1000;
@@ -16,10 +19,12 @@ export async function publishAuditProgress(
 ) {
     const {
         crawlId,
+        pagesPending,
         pagesCompleted,
         pagesTotal,
         currentUrl,
         violations,
+        severityBreakdown,
     } = options;
     await throttleAsync(
         `audit-progress:${crawlId}`,
@@ -34,11 +39,13 @@ export async function publishAuditProgress(
                 type: 'audit.progress',
                 payload: {
                     crawlId,
-                    pagesCompleted,
-                    pagesTotal,
+                    completedRequests: pagesCompleted,
+                    pendingRequests: pagesPending,
+                    totalRequests: pagesTotal,
                     currentUrl,
                     violations,
-                    progress
+                    progressPercentage: progress,
+                    severityBreakdown
                 }
         });
         },

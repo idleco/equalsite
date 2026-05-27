@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Contracts\CacheProgressRepository;
+use App\Services\AuditProgressCacher;
 use App\Support\CrawlerHttpClient;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
@@ -24,6 +26,8 @@ class AppServiceProvider extends ServiceProvider
                 secret: $config['secret']
             );
         });
+
+        $this->app->bind(CacheProgressRepository::class, AuditProgressCacher::class);
     }
 
     /**

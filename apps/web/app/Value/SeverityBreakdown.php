@@ -13,6 +13,16 @@ class SeverityBreakdown implements Arrayable
         public readonly int $minor
     ) {}
 
+    public static function fromArray(array $value): static
+    {
+        return new static(
+            critical: $value['critical'],
+            serious: $value['serious'],
+            moderate: $value['moderate'],
+            minor: $value['minor']
+        );
+    }
+
     public function toArray(): array
     {
         return [

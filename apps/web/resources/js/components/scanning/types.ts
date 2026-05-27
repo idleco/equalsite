@@ -1,4 +1,4 @@
-import type { ServerityBreakdown, Status } from "@equalsite/types";
+import type { Status } from "@equalsite/types";
 
 export interface Audit {
     isActive: boolean;
@@ -11,11 +11,4 @@ export interface Audit {
     siteUrl: string;
     id: string;
     crawlId: string;
-}
-
-export interface ProcessedUrl {
-    currentUrl: string;
-    violations: number;
-    // severityBreakdown: ServerityBreakdown;
-    receivedAt: string
 }

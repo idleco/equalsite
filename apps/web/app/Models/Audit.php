@@ -64,11 +64,9 @@ class Audit extends Model
      */
     public function patchCustomData($key, Closure $callback): self
     {
-        tap($this, function () use ($key, $callback) {
-            foreach (Arr::wrap($key) as $k) {
-                $this->setCustomData($k, $callback($this->getCustomData($k), $k));
-            }
-        })->save();
+        foreach (Arr::wrap($key) as $k) {
+            $this->setCustomData($k, $callback($this->getCustomData($k), $k));
+        }
 
         return $this;
     }

@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Events\CrawlerStreamEvent;
+use App\Events\RedisStreamEvent;
 use App\Support\RedisStream;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
@@ -40,15 +40,8 @@ class ConsumeCrawlerStreams extends Command
             stream: $streamName,
             group: $group,
             consumer: $consumer,
-            handler: function (array $message) use ($streamName) {
-                event(new CrawlerStreamEvent(
-                    id: $message['id'],
-                    streamName: $message['stream'],
-                    type: $message['type'],
-                    payload: $message['payload'],
-                    timestamp: $message['timestamp'],
-                    version: $message['version']
-                ));
+            handler: function ($data) {
+                event(new RedisStreamEvent($data));
             }
         );
 

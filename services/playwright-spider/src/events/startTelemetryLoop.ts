@@ -17,7 +17,7 @@ export function startTelemetryLoop() {
                 error,
             );
         }
-    }, 1000);
+    }, 10000);
 }
 
 export function stopTelemetryLoop() {

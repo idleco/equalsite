@@ -3,17 +3,15 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Item, ItemContent, ItemDescription, ItemMedia, ItemTitle } from "@/components/ui/item";
 import { Progress } from "@/components/ui/progress";
 import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
-import { useScanningContext } from "./scanning-context";
+import type { ProgressState } from "@equalsite/types";
 
-export default function ScanOverview() {
-    const {audit} = useScanningContext()
-    const {
-        totalRequests,
-        pendingRequests,
-        processedRequests,
-        failedRequests
-    } = audit.stats;
-    const progressPercentage = Math.floor(processedRequests / totalRequests * 100);
+type Props = {
+    progress: ProgressState;
+}
+
+export default function ScanOverview({
+    progress,
+}: Props) {
     return (
         <Card>
             <CardHeader>
@@ -27,7 +25,7 @@ export default function ScanOverview() {
                     </ItemMedia>
                     <ItemContent>
                         <ItemTitle>Total Requests</ItemTitle>
-                        <ItemTitle className="text-2xl">{totalRequests || '-'}</ItemTitle>
+                        <ItemTitle className="text-2xl">{progress.totalRequests}</ItemTitle>
                         <ItemDescription>All URLs discovered</ItemDescription>
                     </ItemContent>
                 </Item>
@@ -37,7 +35,7 @@ export default function ScanOverview() {
                     </ItemMedia>
                     <ItemContent>
                         <ItemTitle>Pending Requests</ItemTitle>
-                        <ItemTitle className="text-2xl">{pendingRequests || '-'}</ItemTitle>
+                        <ItemTitle className="text-2xl">{progress.pendingRequests}</ItemTitle>
                         <ItemDescription>In queue / waiting</ItemDescription>
                     </ItemContent>
                 </Item>
@@ -47,7 +45,7 @@ export default function ScanOverview() {
                     </ItemMedia>
                     <ItemContent>
                         <ItemTitle>Processed Requests</ItemTitle>
-                        <ItemTitle className="text-2xl">{processedRequests || '-'}</ItemTitle>
+                        <ItemTitle className="text-2xl">{progress.completedRequests}</ItemTitle>
                         <ItemDescription>Successfully processed</ItemDescription>
                     </ItemContent>
                 </Item>
@@ -57,7 +55,7 @@ export default function ScanOverview() {
                     </ItemMedia>
                     <ItemContent>
                         <ItemTitle>Failed Requests</ItemTitle>
-                        <ItemTitle className="text-2xl">{failedRequests || '-'}</ItemTitle>
+                        <ItemTitle className="text-2xl">0</ItemTitle>
                         <ItemDescription>Errors / Failed</ItemDescription>
                     </ItemContent>
                 </Item>
@@ -66,11 +64,11 @@ export default function ScanOverview() {
                 <Field>
                     <FieldLabel htmlFor="progress-upload">
                         <span>Progress</span>
-                        <span className="ml-auto">{`${progressPercentage}%`}</span>
+                        <span className="ml-auto">{`${progress.progressPercentage}%`}</span>
                     </FieldLabel>
-                    <Progress value={progressPercentage} id="progress-upload" className="h-2" />
+                    <Progress value={progress.progressPercentage} id="progress-upload" className="h-2" />
                     <FieldDescription>
-                        {processedRequests} of {totalRequests} requests processed
+                        {progress.completedRequests} of {progress.totalRequests} requests processed
                     </FieldDescription>
                 </Field>
             </CardFooter>

@@ -12,7 +12,7 @@ export const crawlWorker = new Worker<JobPayload>(
         await publishEvent({
             type: 'audit.started',
             payload: {
-                crawlId: job.id
+                crawlId: job?.id
             }
         });
         await publishQueuePositions();
@@ -28,7 +28,7 @@ crawlWorker.on('completed', async job => {
     await publishEvent({
         type: 'audit.completed',
         payload: {
-            crawlId: job.id
+            crawlId: job?.id
         }
     });
     await publishQueuePositions();
