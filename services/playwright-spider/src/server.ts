@@ -1,4 +1,4 @@
-import app from "./routes";
+import app from "./app";
 
 const HOST = '0.0.0.0';
 const PORT = Number(process.env.CRAWLER_PORT) || 3000;

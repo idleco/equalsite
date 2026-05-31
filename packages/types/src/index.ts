@@ -4,7 +4,6 @@ export type {
     ImpactKey,
     Stats,
     QueueStatus,
-    ProgressState
 } from './common';
 
 export type * from './react';
@@ -12,6 +11,14 @@ export type * from './node';
 
 export type {
     EventType,
+
+    PageCompletedEvent,
+    PageCompletedPayload,
+    PageCompletedStream,
+
+    PageFailedEvent,
+    PageFailedPayload,
+    PageFailedStream,
 
     ProgressPayload,
     ProgressEvent,

@@ -28,3 +28,22 @@ export interface ProgressState {
     totalRequests: number;
     progressPercentage: number
 }
+
+export interface StatisticState {
+    requestsFinished: number;
+    requestsFailed: number;
+    requestsRetries: number;
+    requestsFailedPerMinute: number;
+    requestsFinishedPerMinute: number;
+    requestMinDurationMillis: number;
+    requestMaxDurationMillis: number;
+    requestTotalFailedDurationMillis: number;
+    requestTotalFinishedDurationMillis: number;
+    crawlerStartedAt: Date | string | null;
+    crawlerFinishedAt: Date | string | null;
+    crawlerRuntimeMillis: number;
+    statsPersistedAt: Date | string | null;
+    errors: Record<string, unknown>;
+    retryErrors: Record<string, unknown>;
+    requestsWithStatusCode: Record<string, number>;
+}
