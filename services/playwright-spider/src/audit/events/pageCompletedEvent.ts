@@ -1,4 +1,4 @@
-import type { ServerityBreakdown } from "@equalsite/types";
+import { EventEnum, ServerityBreakdown } from "@equalsite/types";
 import type { EventPublisherParams } from "../repositories/eventPublisher";
 
 export const pageCompletedEvent = (payload: {
@@ -6,7 +6,7 @@ export const pageCompletedEvent = (payload: {
     pageUrl: string;
     accessibilityViolationsCount: number;
     severityBreakdown: ServerityBreakdown
-}): EventPublisherParams<'audit.page.completed'> => ({
-    type: 'audit.page.completed',
+}): EventPublisherParams<typeof EventEnum.PageCompleted> => ({
+    type: EventEnum.PageCompleted,
     payload
 })

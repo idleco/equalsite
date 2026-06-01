@@ -1,9 +1,10 @@
+import { EventEnum } from "@equalsite/types";
 import type { EventPublisherParams } from "../repositories/eventPublisher";
 
 export const failedEvent = (payload: {
     auditId: string;
     error: string;
-}): EventPublisherParams<'audit.failed'> => ({
-    type: 'audit.failed',
+}): EventPublisherParams<typeof EventEnum.Failed> => ({
+    type: EventEnum.Failed,
     payload
 })

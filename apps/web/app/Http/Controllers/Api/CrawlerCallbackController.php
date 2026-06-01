@@ -15,6 +15,10 @@ class CrawlerCallbackController extends Controller
 
     public function __invoke(Request $request)
     {
+        if ($request->boolean('probe')) {
+            return response()->json(['ok' => true]);
+        }
+
         if ($request->hasFile('artifact')) {
             $crawlId = $request->crawlId;
 

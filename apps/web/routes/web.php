@@ -24,8 +24,6 @@ Route::delete('/audit/{id}/cancel', CancelAuditController::class)
 Route::get('/audit/{id}', ScanController::class)
     ->name('audit.scan.progress');
 
-
-
 Route::post('/website-scan', [WebsiteScanController::class, 'store'])
     ->name('website-scan.store');
 

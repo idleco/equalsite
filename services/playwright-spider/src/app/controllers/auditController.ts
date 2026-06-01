@@ -6,34 +6,53 @@ import { crawlerQueue } from "../services/queue";
 import { createCancelAuditAction } from "../../audit/actions/cancelAudit";
 import { publishEvent } from "../adapters/redisStreamPublisher";
 
-export interface CancelAuditParams { auditId: string; }
-export interface CreateAuditQuery { callback: string; }
-export interface CreateAuditBody {
-    url: string;
-    options?: { maxPages: number; }
-}
+const {
+    artifactDirectory,
+    maxRequestsPerCrawl
+} = Config.crawler;
+
+type CreateAuditRequest = RequestHandler<
+    unknown,
+    unknown,
+    {
+        url: string;
+        options?: {
+            maxPages: number;
+        }
+    },
+    { callback: string; }
+>;
 
 const createAuditAction = createAuditFactory(
     auditRepository,
     Config.secretKey
 );
 
-const cancelAuditAction = createCancelAuditAction(
-    auditRepository,
-    publishEvent,
-    Config.crawler.artifactDirectory
-)
+export const CreateAudit: CreateAuditRequest = async (
+    request,
+    response
+) => {
+    const url = request.body.url;
+    const options = request.body.options;
+    const urlCallback = request.query.callback;
 
-export const CreateAudit: RequestHandler<
-    unknown,
-    unknown,
-    CreateAuditBody,
-    CreateAuditQuery
-> = async (req, res) => {
-    const { url, options } = req.body;
-    const { callback: urlCallback } = req.query;
+    console.log('Create audit request', { url, options, urlCallback });
 
-    const maxPages = options?.maxPages || Config.crawler.maxRequestsPerCrawl;
+    if (!url || typeof url !== 'string') {
+        return response.status(400).json({
+            error: 'Invalid request body',
+            message: 'JSON body with a string "url" field is required',
+        });
+    }
+
+    if (!urlCallback || typeof urlCallback !== 'string') {
+        return response.status(400).json({
+            error: 'Invalid query',
+            message: 'A "callback" query parameter is required',
+        });
+    }
+
+    const maxPages = options?.maxPages || maxRequestsPerCrawl;
 
     const auditId = await createAuditAction.run({
         url,
@@ -41,18 +60,35 @@ export const CreateAudit: RequestHandler<
         options: { maxPages }
     });
 
-    await crawlerQueue.add('audit', { auditId }, { jobId: auditId });
+    const job = await crawlerQueue.add('audit', { auditId }, { jobId: auditId });
 
-    return res.status(202).json({
+    console.log('accepted', job.id);
+
+    return response.status(202).json({
         accepted: true,
         auditId,
+        url,
+        options,
     });
 }
 
-export const CancelAudit: RequestHandler<CancelAuditParams> = async (req, res) => {
-    const auditId = req.params.auditId;
+type CancelAuditRequest = RequestHandler<
+    { auditId: string; }
+>;
 
-    await cancelAuditAction.run(auditId);
+const cancelAuditAction = createCancelAuditAction(
+    auditRepository,
+    publishEvent,
+    artifactDirectory
+);
+
+export const CancelAudit: CancelAuditRequest = async (
+    request,
+    response
+) => {
+    const auditId = request.params.auditId;
+
+    await cancelAuditAction.run(auditId)
 
     const job = await crawlerQueue.getJob(auditId);
     const state = await job?.getState();
@@ -63,7 +99,7 @@ export const CancelAudit: RequestHandler<CancelAuditParams> = async (req, res) =
         await job?.remove();
     }
 
-    return res.json({
+    return response.json({
         cancelled: true,
         auditId,
     });

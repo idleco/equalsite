@@ -1,3 +1,4 @@
+import { EventEnum } from "@equalsite/types";
 import type { EventPublisherParams } from "../repositories/eventPublisher";
 
 export const queuedEvent = (payload: {
@@ -5,7 +6,7 @@ export const queuedEvent = (payload: {
     position: number;
     ahead: number;
     waiting: number;
-}): EventPublisherParams<'audit.queued'> => ({
-    type: 'audit.queued',
+}): EventPublisherParams<typeof EventEnum.Queued> => ({
+    type: EventEnum.Queued,
     payload
-})
+});

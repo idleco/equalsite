@@ -1,3 +1,4 @@
+import { EventEnum } from "@equalsite/types";
 import type { EventPublisherParams } from "../repositories/eventPublisher";
 
 export const pageProgressEvent = (payload: {
@@ -6,7 +7,7 @@ export const pageProgressEvent = (payload: {
     pendingRequests: number;
     totalRequests: number;
     progressPercentage: number
-}): EventPublisherParams<'audit.progress'> => ({
-    type: 'audit.progress',
+}): EventPublisherParams<typeof EventEnum.Progress> => ({
+    type: EventEnum.Progress,
     payload
 })

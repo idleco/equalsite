@@ -7,6 +7,7 @@ use App\Support\RedisStream;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 #[Signature('crawler:listen')]
 #[Description('Command description')]
@@ -41,7 +42,8 @@ class ConsumeCrawlerStreams extends Command
             group: $group,
             consumer: $consumer,
             handler: function ($data) {
-                event(new RedisStreamEvent($data));
+                Log::channel('crawler')->debug('Stream', $data->toArray());
+                // event(new RedisStreamEvent($data));
             }
         );
 

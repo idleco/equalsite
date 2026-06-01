@@ -5,18 +5,13 @@ namespace App\Http\Controllers\Audit;
 use App\Contracts\CacheProgressRepository;
 use App\Http\Controllers\Controller;
 use App\Models\Audit;
-use App\Support\CrawlerHttpClient;
-use App\Value\AuditProgress;
-use App\Value\CrawlerStats;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 
 class ScanController extends Controller
 {
     public function __construct(
-        protected CrawlerHttpClient $client,
         protected CacheProgressRepository $cacher,
     ) {}
 

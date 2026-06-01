@@ -19,7 +19,7 @@ import { bullClient } from "./app/services/redis";
 // )
 
 
-new Worker<{ auditId: string }>(
+const crawlerWorker = new Worker<{ auditId: string }>(
     Config.bullmq.queue,
     async job => {
         await createRunAuditAction(
@@ -36,4 +36,16 @@ new Worker<{ auditId: string }>(
         connection: bullClient,
         concurrency: Config.bullmq.concurrency,
     }
-)
+);
+
+crawlerWorker.on('active', (job) => {
+    console.error('Crawler worker active', { jobId: job.id });
+});
+
+crawlerWorker.on('error', (error) => {
+    console.error('Crawler worker error', error);
+});
+
+crawlerWorker.on('ready', () => {
+    console.log('Crawler worker ready');
+});

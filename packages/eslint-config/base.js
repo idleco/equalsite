@@ -12,7 +12,6 @@ export default [
                 tsconfigRootDir: process.cwd(),
             },
         },
-
         rules: {
             /** General */
             'no-console': 'off',

@@ -45,13 +45,11 @@ export const createProcessAxeResultAction = (
                 }
             );
 
-        await eventPublisher(
-            pageCompletedEvent({
-                auditId,
-                pageUrl,
-                severityBreakdown,
-                accessibilityViolationsCount: accessibilityViolations.length,
-            })
-        );
+        await eventPublisher(pageCompletedEvent({
+            auditId,
+            pageUrl,
+            severityBreakdown,
+            accessibilityViolationsCount: accessibilityViolations.length,
+        }));
     }
 })

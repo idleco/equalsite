@@ -29,15 +29,38 @@ export const createAuditAction = (
     }
 })
 
+function assertCallbackIsNotAuditEndpoint(urlCallback: string): void {
+    let parsed: URL;
+
+    try {
+        parsed = new URL(urlCallback);
+    } catch {
+        throw new Error(`Invalid callback URL [${urlCallback}].`);
+    }
+
+    if (parsed.pathname.endsWith('/audit')) {
+        throw new Error(
+            `Callback URL [${urlCallback}] must not point to the audit API endpoint.`
+        );
+    }
+}
+
 export async function validateCallbackUrl(
     urlCallback: string,
     secretKey: string
 ): Promise<void> {
+    assertCallbackIsNotAuditEndpoint(urlCallback);
+
     const response = await fetch(urlCallback, {
         method: 'POST',
-        headers: { 'Authorization':  `Bearer ${secretKey}`},
+        headers: {
+            Authorization: `Bearer ${secretKey}`,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ probe: true }),
     });
-    if (! response.ok) {
+
+    if (!response.ok) {
         throw new Error(`Callback URL [${urlCallback}] is unreachable.`);
     }
 }

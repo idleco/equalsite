@@ -47,7 +47,20 @@ class AuditEntity {
     }
 
     static fromString(value: string): AuditEntity {
-        return new AuditEntity(JSON.parse(value));
+        const parsed = JSON.parse(value) as Omit<Attributes, 'status'> & {
+            status: Status | { value: Status['value'] };
+        };
+
+        const statusValue = typeof parsed.status === 'string'
+            ? parsed.status
+            : parsed.status instanceof Status
+                ? parsed.status.value
+                : parsed.status.value;
+
+        return new AuditEntity({
+            ...parsed,
+            status: Status.make(statusValue),
+        });
     }
 
     markAsCancelled(): this {

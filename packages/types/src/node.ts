@@ -1,27 +1,27 @@
-import { Stats, ServerityBreakdown } from "./common";
+import type {
+    PageStartedEvent,
+    CancelledEvent,
+    CompletedEvent,
+    FailedEvent,
+    PageCompletedEvent,
+    PageFailedEvent,
+    ProgressEvent,
+    QueuedEvent,
+    StartedEvent,
+    TelemetryEvent
+} from "./events";
 
-export type EventType = 'started' | 'progress' | 'completed' | 'cancelled' | 'failed';
-
-interface BasePayload {
-    url: string
-    crawlId: string;
-    timestamp: string
-    stats: Stats;
+interface StreamData<T> {
+    data: T
 }
 
-export type StartedPayload = Omit<BasePayload, 'stats'>;
-
-export type CompletedPayload = Omit<BasePayload, 'url'>;
-
-export type CancelledPayload = Omit<BasePayload, 'url'>;
-
-export interface ProgressPayload extends BasePayload {
-    url: string;
-    violations: number;
-    severityBreakdown: ServerityBreakdown;
-}
-
-export interface FailedPayload extends BasePayload {
-    url: string;
-    errors: string[];
-}
+export type PageStartedStream = StreamData<PageStartedEvent>;
+export type PageFailedStream = StreamData<PageFailedEvent>;
+export type PageCompletedStream = StreamData<PageCompletedEvent>;
+export type ProgressStream = StreamData<ProgressEvent>;
+export type QueuedStream = StreamData<QueuedEvent>;
+export type FailedStream = StreamData<FailedEvent>;
+export type CompletedStream = StreamData<CompletedEvent>;
+export type StartedStream = StreamData<StartedEvent>;
+export type CancelledStream = StreamData<CancelledEvent>;
+export type TelemetryStream = StreamData<TelemetryEvent>;

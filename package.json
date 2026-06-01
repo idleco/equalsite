@@ -6,7 +6,8 @@
         "dev": "turbo run dev --parallel",
         "build": "turbo run build",
         "test": "turbo run test",
-        "lint": "turbo run lint"
+        "lint": "turbo run lint",
+        "lintcheck": "turbo run lintcheck"
     },
     "devDependencies": {
         "@eslint/js": "^9",

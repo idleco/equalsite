@@ -4,13 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Actions\CreateAudit;
 use Illuminate\Http\Request;
-use App\Support\CrawlerHttpClient;
+use App\Support\SpiderClient;
+use App\Value\SpiderRequestBody;
 use Inertia\Inertia;
 
 class WebsiteScanController extends Controller
 {
     public function __construct(
-        protected CrawlerHttpClient $client,
+        protected SpiderClient $spider,
         protected CreateAudit $auditCreator
     ) {}
 
@@ -20,16 +21,14 @@ class WebsiteScanController extends Controller
             'url' => ['required', 'active_url']
         ]);
 
-        $response = $this->client->queue(
-            url: $validated['url'],
-            callback: 'http://web' . route('api.crawler.callback', absolute: false)
-        );
+        $body = SpiderRequestBody::make()
+            ->setUrl($validated['url'])
+            ->setMaxPages(15);
 
-        $crawlerId = $response['crawlId'];
-
+        $response = $this->spider->create($body);
         $created = $this->auditCreator->create(
-            url: $validated['url'],
-            crawlId: $crawlerId
+            url: $response['url'],
+            crawlId: $response['auditId']
         );
 
         return redirect()->route('audit.scan.progress', [

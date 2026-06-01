@@ -2,8 +2,8 @@
     "name": "@equalsite/playwright-spider",
     "type": "module",
     "scripts": {
-        "dev": "NODE_OPTIONS='--conditions=source' tsx watch src/server.ts",
-        "dev:worker": "NODE_OPTIONS='--conditions=source' tsx watch src/worker.ts",
+        "dev": "tsx watch src/server.ts",
+        "dev:worker": "tsx watch src/worker.ts",
         "build": "pnpm clean && tsup src/server.ts src/worker.ts --format esm --dts",
         "start": "node dist/server.js",
         "start:worker": "node dist/worker.js",
@@ -14,26 +14,26 @@
         "typecheck": "tsc --noEmit"
     },
     "dependencies": {
-        "@equalsite/types": "workspace:*",
         "@axe-core/playwright": "^4.11.3",
+        "@equalsite/types": "workspace:*",
         "archiver": "^8.0.0",
-        "axe-core": "^4.11.4",
-        "bullmq": "^5.77.0",
+        "axe-core": "^4.12.0",
+        "bullmq": "^5.77.7",
         "crawlee": "^3.16.0",
         "express": "^5.2.1",
-        "ioredis": "^5.10.1",
+        "ioredis": "5.10.1",
         "p-queue": "^9.3.0",
-        "playwright": "^1.59.1"
+        "playwright": "^1.60.0"
     },
     "devDependencies": {
         "@equalsite/eslint-config": "workspace:*",
         "@equalsite/tsconfig": "workspace:*",
         "@types/express": "^5.0.6",
-        "@types/node": "^25.8.0",
-        "eslint": "^10.3.0",
+        "@types/node": "^25.9.1",
+        "eslint": "^10.4.1",
         "tsup": "^8.5.1",
-        "tsx": "^4.22.0",
+        "tsx": "^4.22.4",
         "typescript": "^6.0.3",
-        "vitest": "^4.1.6"
+        "vitest": "^4.1.8"
     }
 }

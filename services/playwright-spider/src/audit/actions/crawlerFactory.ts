@@ -6,6 +6,7 @@ import { AxeBuilder } from '@axe-core/playwright';
 import type { EventPublisher } from '../repositories/eventPublisher';
 import { createProcessAxeResultAction } from './processAxeResult';
 import { pageFailedEvent } from '../events/pageFailedEvent';
+import { pageStartedEvent } from '../events/pageStartedEvent';
 
 type CrawlerFactoryParams = {
     auditId: string;
@@ -46,14 +47,27 @@ export default function createPlaywrightCrawler({
         enqueueLinks,
     }) => {
         const processAxeResultAction = createProcessAxeResultAction(pushData, eventPublisher);
+        console.log('Crawlee page started', {
+            auditId,
+            pageUrl: request.url,
+            attemptsCount: request.retryCount
+        });
+        await eventPublisher(pageStartedEvent({
+            auditId,
+            pageUrl: request.url,
+            attemptsCount: request.retryCount
+        }));
+
         const axeResults = await new AxeBuilder({ page })
             .withTags(['wcag2a', 'wcag2aa', 'wcag22aa'])
             .analyze();
+
         await processAxeResultAction.run({
             pageUrl: request.url,
             auditId,
             axeResults
         })
+
         await enqueueLinks({
             strategy: EnqueueStrategy.SameDomain,
             selector: 'a',

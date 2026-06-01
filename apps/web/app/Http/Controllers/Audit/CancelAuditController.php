@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Audit;
 
-use App\Support\CrawlerHttpClient;
+use App\Support\SpiderClient;
 use Illuminate\Http\Request;
 
 class CancelAuditController
 {
     public function __construct(
-        protected CrawlerHttpClient $client
+        protected SpiderClient $client
     ) {}
 
     public function __invoke(Request $request)

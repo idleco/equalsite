@@ -18,15 +18,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->singleton(CrawlerHttpClient::class, function ($app) {
-            $config = $app->make('config')->get('services.crawler');
-            return new CrawlerHttpClient(
-                host: $config['host'],
-                port: $config['port'],
-                secret: $config['secret']
-            );
-        });
-
         $this->app->bind(CacheProgressRepository::class, AuditProgressCacher::class);
     }
 
