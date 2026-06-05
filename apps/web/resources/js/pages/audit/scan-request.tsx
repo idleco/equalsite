@@ -7,15 +7,23 @@ import { Item, ItemContent, ItemDescription, ItemMedia, ItemTitle } from '@/comp
 import { Separator } from '@/components/ui/separator';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowRight, Bug, ChartArea, Dot, FileCheck, Globe, Info, Lock, Shield } from 'lucide-react';
-import { store } from '@/actions/App/Http/Controllers/WebsiteScanController';
+import { store } from '@/actions/App/Http/Controllers/Audit/ScanningController';
 import type { ChangeEventHandler, SubmitEventHandler} from 'react';
 import InputError from '@/components/input-error';
 import { Label } from '@/components/ui/label';
+import { useEchoPublic } from '@laravel/echo-react';
 
 export default function ScanRequest() {
     const form = useForm({
         url: ''
     });
+    useEchoPublic(
+        `audit`,
+        '.sample-event',
+        (e) => {
+            console.log(e)
+        }
+    );
     const handleChange: ChangeEventHandler<HTMLInputElement> = (e) => {
         const key = e.target.id;
         const value = e.target.value;

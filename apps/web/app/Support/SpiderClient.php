@@ -16,7 +16,7 @@ class SpiderClient
         protected int $port,
         string $secret
     ) {
-        $this->client = Http::withToken($secret);
+        $this->client = Http::withToken($secret)->asJson();
     }
 
     public function cancel(string $id)
@@ -27,13 +27,15 @@ class SpiderClient
             ->json();
     }
 
-    public function create(SpiderRequestBody $request)
+    public function create(string $url, string $callback, array $options = [])
     {
-        $urlCallback = 'http://web' . route('api.crawler.callback', absolute: false);
+        $queryString = http_build_query(['callback' => $callback]);
 
         return $this->client
-            ->asJson()
-            ->post($this->url('audit?' . http_build_query(['callback' => $urlCallback])), $request->toArray())
+            ->post($this->url('audit?' . $queryString), [
+                'url' => $url,
+                'options' => $options
+            ])
             ->throw()
             ->json();
     }

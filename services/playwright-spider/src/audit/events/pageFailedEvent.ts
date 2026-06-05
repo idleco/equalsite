@@ -9,4 +9,4 @@ export const pageFailedEvent = (payload: {
 }): EventPublisherParams<typeof EventEnum.PageFailed> => ({
     type: EventEnum.PageFailed,
     payload
-})
+});

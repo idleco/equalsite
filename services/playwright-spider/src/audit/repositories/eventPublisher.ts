@@ -1,7 +1,5 @@
 import type { EventPayloadMap, EventType } from "@equalsite/types";
 
-export { EventType };
-
 export type EventPayload<T extends EventType> = EventPayloadMap[T];
 
 export type EventPublisherParams<T extends EventType> = {

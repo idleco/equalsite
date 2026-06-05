@@ -2,18 +2,14 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Actions\UnzipCrawlerArtifacts;
+use App\Actions\Audit\UnzipCrawlerArtifacts;
 use App\Http\Controllers\Controller;
-use App\Jobs\ExtractCrawlerArtifacts;
+use App\Jobs\ProcessAuditArtifacts;
 use Illuminate\Http\Request;
 
 class CrawlerCallbackController extends Controller
 {
-    public function __construct(
-        protected UnzipCrawlerArtifacts $unzipper,
-    ) {}
-
-    public function __invoke(Request $request)
+    public function __invoke(Request $request, UnzipCrawlerArtifacts $zip)
     {
         if ($request->boolean('probe')) {
             return response()->json(['ok' => true]);
@@ -23,9 +19,9 @@ class CrawlerCallbackController extends Controller
             $crawlId = $request->crawlId;
 
             $zipFile = $request->file('artifact');
-            $this->unzipper->unzip($crawlId, $zipFile->getRealPath());
+            $zip->unzip($crawlId, $zipFile->getRealPath());
 
-            ExtractCrawlerArtifacts::dispatch($crawlId);
+            ProcessAuditArtifacts::dispatch($crawlId);
         }
 
         return response()->json([

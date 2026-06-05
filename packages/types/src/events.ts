@@ -1,4 +1,4 @@
-import { QueueStatus, ServerityBreakdown, StatisticState } from './common';
+import { ProgressState, QueueStatus, ServerityBreakdown, StatisticState } from './common';
 
 export enum EventEnum {
     Queued = 'audit.queued',
@@ -8,6 +8,7 @@ export enum EventEnum {
     Failed = 'audit.failed',
     Cancelled = 'audit.cancelled',
     PageStarted = 'audit.page.started',
+    PageSkipped = 'audit.page.skipped',
     PageFailed = 'audit.page.failed',
     PageCompleted = 'audit.page.completed',
     CrawlerTelemetry = 'crawler.telemetry',
@@ -25,59 +26,51 @@ export interface EventPayloadMap {
     [EventEnum.Failed]: FailedPayload;
     [EventEnum.Cancelled]: CancelledPayload;
     [EventEnum.PageStarted]: PageStartedPayload;
+    [EventEnum.PageSkipped]: PageSkippedPayload;
     [EventEnum.PageFailed]: PageFailedPayload;
     [EventEnum.PageCompleted]: PageCompletedPayload;
     [EventEnum.CrawlerTelemetry]: TelemetryPayload;
 }
 
-export interface PageStartedPayload {
+interface BasePayload {
     auditId: string;
+}
+
+export interface PageStartedPayload extends BasePayload {
     pageUrl: string;
     attemptsCount: number;
 }
 
-export interface PageFailedPayload {
-    auditId: string;
+export interface PageSkippedPayload extends BasePayload {
+    pageUrl: string;
+    reason: string;
+}
+
+export interface PageFailedPayload extends BasePayload {
     pageUrl: string;
     attemptsCount: number;
     errorMessage: string;
 }
 
-export interface PageCompletedPayload {
-    auditId: string;
+export interface PageCompletedPayload extends BasePayload {
     pageUrl: string;
     accessibilityViolationsCount: number;
     severityBreakdown: ServerityBreakdown;
 }
 
-export interface ProgressPayload {
-    auditId: string;
-    completedRequests: number;
-    pendingRequests: number;
-    totalRequests: number;
-    progressPercentage: number;
-}
+export interface ProgressPayload extends BasePayload, ProgressState {}
 
-export interface QueuedPayload extends QueueStatus {
-    auditId: string;
-}
-
-export interface FailedPayload {
-    auditId: string;
+export interface FailedPayload extends BasePayload {
     error: string;
 }
 
-export interface CompletedPayload extends StatisticState {
-    auditId: string;
-}
+export interface QueuedPayload extends BasePayload, QueueStatus {}
 
-export interface CancelledPayload extends StatisticState {
-    auditId: string;
-}
+export interface CompletedPayload extends BasePayload, StatisticState {}
 
-export interface StartedPayload {
-    auditId: string;
-}
+export interface CancelledPayload extends BasePayload, StatisticState {}
+
+export interface StartedPayload extends BasePayload {}
 
 export interface TelemetryPayload {
     process: {
@@ -118,5 +111,6 @@ export type StartedEvent = PublishedEvent<'audit.started', StartedPayload>;
 export type QueuedEvent = PublishedEvent<'audit.queued', QueuedPayload>;
 export type PageStartedEvent = PublishedEvent<'audit.page.started', PageStartedPayload>;
 export type PageFailedEvent = PublishedEvent<'audit.page.failed', PageFailedPayload>;
+export type PageSkippedEvent = PublishedEvent<'audit.page.skipped', PageSkippedPayload>;
 export type PageCompletedEvent = PublishedEvent<'audit.page.completed', PageCompletedPayload>;
 export type ProgressEvent = PublishedEvent<'audit.progress', ProgressPayload>;

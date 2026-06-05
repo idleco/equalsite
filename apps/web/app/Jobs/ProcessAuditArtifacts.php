@@ -4,24 +4,17 @@ namespace App\Jobs;
 
 use App\Actions\CreateAuditViolation;
 use App\Models\Audit;
-use App\Value\Status;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
-class ExtractCrawlerArtifacts implements ShouldQueue
+class ProcessAuditArtifacts implements ShouldQueue
 {
     use Queueable;
 
-    /**
-     * Create a new job instance.
-     */
     public function __construct(
         public string $crawlerId
     ) {}
 
-    /**
-     * Execute the job.
-     */
     public function handle(CreateAuditViolation $violationCreator): void
     {
         /** @var Audit */

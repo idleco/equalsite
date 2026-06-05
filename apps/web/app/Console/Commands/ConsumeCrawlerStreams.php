@@ -2,12 +2,13 @@
 
 namespace App\Console\Commands;
 
+use App\Events;
 use App\Events\RedisStreamEvent;
 use App\Support\RedisStream;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Carbon;
 
 #[Signature('crawler:listen')]
 #[Description('Command description')]
@@ -42,8 +43,27 @@ class ConsumeCrawlerStreams extends Command
             group: $group,
             consumer: $consumer,
             handler: function ($data) {
-                Log::channel('crawler')->debug('Stream', $data->toArray());
-                // event(new RedisStreamEvent($data));
+                $this->info(sprintf(
+                    'Stream version %s [%s] %s on %s',
+                    $data->version,
+                    $data->id,
+                    $data->type,
+                    Carbon::createFromTimestampMs($data->timestamp)->toDateTimeString()
+                ));
+
+                event(match ($data->type) {
+                    'audit.queued' => new Events\Audit\AuditQueued($data),
+                    'audit.started' => new Events\Audit\AuditStarted($data),
+                    'audit.progress' => new Events\Audit\AuditProgress($data),
+                    'audit.completed' => new Events\Audit\AuditCompleted($data),
+                    'audit.failed' => new Events\Audit\AuditFailed($data),
+                    'audit.cancelled' => new Events\Audit\AuditCancelled($data),
+                    'audit.page.started' => new Events\Audit\AuditPageStarted($data),
+                    'audit.page.skipped' => new Events\Audit\AuditPageSkipped($data),
+                    'audit.page.failed' => new Events\Audit\AuditPageFailed($data),
+                    'audit.page.completed' => new Events\Audit\AuditPageCompleted($data),
+                    default => new RedisStreamEvent($data)
+                });
             }
         );
 

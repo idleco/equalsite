@@ -1,11 +1,12 @@
-import { PlaywrightCrawler, StatisticState } from "crawlee";
-import AuditEntity from "../entities/audit";
-import { AuditRepository } from "../repositories/auditRepository";
-import { EventPublisher } from "../repositories/eventPublisher";
+import type { PlaywrightCrawler} from "crawlee";
+import type AuditEntity from "../entities/audit";
+import type { AuditRepository } from "../repositories/auditRepository";
+import type { EventPublisher } from "../repositories/eventPublisher";
 import { completedEvent } from "../events/completedEvent";
 import { startedEvent } from "../events/startedEvent";
 import { failedEvent } from "../events/failedEvent";
 import { cancelledEvent } from "../events/cancelledEvent";
+import { progressEvent } from "../events/progressEvent";
 
 
 export const createAuditService = (
@@ -40,6 +41,16 @@ export const createAuditService = (
         audit: AuditEntity,
         crawler: PlaywrightCrawler
     ) => {
+        const queue = await crawler.getRequestQueue();
+        const info = await queue.getInfo();
+
+        await eventPublisher(progressEvent({
+            auditId: audit.id,
+            completedRequests: info?.handledRequestCount ?? 0,
+            pendingRequests: info?.pendingRequestCount ?? 0,
+            totalRequests: info?.totalRequestCount ?? 0,
+        }));
+
         return await Promise.allSettled([
             auditRepository.save(audit.markAsCompleted()),
             eventPublisher(completedEvent({

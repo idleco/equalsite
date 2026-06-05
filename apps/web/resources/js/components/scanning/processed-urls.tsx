@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { str } from "@/lib/utils";
 import type { ServerityBreakdown } from "@equalsite/types";
+import type { ScannedUrl } from "@/types";
 
 enum ImpactLevel {
     critical = 0,
@@ -23,15 +24,15 @@ function sortSeverityBreakdown(breakdown: ServerityBreakdown): ImpactLevelKey[] 
     return impactLevels.sort((a, b) => ImpactLevel[a] - ImpactLevel[b]);
 }
 
-type Props = {
-    processedUrls: Record<string, ServerityBreakdown>;
+type ProcessedUrlsProps = {
+    scanUrls: Record<string, ScannedUrl>;
 }
 
 export default function ProcessedUrls({
-    processedUrls
-}: Props) {
-    const renderSeverityBreakdown = (item: ServerityBreakdown) => {
-        return sortSeverityBreakdown(item).map(k => (
+    scanUrls
+}: ProcessedUrlsProps) {
+    const renderSeverityBreakdown = (item?: ServerityBreakdown) => {
+        return item ? sortSeverityBreakdown(item).map(k => (
             <Badge key={k} className={({
                 'critical': 'bg-chart-5/20 text-chart-5',
                 'serious':  'bg-chart-3/20 text-chart-3',
@@ -43,7 +44,7 @@ export default function ProcessedUrls({
                 </span>
                 {str.title(k)}
             </Badge>
-        ));
+        )) : null;
     }
     return (
         <Card>
@@ -61,7 +62,7 @@ export default function ProcessedUrls({
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {Object.keys(processedUrls).reverse().map(url => (
+                        {Object.keys(scanUrls).reverse().map(url => (
                             <TableRow key={url}>
                                 <TableCell className="font-medium min-w-2xl">
                                     <Stack direction="row" gap="xs" align="center">
@@ -71,7 +72,8 @@ export default function ProcessedUrls({
                                 </TableCell>
                                 <TableCell>
                                     <Stack direction="row" gap="xs">
-                                        {renderSeverityBreakdown(processedUrls[url] as ServerityBreakdown)}
+                                        <Badge>{scanUrls[url]?.status}</Badge>
+                                        {renderSeverityBreakdown(scanUrls[url]?.severityBreakdown)}
                                     </Stack>
                                 </TableCell>
                                 <TableCell className="text-right">

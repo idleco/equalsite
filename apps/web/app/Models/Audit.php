@@ -30,11 +30,6 @@ class Audit extends Model
         'started_at' => 'datetime'
     ];
 
-    public function isActive(): bool
-    {
-        return $this->status->queued() || $this->status->started();
-    }
-
     public function artifacts(): CrawlerArtifacts
     {
         return new CrawlerArtifacts($this->crawler_id);
@@ -84,14 +79,6 @@ class Audit extends Model
         ])->save();
 
         return $this;
-    }
-
-    public function fail(string $reason): void
-    {
-        $this->fill([
-            'status' => Status::Failed,
-            'failure_reason' => $reason
-        ])->save();
     }
 
     public function violations(): HasMany

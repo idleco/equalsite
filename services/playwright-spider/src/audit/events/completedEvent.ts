@@ -11,4 +11,4 @@ export const completedEvent = (payload: {
         auditId: payload.auditId,
         ...payload.statistics
     }
-})
+});

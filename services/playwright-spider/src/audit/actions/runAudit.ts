@@ -2,11 +2,8 @@ import type { AuditRepository } from "../repositories/auditRepository";
 import createPlaywrightCrawler from "./crawlerFactory";
 import type { EventPublisher } from "../repositories/eventPublisher";
 import { createReleaseArtifactsAction } from "./releaseArtifacts";
-import { failedEvent } from "../events/failedEvent";
-import { completedEvent } from "../events/completedEvent";
-import { startedEvent } from "../events/startedEvent";
 import { crawlerMap } from "../services/crawlerMap";
-import AuditEntity from "../entities/audit";
+import type AuditEntity from "../entities/audit";
 import { deleteFileIfExists } from "../utils/fsDirectory";
 import { createAuditService } from "../services/auditService";
 
@@ -35,10 +32,10 @@ export const createRunAuditAction = (
     async function performAuditCleanup(audit: AuditEntity, zipPath: string) {
         try  {
             await crawlerMap.get(audit.id)?.teardown();
-            await deleteFileIfExists(zipPath);
         } finally {
             await auditRepository.delete(audit.id);
             crawlerMap.delete(audit.id);
+            deleteFileIfExists(zipPath);
         }
     }
 

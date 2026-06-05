@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Actions;
+namespace App\Actions\Audit;
 
 use App\Support\CrawlerArtifacts;
 use Illuminate\Support\Facades\File;

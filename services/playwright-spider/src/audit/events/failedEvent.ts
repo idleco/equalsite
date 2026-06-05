@@ -7,4 +7,4 @@ export const failedEvent = (payload: {
 }): EventPublisherParams<typeof EventEnum.Failed> => ({
     type: EventEnum.Failed,
     payload
-})
+});

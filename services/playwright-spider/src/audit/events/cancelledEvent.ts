@@ -11,4 +11,4 @@ export const cancelledEvent = (payload: {
         auditId: payload.auditId,
         ...payload.statistics
     }
-})
+});

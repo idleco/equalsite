@@ -1,9 +1,6 @@
 <?php
 
-use App\Http\Controllers\Audit\CancelAuditController;
-use App\Http\Controllers\Audit\ScanController;
-use App\Http\Controllers\WebsiteScanController;
-use App\Support\CrawlerHttpClient;
+use App\Http\Controllers\Audit\ScanningController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
@@ -18,13 +15,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::inertia('/audit/create', 'audit/scan-request')
     ->name('audit.scan.create');
 
-Route::delete('/audit/{id}/cancel', CancelAuditController::class)
-    ->name('audit.scan.cancel');
-
-Route::get('/audit/{id}', ScanController::class)
-    ->name('audit.scan.progress');
-
-Route::post('/website-scan', [WebsiteScanController::class, 'store'])
-    ->name('website-scan.store');
+Route::post('/audit', [ScanningController::class, 'store'])->name('scanning.store');
+Route::delete('/audit/{id}', [ScanningController::class, 'cancel'])->name('scanning.cancel');
+Route::get('/audit/{id}', [ScanningController::class, 'progress'])->name('scanning.progress');
 
 require __DIR__ . '/settings.php';

@@ -7,6 +7,8 @@ import type { EventPublisher } from '../repositories/eventPublisher';
 import { createProcessAxeResultAction } from './processAxeResult';
 import { pageFailedEvent } from '../events/pageFailedEvent';
 import { pageStartedEvent } from '../events/pageStartedEvent';
+import { pageSkippedEvent } from '../events/pageSkippedEvent';
+import { progressEvent } from '../events/progressEvent';
 
 type CrawlerFactoryParams = {
     auditId: string;
@@ -31,27 +33,15 @@ export default function createPlaywrightCrawler({
         },
     });
 
-    const failedRequestHandler: PlaywrightCrawlerOptions['failedRequestHandler'] = async ({ request }, error) => {
-        await eventPublisher(pageFailedEvent({
-            auditId,
-            pageUrl: request.url,
-            attemptsCount: request.retryCount,
-            errorMessage: error.message
-        }));
-    }
-
     const requestHandler: PlaywrightCrawlerOptions['requestHandler'] = async ({
         request,
         page,
         pushData,
         enqueueLinks,
+        crawler
     }) => {
         const processAxeResultAction = createProcessAxeResultAction(pushData, eventPublisher);
-        console.log('Crawlee page started', {
-            auditId,
-            pageUrl: request.url,
-            attemptsCount: request.retryCount
-        });
+
         await eventPublisher(pageStartedEvent({
             auditId,
             pageUrl: request.url,
@@ -66,18 +56,42 @@ export default function createPlaywrightCrawler({
             pageUrl: request.url,
             auditId,
             axeResults
-        })
+        });
 
         await enqueueLinks({
             strategy: EnqueueStrategy.SameDomain,
             selector: 'a',
         });
+
+        const queue = await crawler.getRequestQueue();
+        const info = await queue.getInfo();
+
+        await eventPublisher(progressEvent({
+            auditId,
+            completedRequests: info?.handledRequestCount ?? 0,
+            pendingRequests: info?.pendingRequestCount ?? 0,
+            totalRequests: info?.totalRequestCount ?? 0,
+        }));
     }
 
     return new PlaywrightCrawler(
         {
-            failedRequestHandler,
             requestHandler,
+            failedRequestHandler: async ({ request }, error) => {
+                await eventPublisher(pageFailedEvent({
+                    auditId,
+                    pageUrl: request.url,
+                    attemptsCount: request.retryCount,
+                    errorMessage: error.message
+                }));
+            },
+            onSkippedRequest: async ({ url, reason }) => {
+                await eventPublisher(pageSkippedEvent({
+                    auditId,
+                    reason,
+                    pageUrl: url,
+                }));
+            },
             minConcurrency: 1,
             maxConcurrency: 2,
             maxRequestsPerCrawl: options.maxPages,

@@ -1,11 +1,11 @@
 import { EventEnum } from "@equalsite/types";
 import type { EventPublisherParams } from "../repositories/eventPublisher";
 
-export const pageStartedEvent = (payload: {
+export const pageSkippedEvent = (payload: {
     auditId: string;
     pageUrl: string;
-    attemptsCount: number;
-}): EventPublisherParams<typeof EventEnum.PageStarted> => ({
-    type: EventEnum.PageStarted,
+    reason: string;
+}): EventPublisherParams<typeof EventEnum.PageSkipped> => ({
+    type: EventEnum.PageSkipped,
     payload
 });

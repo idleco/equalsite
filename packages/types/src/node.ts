@@ -8,7 +8,8 @@ import type {
     ProgressEvent,
     QueuedEvent,
     StartedEvent,
-    TelemetryEvent
+    TelemetryEvent,
+    PageSkippedEvent
 } from "./events";
 
 interface StreamData<T> {
@@ -16,6 +17,7 @@ interface StreamData<T> {
 }
 
 export type PageStartedStream = StreamData<PageStartedEvent>;
+export type PageSkippedStream = StreamData<PageSkippedEvent>
 export type PageFailedStream = StreamData<PageFailedEvent>;
 export type PageCompletedStream = StreamData<PageCompletedEvent>;
 export type ProgressStream = StreamData<ProgressEvent>;
