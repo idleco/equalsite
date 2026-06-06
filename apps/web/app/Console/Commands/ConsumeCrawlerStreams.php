@@ -44,11 +44,10 @@ class ConsumeCrawlerStreams extends Command
             consumer: $consumer,
             handler: function ($data) {
                 $this->info(sprintf(
-                    'Stream version %s [%s] %s on %s',
-                    $data->version,
-                    $data->id,
+                    '%s - [%s] %s',
+                    Carbon::createFromTimestampMs($data->timestamp)->toDateTimeString(),
                     $data->type,
-                    Carbon::createFromTimestampMs($data->timestamp)->toDateTimeString()
+                    json_encode($data->payload),
                 ));
 
                 event(match ($data->type) {

@@ -9,14 +9,24 @@ use App\Events\Audit\AuditPageFailed;
 use App\Events\Audit\AuditPageStarted;
 use App\Events\Audit\AuditQueued;
 use App\Events\Audit\AuditStarted;
+use App\Events\Audit\BaseEvent;
 use App\Models\Audit;
 use App\Value\Status;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Events\Dispatcher;
+use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class AuditStatusSubscriber implements ShouldQueue
 {
+    // public function middleware(BaseEvent $event)
+    // {
+    //     return [
+    //         (new WithoutOverlapping('audit-' . $event->crawlerId() . '-status-subscribe'))->shared()
+    //     ];
+    // }
+
     public function handleAuditStarted(AuditStarted $event): void
     {
         $this->updateAudit($event->crawlerId(), [
@@ -46,13 +56,17 @@ class AuditStatusSubscriber implements ShouldQueue
         return Carbon::createFromTimestampMs($timestamp);
     }
 
-    protected function updateAudit(int $crawlerId, array $attributes): void
+    protected function updateAudit(string $crawlerId, array $attributes): void
     {
-        $audit = Audit::where('crawler_id', $crawlerId)->first();
+        DB::transaction(function () use ($crawlerId, $attributes) {
+            $audit = Audit::where('crawler_id', $crawlerId)
+                ->lockForUpdate()
+                ->first();
 
-        if ($audit) {
-            $audit->update($attributes);
-        }
+            if ($audit) {
+                $audit->update($attributes);
+            }
+        });
     }
 
     public function subscribe(Dispatcher $events): void

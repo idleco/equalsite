@@ -32,13 +32,11 @@ export const CreateAudit: CreateAuditRequest = async (
     request,
     response
 ) => {
-    const url = request.body.url;
+    const siteUrl = request.body.url;
     const options = request.body.options;
     const urlCallback = request.query.callback;
 
-    console.log('Create audit request', { url, options, urlCallback });
-
-    if (!url || typeof url !== 'string') {
+    if (!siteUrl || typeof siteUrl !== 'string') {
         return response.status(400).json({
             error: 'Invalid request body',
             message: 'JSON body with a string "url" field is required',
@@ -52,23 +50,26 @@ export const CreateAudit: CreateAuditRequest = async (
         });
     }
 
-    const maxPages = options?.maxPages || maxRequestsPerCrawl;
-
     const auditId = await createAuditAction.run({
-        url,
+        url: siteUrl,
         urlCallback,
-        options: { maxPages }
+        options: {
+            maxPages: options?.maxPages || maxRequestsPerCrawl
+        }
     });
 
-    const job = await crawlerQueue.add('audit', { auditId }, { jobId: auditId });
-
-    console.log('accepted', job.id);
+    const auditJob = await crawlerQueue.add('audit', { auditId }, { jobId: auditId });
 
     return response.status(202).json({
         accepted: true,
-        auditId,
-        url,
-        options,
+        data: {
+            auditId: auditJob.id,
+            auditRequest: {
+                siteUrl,
+                options,
+                urlCallback
+            }
+        }
     });
 }
 

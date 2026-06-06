@@ -47,6 +47,7 @@ declare enum EventEnum {
     Failed = "audit.failed",
     Cancelled = "audit.cancelled",
     PageStarted = "audit.page.started",
+    PageSkipped = "audit.page.skipped",
     PageFailed = "audit.page.failed",
     PageCompleted = "audit.page.completed",
     CrawlerTelemetry = "crawler.telemetry"
@@ -61,49 +62,44 @@ interface EventPayloadMap {
     [EventEnum.Failed]: FailedPayload;
     [EventEnum.Cancelled]: CancelledPayload;
     [EventEnum.PageStarted]: PageStartedPayload;
+    [EventEnum.PageSkipped]: PageSkippedPayload;
     [EventEnum.PageFailed]: PageFailedPayload;
     [EventEnum.PageCompleted]: PageCompletedPayload;
     [EventEnum.CrawlerTelemetry]: TelemetryPayload;
 }
-interface PageStartedPayload {
+interface BasePayload {
     auditId: string;
+}
+interface PageStartedPayload extends BasePayload {
     pageUrl: string;
     attemptsCount: number;
 }
-interface PageFailedPayload {
-    auditId: string;
+interface PageSkippedPayload extends BasePayload {
+    pageUrl: string;
+    reason: string;
+}
+interface PageFailedPayload extends BasePayload {
     pageUrl: string;
     attemptsCount: number;
     errorMessage: string;
 }
-interface PageCompletedPayload {
-    auditId: string;
+interface PageCompletedPayload extends BasePayload {
     pageUrl: string;
     accessibilityViolationsCount: number;
     severityBreakdown: ServerityBreakdown;
 }
-interface ProgressPayload {
-    auditId: string;
-    completedRequests: number;
-    pendingRequests: number;
-    totalRequests: number;
-    progressPercentage: number;
+interface ProgressPayload extends BasePayload, ProgressState {
 }
-interface QueuedPayload extends QueueStatus {
-    auditId: string;
-}
-interface FailedPayload {
-    auditId: string;
+interface FailedPayload extends BasePayload {
     error: string;
 }
-interface CompletedPayload extends StatisticState {
-    auditId: string;
+interface QueuedPayload extends BasePayload, QueueStatus {
 }
-interface CancelledPayload extends StatisticState {
-    auditId: string;
+interface CompletedPayload extends BasePayload, StatisticState {
 }
-interface StartedPayload {
-    auditId: string;
+interface CancelledPayload extends BasePayload, StatisticState {
+}
+interface StartedPayload extends BasePayload {
 }
 interface TelemetryPayload {
     process: {
@@ -142,37 +138,60 @@ type StartedEvent = PublishedEvent<'audit.started', StartedPayload>;
 type QueuedEvent = PublishedEvent<'audit.queued', QueuedPayload>;
 type PageStartedEvent = PublishedEvent<'audit.page.started', PageStartedPayload>;
 type PageFailedEvent = PublishedEvent<'audit.page.failed', PageFailedPayload>;
+type PageSkippedEvent = PublishedEvent<'audit.page.skipped', PageSkippedPayload>;
 type PageCompletedEvent = PublishedEvent<'audit.page.completed', PageCompletedPayload>;
 type ProgressEvent = PublishedEvent<'audit.progress', ProgressPayload>;
 
-type Status = 'queued' | 'started' | 'cancelled' | 'failed' | 'completed';
-type WebSocketEventType = 'audit.progress' | 'audit.updated';
-interface WebSocketEvent<T> {
-    event: WebSocketEventType;
-    data: T;
+declare enum StatusEnum {
+    Queued = "queued",
+    Started = "started",
+    Cancelled = "cancelled",
+    Failed = "failed",
+    Completed = "completed"
 }
-type UpdatedWebSocketEvent = WebSocketEvent<{
-    cancelledAt?: string;
-    completedAt?: string;
-    id: string;
-    failureReason?: string;
-    startedAt?: string;
-    status: Status;
-    stats?: Stats;
-}>;
-type ProgressWebSocketEvent = WebSocketEvent<{
-    violations: number;
-    id: string;
-    url: string;
-    stats: Stats;
+type StatusEnumKeys = keyof typeof StatusEnum;
+interface WsEvent<D> {
+    type: EventType;
+    data: D;
+    version: string;
     timestamp: string;
-    severityBreakdown: ServerityBreakdown;
-}>;
+}
+interface StartedWsData extends StartedPayload {
+}
+interface QueuedWsData extends QueuedPayload {
+}
+interface FailedWsData extends FailedPayload {
+}
+interface CancelledWsData extends CancelledPayload {
+}
+interface CompletedWsData extends CompletedPayload {
+}
+interface PageStartedWsData extends PageStartedPayload {
+}
+interface PageSkippedWsData extends PageSkippedPayload {
+}
+interface PageFailedWsData extends PageFailedPayload {
+}
+interface PageCompletedWsData extends PageCompletedPayload {
+}
+interface ProgressWsData extends ProgressPayload {
+}
+type StartedWsEvent = WsEvent<StartedWsData>;
+type QueuedWsEvent = WsEvent<QueuedWsData>;
+type FailedWsEvent = WsEvent<FailedWsData>;
+type CancelledWsEvent = WsEvent<CancelledWsData>;
+type CompletedWsEvent = WsEvent<CompletedWsData>;
+type PageStartedWsEvent = WsEvent<PageStartedWsData>;
+type PageFailedWsEvent = WsEvent<PageFailedWsData>;
+type PageSkippedWsEvent = WsEvent<PageSkippedWsData>;
+type PageCompletedWsEvent = WsEvent<PageCompletedWsData>;
+type ProgressWsEvent = WsEvent<ProgressWsData>;
 
 interface StreamData<T> {
     data: T;
 }
 type PageStartedStream = StreamData<PageStartedEvent>;
+type PageSkippedStream = StreamData<PageSkippedEvent>;
 type PageFailedStream = StreamData<PageFailedEvent>;
 type PageCompletedStream = StreamData<PageCompletedEvent>;
 type ProgressStream = StreamData<ProgressEvent>;
@@ -183,4 +202,4 @@ type StartedStream = StreamData<StartedEvent>;
 type CancelledStream = StreamData<CancelledEvent>;
 type TelemetryStream = StreamData<TelemetryEvent>;
 
-export { type CancelledEvent, type CancelledPayload, type CancelledStream, type CompletedEvent, type CompletedPayload, type CompletedStream, EventEnum, type EventEnumKeys, type EventPayloadMap, type EventType, type FailedEvent, type FailedPayload, type FailedStream, type ImpactKey, type ImpactLevel, type PageCompletedEvent, type PageCompletedPayload, type PageCompletedStream, type PageFailedEvent, type PageFailedPayload, type PageFailedStream, type PageStartedEvent, type PageStartedPayload, type PageStartedStream, type ProgressEvent, type ProgressPayload, type ProgressState, type ProgressStream, type ProgressWebSocketEvent, type PublishedEvent, type QueueStatus, type QueuedEvent, type QueuedPayload, type QueuedStream, type ServerityBreakdown, type StartedEvent, type StartedPayload, type StartedStream, type StatisticState, type Stats, type Status, type TelemetryEvent, type TelemetryPayload, type TelemetryStream, type UpdatedWebSocketEvent, type WebSocketEventType };
+export { type CancelledEvent, type CancelledPayload, type CancelledStream, type CancelledWsData, type CancelledWsEvent, type CompletedEvent, type CompletedPayload, type CompletedStream, type CompletedWsData, type CompletedWsEvent, EventEnum, type EventEnumKeys, type EventPayloadMap, type EventType, type FailedEvent, type FailedPayload, type FailedStream, type FailedWsData, type FailedWsEvent, type ImpactKey, type ImpactLevel, type PageCompletedEvent, type PageCompletedPayload, type PageCompletedStream, type PageCompletedWsData, type PageCompletedWsEvent, type PageFailedEvent, type PageFailedPayload, type PageFailedStream, type PageFailedWsData, type PageFailedWsEvent, type PageSkippedEvent, type PageSkippedPayload, type PageSkippedStream, type PageSkippedWsData, type PageSkippedWsEvent, type PageStartedEvent, type PageStartedPayload, type PageStartedStream, type PageStartedWsData, type PageStartedWsEvent, type ProgressEvent, type ProgressPayload, type ProgressState, type ProgressStream, type ProgressWsData, type ProgressWsEvent, type PublishedEvent, type QueueStatus, type QueuedEvent, type QueuedPayload, type QueuedStream, type QueuedWsData, type QueuedWsEvent, type ServerityBreakdown, type StartedEvent, type StartedPayload, type StartedStream, type StartedWsData, type StartedWsEvent, type StatisticState, type Stats, StatusEnum, type StatusEnumKeys, type TelemetryEvent, type TelemetryPayload, type TelemetryStream, type WsEvent };

@@ -6,6 +6,7 @@ use App\Actions\Audit\UnzipCrawlerArtifacts;
 use App\Http\Controllers\Controller;
 use App\Jobs\ProcessAuditArtifacts;
 use Illuminate\Http\Request;
+use Throwable;
 
 class CrawlerCallbackController extends Controller
 {
@@ -16,12 +17,13 @@ class CrawlerCallbackController extends Controller
         }
 
         if ($request->hasFile('artifact')) {
-            $crawlId = $request->crawlId;
-
-            $zipFile = $request->file('artifact');
-            $zip->unzip($crawlId, $zipFile->getRealPath());
-
-            ProcessAuditArtifacts::dispatch($crawlId);
+            try {
+                $zipFile = $request->file('artifact');
+                $zip->unzip($request->auditId, $zipFile->getRealPath());
+                ProcessAuditArtifacts::dispatch($request->auditId);
+            } catch (Throwable $e) {
+                report($e);
+            }
         }
 
         return response()->json([

@@ -19,9 +19,9 @@ class CrawlerPage
     public static function fromJson(array $value): static
     {
         return new static(
-            crawlId: $value['crawlId'],
-            url: $value['url'],
-            violations: collect($value['violations'])
+            crawlId: $value['auditId'],
+            url: $value['pageUrl'],
+            violations: collect($value['accessibilityViolations'])
                 ->map(fn(array $array) => CrawlerViolation::fromJson($array))
                 ->all()
         );

@@ -134,13 +134,14 @@ class RedisStream implements StreamBus
                             new RedisStreamData(
                                 id: $id,
                                 streamName: $streamName,
-                                type: $data['type'] ?? null,
+                                type: $data['type'] ?? 'unknown',
                                 payload: $data['payload'] ?? [],
                                 version: $data['version'] ?? 1,
                                 timestamp: (int) $data['timestamp'] ?? now()->getTimestampMs()
                             )
                         );
                         $this->ack($stream, $group, $id);
+                        usleep(1000);
                     } catch (Throwable $e) {
                         report($e);
 

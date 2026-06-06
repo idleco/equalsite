@@ -6,24 +6,40 @@ import {
   crawlerMap,
   createAuditService,
   deleteDirectoryIfExists,
-  deleteFileIfExists,
+  progressEvent,
   publishEvent,
   secretKey,
   zipDirectory
-} from "./chunk-2XOCD232.js";
+} from "./chunk-NXGFBMWD.js";
 
 // src/worker.ts
 import { Worker } from "bullmq";
 
 // src/audit/actions/crawlerFactory.ts
 import path from "path";
-import { Configuration, EnqueueStrategy, PlaywrightCrawler } from "crawlee";
-import { AxeBuilder } from "@axe-core/playwright";
+import { Configuration, PlaywrightCrawler } from "crawlee";
+
+// src/audit/events/pageFailedEvent.ts
+import { EventEnum } from "@equalsite/types";
+var pageFailedEvent = (payload) => ({
+  type: EventEnum.PageFailed,
+  payload
+});
+
+// src/audit/actions/handleAuditPageRequest.ts
+import { EnqueueStrategy } from "crawlee";
+
+// src/audit/events/pageStartedEvent.ts
+import { EventEnum as EventEnum2 } from "@equalsite/types";
+var pageStartedEvent = (payload) => ({
+  type: EventEnum2.PageStarted,
+  payload
+});
 
 // src/audit/events/pageCompletedEvent.ts
-import { EventEnum } from "@equalsite/types";
+import { EventEnum as EventEnum3 } from "@equalsite/types";
 var pageCompletedEvent = (payload) => ({
-  type: EventEnum.PageCompleted,
+  type: EventEnum3.PageCompleted,
   payload
 });
 
@@ -63,19 +79,40 @@ var createProcessAxeResultAction = (pushData, eventPublisher) => ({
   }
 });
 
-// src/audit/events/pageFailedEvent.ts
-import { EventEnum as EventEnum2 } from "@equalsite/types";
-var pageFailedEvent = (payload) => ({
-  type: EventEnum2.PageFailed,
-  payload
-});
-
-// src/audit/events/pageStartedEvent.ts
-import { EventEnum as EventEnum3 } from "@equalsite/types";
-var pageStartedEvent = (payload) => ({
-  type: EventEnum3.PageStarted,
-  payload
-});
+// src/audit/actions/handleAuditPageRequest.ts
+import AxeBuilder from "@axe-core/playwright";
+var createAuditPageRequestHandler = (auditId, eventPublisher) => async ({
+  request,
+  page,
+  pushData,
+  enqueueLinks,
+  crawler: crawler2
+}) => {
+  await eventPublisher(pageStartedEvent({
+    auditId,
+    pageUrl: request.url,
+    attemptsCount: request.retryCount
+  }));
+  const processAxeResultAction = createProcessAxeResultAction(pushData, eventPublisher);
+  const axeResults = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag22aa"]).analyze();
+  await processAxeResultAction.run({
+    pageUrl: request.url,
+    auditId,
+    axeResults
+  });
+  const queue = await crawler2.getRequestQueue();
+  const info = await queue.getInfo();
+  await eventPublisher(progressEvent({
+    auditId,
+    completedRequests: info?.handledRequestCount ?? 0,
+    pendingRequests: info?.pendingRequestCount ?? 0,
+    totalRequests: info?.totalRequestCount ?? 0
+  }));
+  await enqueueLinks({
+    strategy: EnqueueStrategy.SameDomain,
+    selector: "a"
+  });
+};
 
 // src/audit/actions/crawlerFactory.ts
 function createPlaywrightCrawler({
@@ -91,46 +128,24 @@ function createPlaywrightCrawler({
       localDataDirectory: storageDir
     }
   });
-  const failedRequestHandler = async ({ request }, error) => {
-    await eventPublisher(pageFailedEvent({
-      auditId,
-      pageUrl: request.url,
-      attemptsCount: request.retryCount,
-      errorMessage: error.message
-    }));
-  };
-  const requestHandler = async ({
-    request,
-    page,
-    pushData,
-    enqueueLinks
-  }) => {
-    const processAxeResultAction = createProcessAxeResultAction(pushData, eventPublisher);
-    console.log("Crawlee page started", {
-      auditId,
-      pageUrl: request.url,
-      attemptsCount: request.retryCount
-    });
-    await eventPublisher(pageStartedEvent({
-      auditId,
-      pageUrl: request.url,
-      attemptsCount: request.retryCount
-    }));
-    const axeResults = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag22aa"]).analyze();
-    await processAxeResultAction.run({
-      pageUrl: request.url,
-      auditId,
-      axeResults
-    });
-    await enqueueLinks({
-      strategy: EnqueueStrategy.SameDomain,
-      selector: "a"
-    });
-  };
   return new PlaywrightCrawler(
     {
-      failedRequestHandler,
-      requestHandler,
+      requestHandler: createAuditPageRequestHandler(auditId, eventPublisher),
+      failedRequestHandler: async ({ request }, error) => {
+        await eventPublisher(pageFailedEvent({
+          auditId,
+          pageUrl: request.url,
+          attemptsCount: request.retryCount,
+          errorMessage: error.message
+        }));
+      },
+      // onSkippedRequest: async ({ url, reason }) => {
+      //     await eventPublisher(pageSkippedEvent({
+      //         auditId,
+      //         reason,
+      //         pageUrl: url,
+      //     }));
+      // },
       minConcurrency: 1,
       maxConcurrency: 2,
       maxRequestsPerCrawl: options.maxPages,
@@ -162,53 +177,64 @@ function createPlaywrightCrawler({
         }
       },
       preNavigationHooks: [
-        // Resource Blocking
-        async ({ page }) => {
-          await page.route("**/*", async (route) => {
-            const request = route.request();
-            const resourceType = request.resourceType();
-            if ([
-              "media",
-              "font",
-              "websocket",
-              "manifest",
-              "stylesheet"
-            ].includes(resourceType)) {
-              return await route.abort();
-            }
-            const url = request.url();
-            if (url.includes("google-analytics") || url.includes("doubleclick") || url.includes("hotjar")) {
-              return await route.abort();
-            }
-            return await route.continue();
-          });
-        }
+        resourceBlockingHook
       ]
     },
     config
   );
 }
+var resourceBlockingHook = async ({ page }) => {
+  await page.route("**/*", async (route) => {
+    const request = route.request();
+    const resourceType = request.resourceType();
+    if ([
+      "media",
+      "font",
+      "websocket",
+      "manifest",
+      "stylesheet"
+    ].includes(resourceType)) {
+      return await route.abort();
+    }
+    const url = request.url();
+    if (url.includes("google-analytics") || url.includes("doubleclick") || url.includes("hotjar")) {
+      return await route.abort();
+    }
+    return await route.continue();
+  });
+};
 
 // src/audit/actions/releaseArtifacts.ts
 import fs from "fs";
 import path2 from "path";
-var createReleaseArtifactsAction = (auditRepository2, secretKey2) => ({
-  run: async ({
-    auditId,
-    artifactDirectory,
-    archiveDirectory
-  }) => {
-    const audit = await auditRepository2.findOrFail(auditId);
-    const zipPath = await extractAndCompressArtifacts(audit, archiveDirectory, artifactDirectory);
+var createReleaseArtifactsAction = (auditRepository2, artifactDirectory, archiveDirectory, secretKey2) => {
+  async function performAuditCleanup(audit, zipPath) {
+    console.log("Performing audit cleanup...");
     try {
-      await sendHttpRequest(audit, zipPath, secretKey2);
+      await crawlerMap.get(audit.id)?.teardown();
+      crawlerMap.delete(audit.id);
+      await auditRepository2.delete(audit.id);
+      console.log("Cleanup successfully!");
     } catch (err) {
-      console.error(err);
-    } finally {
-      return zipPath;
+      console.log("Clean up failed: ", err);
     }
   }
-});
+  return {
+    run: async (auditId) => {
+      const audit = await auditRepository2.findOrFail(auditId);
+      const zipPath = await extractAndCompressArtifacts(audit, artifactDirectory, archiveDirectory);
+      console.log(`Releasing audit (${auditId}) artifacts...`);
+      try {
+        await sendHttpRequest(audit, zipPath, secretKey2);
+        console.log(`Audit ${auditId} artifacts sent!`);
+      } catch (err) {
+        console.error("Audit artifacts could'nt release: ", err);
+      } finally {
+        await performAuditCleanup(audit, zipPath);
+      }
+    }
+  };
+};
 async function sendHttpRequest(audit, zipPath, secretKey2) {
   const form = new FormData();
   form.append("auditId", audit.id);
@@ -225,6 +251,7 @@ async function sendHttpRequest(audit, zipPath, secretKey2) {
 async function extractAndCompressArtifacts(audit, artifactDirectory, archiveDirectory) {
   const sourceDir = path2.join(artifactDirectory, audit.id);
   const zipPath = path2.join(archiveDirectory, `${audit.id}.zip`);
+  console.log(`Extracting artifacts (${sourceDir}) to (${zipPath})`);
   const result = await zipDirectory(sourceDir, zipPath);
   await deleteDirectoryIfExists(sourceDir);
   return result.path;
@@ -238,16 +265,7 @@ var createRunAuditAction = (auditRepository2, eventPublisher, config) => {
     secretKey: secretKey2
   } = config;
   const auditService = createAuditService(auditRepository2, eventPublisher);
-  const releaseArtifactsAction = createReleaseArtifactsAction(auditRepository2, secretKey2);
-  async function performAuditCleanup(audit, zipPath) {
-    try {
-      await crawlerMap.get(audit.id)?.teardown();
-      await deleteFileIfExists(zipPath);
-    } finally {
-      await auditRepository2.delete(audit.id);
-      crawlerMap.delete(audit.id);
-    }
-  }
+  const releaseArtifactsAction = createReleaseArtifactsAction(auditRepository2, artifactDirectory, archiveDirectory, secretKey2);
   return {
     run: async (auditId) => {
       const audit = await auditRepository2.findOrFail(auditId);
@@ -268,13 +286,9 @@ var createRunAuditAction = (auditRepository2, eventPublisher, config) => {
       } catch (err) {
         console.error(err);
         await auditService.failAudit(audit, err);
+        throw err;
       } finally {
-        const zipPath = await releaseArtifactsAction.run({
-          auditId: audit.id,
-          archiveDirectory,
-          artifactDirectory
-        });
-        void performAuditCleanup(audit, zipPath);
+        await releaseArtifactsAction.run(audit.id);
       }
     }
   };

@@ -5,7 +5,6 @@ namespace App\Actions\Audit;
 use App\Models\Audit;
 use App\Support\SpiderClient;
 use App\Value\Status;
-use Illuminate\Support\Arr;
 
 class CreateAudit
 {
@@ -15,13 +14,17 @@ class CreateAudit
 
     public function create(string $url, string $callback, array $options = []): Audit
     {
-        $id = $this->spider->create($url, $callback, $this->resolveOptions($options));
+        $response = $this->spider->create(
+            $url,
+            $callback,
+            $this->resolveOptions($options)
+        );
 
         return Audit::create([
-            'url' => $url,
             'domain' => parse_url($url, PHP_URL_HOST),
+            'url' => $url,
             'status' => Status::Queued,
-            'crawler_id' => $id
+            'crawler_id' => $response['data']['auditId']
         ]);
     }
 

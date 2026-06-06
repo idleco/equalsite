@@ -56,12 +56,18 @@ class Audit extends Model
     /**
      * @param string[] | string $key
      * @param \Closure $callback
+     * @deprecated use tapCustomData instead
      */
-    public function patchCustomData($key, Closure $callback): self
+    public function patchCustomData($key, Closure $callback, $default = null): self
     {
-        foreach (Arr::wrap($key) as $k) {
-            $this->setCustomData($k, $callback($this->getCustomData($k), $k));
-        }
+        return $this->tapCustomData($key, $callback, $default);
+    }
+
+    public function tapCustomData(string $key, Closure $callback, $default = null): self
+    {
+        $value = $this->getCustomData($key, $default);
+
+        $this->setCustomData($key, $callback($value));
 
         return $this;
     }

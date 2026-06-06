@@ -1,4 +1,4 @@
-import { CheckCircle, ChevronLeft, ChevronRight } from "lucide-react";
+import { CheckCircle, ChevronLeft, ChevronRight, CircleX, Minus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -9,6 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { str } from "@/lib/utils";
 import type { ServerityBreakdown } from "@equalsite/types";
 import type { ScannedUrl } from "@/types";
+import { Spinner } from "../ui/spinner";
 
 enum ImpactLevel {
     critical = 0,
@@ -31,9 +32,17 @@ type ProcessedUrlsProps = {
 export default function ProcessedUrls({
     scanUrls
 }: ProcessedUrlsProps) {
+    const renderStatusIcon = (item?: ScannedUrl) => {
+        switch (item?.status) {
+            case 'started': return <Spinner className="size-4" />
+            case 'failed': return <CircleX className="size-4 text-red-500" />
+            case 'completed': return <CheckCircle className="size-4 text-green-500" />
+            default: return <Minus className="size-4" />
+        };
+    }
     const renderSeverityBreakdown = (item?: ServerityBreakdown) => {
         return item ? sortSeverityBreakdown(item).map(k => (
-            <Badge key={k} className={({
+            (item[k] > 0) ? (<Badge key={k} className={({
                 'critical': 'bg-chart-5/20 text-chart-5',
                 'serious':  'bg-chart-3/20 text-chart-3',
                 'moderate': 'bg-chart-1/20 text-chart-1',
@@ -43,7 +52,7 @@ export default function ProcessedUrls({
                     {item[k]}
                 </span>
                 {str.title(k)}
-            </Badge>
+            </Badge>) : null
         )) : null;
     }
     return (
@@ -66,13 +75,12 @@ export default function ProcessedUrls({
                             <TableRow key={url}>
                                 <TableCell className="font-medium min-w-2xl">
                                     <Stack direction="row" gap="xs" align="center">
-                                        <CheckCircle className="size-4 text-green-500" />
+                                        {renderStatusIcon(scanUrls[url])}
                                         <div className="max-w-lg overflow-hidden text-ellipsis">{url}</div>
                                     </Stack>
                                 </TableCell>
                                 <TableCell>
                                     <Stack direction="row" gap="xs">
-                                        <Badge>{scanUrls[url]?.status}</Badge>
                                         {renderSeverityBreakdown(scanUrls[url]?.severityBreakdown)}
                                     </Stack>
                                 </TableCell>

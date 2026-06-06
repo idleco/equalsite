@@ -1,4 +1,17 @@
+var __defProp = Object.defineProperty;
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+
 // src/config/index.ts
+var config_exports = {};
+__export(config_exports, {
+  bullmq: () => bullmq,
+  crawler: () => crawler,
+  redis: () => redis,
+  secretKey: () => secretKey
+});
 import path from "path";
 var secretKey = String(process.env.CRAWLER_SECRET);
 var redis = {
@@ -93,7 +106,12 @@ var AuditEntity = class _AuditEntity {
     return new _AuditEntity(attributes);
   }
   static fromString(value) {
-    return new _AuditEntity(JSON.parse(value));
+    const parsed = JSON.parse(value);
+    const statusValue = typeof parsed.status === "string" ? parsed.status : parsed.status instanceof status_default ? parsed.status.value : parsed.status.value;
+    return new _AuditEntity({
+      ...parsed,
+      status: status_default.make(statusValue)
+    });
   }
   markAsCancelled() {
     const cancelled = status_default.cancelled();
@@ -309,43 +327,53 @@ var cancelledEvent = (payload) => ({
   }
 });
 
+// src/audit/events/progressEvent.ts
+import { EventEnum as EventEnum5 } from "@equalsite/types";
+var progressEvent = (payload) => ({
+  type: EventEnum5.Progress,
+  payload: {
+    ...payload,
+    progressPercentage: Math.floor(payload.completedRequests / payload.totalRequests * 100)
+  }
+});
+
 // src/audit/services/auditService.ts
 var createAuditService = (auditRepository2, eventPublisher) => ({
   startAudit: async (audit) => {
-    return await Promise.allSettled([
-      auditRepository2.save(audit.markAsActive()),
-      eventPublisher(startedEvent({
-        auditId: audit.id
-      }))
-    ]);
+    await auditRepository2.save(audit.markAsActive());
+    await eventPublisher(startedEvent({
+      auditId: audit.id
+    }));
   },
   cancelAudit: async (audit, crawler2) => {
-    return await Promise.allSettled([
-      auditRepository2.save(audit.markAsCancelled()),
-      eventPublisher(cancelledEvent({
-        auditId: audit.id,
-        statistics: crawler2.stats.state
-      }))
-    ]);
+    await auditRepository2.save(audit.markAsCancelled());
+    await eventPublisher(cancelledEvent({
+      auditId: audit.id,
+      statistics: crawler2.stats.state
+    }));
   },
   completeAudit: async (audit, crawler2) => {
-    return await Promise.allSettled([
-      auditRepository2.save(audit.markAsCompleted()),
-      eventPublisher(completedEvent({
-        auditId: audit.id,
-        statistics: crawler2.stats.state
-      }))
-    ]);
+    const queue = await crawler2.getRequestQueue();
+    const info = await queue.getInfo();
+    await eventPublisher(progressEvent({
+      auditId: audit.id,
+      completedRequests: info?.handledRequestCount ?? 0,
+      pendingRequests: info?.pendingRequestCount ?? 0,
+      totalRequests: info?.totalRequestCount ?? 0
+    }));
+    await auditRepository2.save(audit.markAsCompleted());
+    await eventPublisher(completedEvent({
+      auditId: audit.id,
+      statistics: crawler2.stats.state
+    }));
   },
   failAudit: async (audit, err) => {
     const error = typeof err === "string" ? err : err.message;
-    return await Promise.allSettled([
-      auditRepository2.save(audit.markAsFailed(error)),
-      eventPublisher(failedEvent({
-        auditId: audit.id,
-        error
-      }))
-    ]);
+    await auditRepository2.save(audit.markAsFailed(error));
+    await eventPublisher(failedEvent({
+      auditId: audit.id,
+      error
+    }));
   }
 });
 
@@ -365,15 +393,6 @@ async function deleteDirectoryIfExists(dir) {
         force: true
       }
     );
-  }
-}
-function deleteFileIfExists(path3) {
-  if (fs.existsSync(path3)) {
-    try {
-      fs.unlinkSync(path3);
-    } catch (err) {
-      console.error("Error deleting file:", err);
-    }
   }
 }
 function ensureDirectoryExistence(targetPath) {
@@ -410,12 +429,13 @@ export {
   secretKey,
   bullmq,
   crawler,
+  config_exports,
   bullClient,
   auditRepository,
+  progressEvent,
   createAuditService,
   crawlerMap,
   deleteDirectoryIfExists,
-  deleteFileIfExists,
   zipDirectory,
   publishEvent
 };

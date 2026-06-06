@@ -6,18 +6,32 @@ use App\Events\Audit\AuditPageCompleted;
 use App\Events\Audit\AuditPageFailed;
 use App\Events\Audit\AuditPageSkipped;
 use App\Events\Audit\AuditPageStarted;
+use App\Events\Audit\BaseEvent;
 use App\Models\Audit;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Events\Dispatcher;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AuditPageSubscriber implements ShouldQueue
 {
+    // public function middleware(BaseEvent $event)
+    // {
+    //     return [
+    //         (new WithoutOverlapping('audit-' . $event->crawlerId()))->shared()
+    //     ];
+    // }
+
     public function handlePageStarted(AuditPageStarted $event): void
     {
         $payload = $event->payload();
         $timestamp = $this->carbonTimestamp($event->timestamp());
+
+        Log::channel('audit')->debug('Page Started', $event->payload());
 
         $this->updatePage($event->crawlerId(), $payload['pageUrl'], [
             'status' => 'started',
@@ -31,6 +45,8 @@ class AuditPageSubscriber implements ShouldQueue
         $payload = $event->payload();
         $timestamp = $this->carbonTimestamp($event->timestamp());
 
+        Log::channel('audit')->debug('Page skipped', $event->payload());
+
         $this->updatePage($event->crawlerId(), $payload['pageUrl'], [
             'status' => 'skipped',
             'skippingReason' => $payload['reason'],
@@ -42,6 +58,8 @@ class AuditPageSubscriber implements ShouldQueue
     {
         $payload = $event->payload();
         $timestamp = $this->carbonTimestamp($event->timestamp());
+
+        Log::channel('audit')->debug('Page failed', $event->payload());
 
         $this->updatePage($event->crawlerId(), $payload['pageUrl'], [
             'status' => 'failed',
@@ -56,6 +74,8 @@ class AuditPageSubscriber implements ShouldQueue
         $payload = $event->payload();
         $timestamp = $this->carbonTimestamp($event->timestamp());
 
+        Log::channel('audit')->debug('Page completed', $event->payload());
+
         $this->updatePage($event->crawlerId(), $payload['pageUrl'], [
             'status' => 'completed',
             'accessibilityViolationsCount' => $payload['accessibilityViolationsCount'],
@@ -66,16 +86,19 @@ class AuditPageSubscriber implements ShouldQueue
 
     protected function updatePage(string $crawlerId, string $url, array $attributes = []): void
     {
-        $audit = Audit::where('crawler_id', $crawlerId)->first();
+        DB::transaction(function () use ($crawlerId, $url, $attributes) {
+            $audit = Audit::where('crawler_id', $crawlerId)
+                ->lockForUpdate()
+                ->first();
 
-        if ($audit) {
-            $audit->patchCustomData('scanned_urls', function ($urls) use ($url, $attributes) {
-                $urls = $urls ?? [];
-                $prev = Arr::get($urls, $url, []);
-                Arr::set($urls, $url, array_merge($prev, $attributes));
-                return $urls;
-            })->save();
-        }
+            if ($audit) {
+                $audit->tapCustomData('scanned_urls', function (array $prev) use ($url, $attributes) {
+                    $prevAttr = $prev[$url] ?? [];
+                    $prev[$url] = [...$prevAttr, ...$attributes];
+                    return $prev;
+                }, []);
+            }
+        });
     }
 
     protected function carbonTimestamp(int $timestamp)
@@ -87,22 +110,22 @@ class AuditPageSubscriber implements ShouldQueue
     {
         $events->listen(
             AuditPageStarted::class,
-            [AuditPageSubscriber::class, 'handlePageStarted']
+            [self::class, 'handlePageStarted']
         );
 
         $events->listen(
             AuditPageSkipped::class,
-            [AuditPageSubscriber::class, 'handlePageSkipped']
+            [self::class, 'handlePageSkipped']
         );
 
         $events->listen(
             AuditPageFailed::class,
-            [AuditPageSubscriber::class, 'handlePageFailed']
+            [self::class, 'handlePageFailed']
         );
 
         $events->listen(
             AuditPageCompleted::class,
-            [AuditPageSubscriber::class, 'handlePageCompleted']
+            [self::class, 'handlePageCompleted']
         );
     }
 }

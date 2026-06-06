@@ -16,25 +16,21 @@ export const createAuditService = (
     startAudit: async (
         audit: AuditEntity,
     ) => {
-        return await Promise.allSettled([
-            auditRepository.save(audit.markAsActive()),
-            eventPublisher(startedEvent({
-                auditId: audit.id
-            }))
-        ]);
+        await auditRepository.save(audit.markAsActive());
+        await eventPublisher(startedEvent({
+            auditId: audit.id
+        }));
     },
 
     cancelAudit: async (
         audit: AuditEntity,
         crawler: PlaywrightCrawler
     ) => {
-        return await Promise.allSettled([
-            auditRepository.save(audit.markAsCancelled()),
-            eventPublisher(cancelledEvent({
-                auditId: audit.id,
-                statistics: crawler.stats.state
-            }))
-        ]);
+        await auditRepository.save(audit.markAsCancelled());
+        await eventPublisher(cancelledEvent({
+            auditId: audit.id,
+            statistics: crawler.stats.state
+        }));
     },
 
     completeAudit: async (
@@ -51,13 +47,12 @@ export const createAuditService = (
             totalRequests: info?.totalRequestCount ?? 0,
         }));
 
-        return await Promise.allSettled([
-            auditRepository.save(audit.markAsCompleted()),
-            eventPublisher(completedEvent({
-                auditId: audit.id,
-                statistics: crawler.stats.state
-            }))
-        ]);
+        await auditRepository.save(audit.markAsCompleted());
+
+        await eventPublisher(completedEvent({
+            auditId: audit.id,
+            statistics: crawler.stats.state
+        }));
     },
 
     failAudit: async (
@@ -65,12 +60,10 @@ export const createAuditService = (
         err: unknown
     ) => {
         const error = typeof err === 'string' ? err : (err as Error).message;
-        return await Promise.allSettled([
-            auditRepository.save(audit.markAsFailed(error)),
-            eventPublisher(failedEvent({
-                auditId: audit.id,
-                error
-            }))
-        ]);
+        await auditRepository.save(audit.markAsFailed(error));
+        await eventPublisher(failedEvent({
+            auditId: audit.id,
+            error
+        }));
     },
 })

@@ -4,7 +4,6 @@ namespace App\Value;
 
 use App\Models\Audit;
 use Illuminate\Contracts\Support\Arrayable;
-use Override;
 
 class ScanInfo implements Arrayable
 {
@@ -12,10 +11,10 @@ class ScanInfo implements Arrayable
         public readonly string $auditId,
         public readonly string $siteUrl,
         public readonly string $status,
-        public readonly string $failureReason,
-        public readonly string $startedAt,
-        public readonly string $completedAt,
-        public readonly string $cancelledAt,
+        public readonly ?string $failureReason,
+        public readonly ?string $startedAt,
+        public readonly ?string $completedAt,
+        public readonly ?string $cancelledAt,
         public readonly string $createdAt
     ) {}
 

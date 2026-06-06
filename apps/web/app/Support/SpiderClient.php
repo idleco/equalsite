@@ -27,6 +27,14 @@ class SpiderClient
             ->json();
     }
 
+    public function ping()
+    {
+        return $this->client
+            ->get($this->url('ping'))
+            ->throw()
+            ->json();
+    }
+
     public function create(string $url, string $callback, array $options = [])
     {
         $queryString = http_build_query(['callback' => $callback]);

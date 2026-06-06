@@ -25,7 +25,7 @@ class ScanningController extends Controller
             url: $validated['url'],
             callback: 'http://web' . route('api.crawler.callback', absolute: false),
             options: [
-                'maxPages' => 15
+                'maxPages' => 20
             ]
         );
 

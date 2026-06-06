@@ -3,8 +3,6 @@ import createPlaywrightCrawler from "./crawlerFactory";
 import type { EventPublisher } from "../repositories/eventPublisher";
 import { createReleaseArtifactsAction } from "./releaseArtifacts";
 import { crawlerMap } from "../services/crawlerMap";
-import type AuditEntity from "../entities/audit";
-import { deleteFileIfExists } from "../utils/fsDirectory";
 import { createAuditService } from "../services/auditService";
 
 export interface IRunAuditAction {
@@ -25,20 +23,8 @@ export const createRunAuditAction = (
         archiveDirectory,
         secretKey
     } = config;
-
     const auditService = createAuditService(auditRepository, eventPublisher);
-    const releaseArtifactsAction = createReleaseArtifactsAction(auditRepository, secretKey);
-
-    async function performAuditCleanup(audit: AuditEntity, zipPath: string) {
-        try  {
-            await crawlerMap.get(audit.id)?.teardown();
-        } finally {
-            await auditRepository.delete(audit.id);
-            crawlerMap.delete(audit.id);
-            deleteFileIfExists(zipPath);
-        }
-    }
-
+    const releaseArtifactsAction = createReleaseArtifactsAction(auditRepository, artifactDirectory, archiveDirectory, secretKey);
     return {
         run: async (auditId) => {
             const audit = await auditRepository.findOrFail(auditId);
@@ -63,16 +49,11 @@ export const createRunAuditAction = (
             } catch (err) {
                 console.error(err);
                 await auditService.failAudit(audit, err);
+                throw err;
             } finally {
                 // Regardless of audit status (failed, cancelled, completed) we release
                 // the audit artifacts and cleanup everything. NO AUDIT HISTORY HERE!
-                const zipPath = await releaseArtifactsAction.run({
-                    auditId: audit.id,
-                    archiveDirectory,
-                    artifactDirectory
-                });
-
-                void performAuditCleanup(audit, zipPath);
+                await releaseArtifactsAction.run(audit.id);
             }
         }
     }

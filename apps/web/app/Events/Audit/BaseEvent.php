@@ -4,10 +4,10 @@ namespace App\Events\Audit;
 
 use App\Value\RedisStreamData;
 use Illuminate\Broadcasting\Channel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Support\Carbon;
 
-abstract class BaseEvent implements ShouldBroadcastNow
+abstract class BaseEvent implements ShouldBroadcast
 {
     public RedisStreamData $streamData;
 

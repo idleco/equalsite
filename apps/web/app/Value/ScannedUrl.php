@@ -9,8 +9,8 @@ class ScannedUrl implements Arrayable
 {
     public function __construct(
         public readonly string $status,
-        public readonly int $attemptsCount,
-        public readonly string $startedAt,
+        public readonly ?string $startedAt,
+        public readonly ?int $attemptsCount,
         public readonly ?string $skippedAt,
         public readonly ?string $failedAt,
         public readonly ?string $completedAt,
@@ -23,7 +23,7 @@ class ScannedUrl implements Arrayable
     public static function mapFromAudit(Audit $audit): array
     {
         $result = [];
-        $urls = $audit->getCustomData('scanned_url', []);
+        $urls = $audit->getCustomData('scanned_urls', []);
 
         foreach ($urls as $url => $data) {
             $result[$url] = static::fromArray($data);
@@ -36,8 +36,8 @@ class ScannedUrl implements Arrayable
     {
         return new static(
             status: $array['status'],
-            attemptsCount: $array['attemptsCount'],
-            startedAt: $array['startedAt'],
+            attemptsCount: $array['attemptsCount'] ?? null,
+            startedAt: $array['startedAt'] ?? null,
             skippedAt: $array['skippedAt'] ?? null,
             failedAt: $array['failedAt'] ?? null,
             completedAt: $array['completedAt'] ?? null,

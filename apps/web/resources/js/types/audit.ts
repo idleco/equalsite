@@ -2,7 +2,7 @@ import type { ProgressState, QueueStatus, ServerityBreakdown } from "@equalsite/
 
 export type ScanStatus = 'queued' | 'started' | 'failed' | 'cancelled' | 'completed';
 
-export type UrlStatus = 'started' | 'failed' | 'completed';
+export type UrlStatus = 'started' | 'failed' | 'completed' | 'skipped';
 
 export type ScanQueue = QueueStatus
 export type ScanProgress = ProgressState;

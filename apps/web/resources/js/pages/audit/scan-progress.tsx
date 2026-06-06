@@ -72,6 +72,8 @@ export default function ScanProgress({
     scanInfo,
     scanQueue
 }: ScanProgressPageProps) {
+    console.log(scanProgress);
+    console.log(scanUrls);
     useEchoPublic<WsEvents>(
         `audit-${scanInfo.auditId}-scanning`,
         [
@@ -80,9 +82,11 @@ export default function ScanProgress({
             '.audit.page.completed'
         ],
         (e) => {
+            console.log('WS Event: ', { ...e });
             if (e.type === 'audit.queued') {
                 const data = (e as QueuedWsEvent).data;
                 router.replace<ScanProgressPageProps>({
+                    preserveScroll: true,
                     props: (current) => ({
                         ...current,
                         scanQueue: omit(data, ['auditId'])
@@ -92,6 +96,7 @@ export default function ScanProgress({
             else if (e.type === 'audit.started') {
                 const { timestamp } = e as StartedWsEvent;
                 router.replace<ScanProgressPageProps>({
+                    preserveScroll: true,
                     props: (current) => ({
                         ...current,
                         scanInfo: {
@@ -105,6 +110,7 @@ export default function ScanProgress({
             else if (e.type === 'audit.progress') {
                 const { data } = e as ProgressWsEvent;
                 router.replace<ScanProgressPageProps>({
+                    preserveScroll: true,
                     props: (current) => ({
                         ...current,
                         scanProgress: { ...data }
@@ -114,6 +120,7 @@ export default function ScanProgress({
             else if (e.type === 'audit.completed') {
                 const { timestamp } = e as CompletedWsEvent;
                 router.replace<ScanProgressPageProps>({
+                    preserveScroll: true,
                     props: (current) => ({
                         ...current,
                         scanInfo: {
@@ -127,6 +134,7 @@ export default function ScanProgress({
             else if (e.type === 'audit.failed') {
                 const { error } = (e as FailedWsEvent).data;
                 router.replace<ScanProgressPageProps>({
+                    preserveScroll: true,
                     props: (current) => ({
                         ...current,
                         scanInfo: {
@@ -140,6 +148,7 @@ export default function ScanProgress({
             else if (e.type === 'audit.page.started') {
                 const { data, timestamp } = e as PageStartedWsEvent;
                 router.replace<ScanProgressPageProps>({
+                    preserveScroll: true,
                     props: (current) => ({
                         ...current,
                         scanUrls: {
@@ -156,6 +165,7 @@ export default function ScanProgress({
             else if (e.type === 'audit.page.skipped') {
                 const { data, timestamp } = e as PageSkippedWsEvent;
                 router.replace<ScanProgressPageProps>({
+                    preserveScroll: true,
                     props: (current) => ({
                         ...current,
                         scanUrls: {
@@ -172,6 +182,7 @@ export default function ScanProgress({
             else if (e.type === 'audit.page.failed') {
                 const { data, timestamp } = e as PageFailedWsEvent;
                 router.replace<ScanProgressPageProps>({
+                    preserveScroll: true,
                     props: (current) => ({
                         ...current,
                         scanUrls: {
@@ -190,6 +201,7 @@ export default function ScanProgress({
             else if (e.type === 'audit.page.completed') {
                 const { data, timestamp } = e as PageCompletedWsEvent;
                 router.replace<ScanProgressPageProps>({
+                    preserveScroll: true,
                     props: (current) => ({
                         ...current,
                         scanUrls: {

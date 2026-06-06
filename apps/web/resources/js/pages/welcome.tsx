@@ -1,12 +1,5 @@
-import { Form, Head, Link, usePage } from '@inertiajs/react';
-import { dashboard, login, register } from '@/routes';
+import { Head, usePage } from '@inertiajs/react';
 import { Stack } from '@/components/stack';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { LoaderCircle } from 'lucide-react';
-import InputError from '@/components/input-error';
-import { store } from '@/actions/App/Http/Controllers/WebsiteScanController';
 
 export default function Welcome({
     canRegister = true,
@@ -28,39 +21,6 @@ export default function Welcome({
                                 <p className="mt-2 text-sm leading-relaxed sm:text-base">
                                     Enter your website to get a free accessibility report.
                                 </p>
-                                <Form action={store().url} method={store().method}>
-                                    {({ processing, errors }) => (
-                                        <Stack
-                                            gap="lg"
-                                            align="stretch"
-                                            className="w-full"
-                                        >
-                                            <div className="grid gap-2">
-                                                <Label htmlFor="url">Website URL</Label>
-                                                <Input
-                                                    id="url"
-                                                    type="url"
-                                                    name="url"
-                                                    autoComplete="url"
-                                                    autoFocus
-                                                />
-                                                <InputError message={errors.url} />
-                                            </div>
-                                            <Button
-                                                type="submit"
-                                                variant="default"
-                                                size="lg"
-                                                className="h-12 w-full rounded-xl text-base shadow-md min-[400px]:w-auto min-[400px]:min-w-56"
-                                                disabled={processing}
-                                            >
-                                                {processing && (
-                                                    <LoaderCircle className="h-4 w-4 animate-spin" />
-                                                )}
-                                                Start Scan
-                                            </Button>
-                                        </Stack>
-                                    )}
-                                </Form>
                             </Stack>
                         </div>
                     </main>

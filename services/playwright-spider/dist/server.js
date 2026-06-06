@@ -2,13 +2,14 @@ import {
   auditRepository,
   bullClient,
   bullmq,
+  config_exports,
   crawler,
   crawlerMap,
   createAuditService,
   deleteDirectoryIfExists,
   publishEvent,
   secretKey
-} from "./chunk-2XOCD232.js";
+} from "./chunk-NXGFBMWD.js";
 
 // src/app.ts
 import express from "express";
@@ -115,11 +116,10 @@ var createAuditAction2 = createAuditAction(
   secretKey
 );
 var CreateAudit = async (request, response) => {
-  const url = request.body.url;
+  const siteUrl = request.body.url;
   const options = request.body.options;
   const urlCallback = request.query.callback;
-  console.log("Create audit request", { url, options, urlCallback });
-  if (!url || typeof url !== "string") {
+  if (!siteUrl || typeof siteUrl !== "string") {
     return response.status(400).json({
       error: "Invalid request body",
       message: 'JSON body with a string "url" field is required'
@@ -131,19 +131,24 @@ var CreateAudit = async (request, response) => {
       message: 'A "callback" query parameter is required'
     });
   }
-  const maxPages = options?.maxPages || maxRequestsPerCrawl;
   const auditId = await createAuditAction2.run({
-    url,
+    url: siteUrl,
     urlCallback,
-    options: { maxPages }
+    options: {
+      maxPages: options?.maxPages || maxRequestsPerCrawl
+    }
   });
-  const job = await crawlerQueue.add("audit", { auditId }, { jobId: auditId });
-  console.log("accepted", job.id);
+  const auditJob = await crawlerQueue.add("audit", { auditId }, { jobId: auditId });
   return response.status(202).json({
     accepted: true,
-    auditId,
-    url,
-    options
+    data: {
+      auditId: auditJob.id,
+      auditRequest: {
+        siteUrl,
+        options,
+        urlCallback
+      }
+    }
   });
 };
 var cancelAuditAction = createCancelAuditAction(
@@ -169,6 +174,10 @@ var CancelAudit = async (request, response) => {
 var router = Router();
 router.post("/audit", CreateAudit);
 router.delete("/audit/:auditId", CancelAudit);
+router.get("/ping", (req, res) => {
+  console.log(config_exports);
+  res.json({ ok: true });
+});
 var routes_default = router;
 
 // src/app/middleware/authenticateInternalRequest.ts

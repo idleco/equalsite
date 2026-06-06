@@ -17,27 +17,32 @@ class ScanProgress implements Arrayable
     public static function fromAudit(Audit $audit): static
     {
         return static::fromArray(
-            $audit->getCustomData('progress_state', [])
+            $audit->getCustomData('progress_state', [
+                'completedRequests' => 0,
+                'pendingRequests' => 0,
+                'totalRequests' => 0,
+                'progressPercentage' => 0
+            ])
         );
     }
 
     public static function fromArray(array $array): static
     {
         return new static(
-            completedRequests: $array['completedRequests'] ?? 0,
-            pendingRequests: $array['pendingRequests'] ?? 0,
-            totalRequests: $array['totalRequests'] ?? 0,
-            progressPercentage: $array['progressPercentage'] ?? 0,
+            completedRequests: $array['completedRequests'],
+            pendingRequests: $array['pendingRequests'],
+            totalRequests: $array['totalRequests'],
+            progressPercentage: $array['progressPercentage'],
         );
     }
 
     public function toArray(): array
     {
         return [
-            'completedRequests' => 0,
-            'pendingRequests' => 0,
-            'totalRequests' => 0,
-            'progressPercentage' => 0
+            'completedRequests' => $this->completedRequests,
+            'pendingRequests' => $this->pendingRequests,
+            'totalRequests' => $this->totalRequests,
+            'progressPercentage' => $this->progressPercentage
         ];
     }
 }

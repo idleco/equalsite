@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Audit\ScanningController;
+use App\Support\SpiderClient;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
@@ -10,6 +11,10 @@ Route::inertia('/', 'welcome', [
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'dashboard')->name('dashboard');
+});
+
+Route::get('/ping', function (SpiderClient $spider) {
+    dd($spider->ping());
 });
 
 Route::inertia('/audit/create', 'audit/scan-request')
