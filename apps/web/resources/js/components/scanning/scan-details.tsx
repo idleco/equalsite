@@ -3,11 +3,13 @@ import { Ban, Calendar, CheckCircle, CircleDot, CircleSmall, CircleX, ExternalLi
 import { Item, ItemContent, ItemDescription, ItemMedia, ItemTitle } from '@/components/ui/item';
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { usePoll } from "@inertiajs/react";
+import { Link, usePoll } from "@inertiajs/react";
 import { useEffect } from "react";
 import TimeElapsed from "./time-elapsed";
 import { cn, str } from "@/lib/utils";
 import type { ScanInfo, ScanQueue } from "@/types";
+import { Stack } from "../stack";
+import { show } from '@/actions/App/Http/Controllers/Audit/ReportController';
 
 function QueuePosition({
     scanQueue
@@ -76,30 +78,33 @@ export default function ScanDetails({
     return (
         <Card>
             <CardHeader>
-                <Badge
-                    className={cn(
-                        'leading-normal font-semibold',
-                        ({
-                            'queued': 'bg-chart-3/20 text-chart-3',
-                            'started': 'bg-chart-1/20 text-chart-1',
-                            'completed': 'bg-chart-2/20 text-chart-2',
-                            'cancelled': 'bg-chart-5/20 text-chart-5',
-                            'failed': 'bg-chart-5/20 text-chart-5'
-                        })[scanInfo.status]
-                    )}
-                >
-                    <CircleSmall
-                        data-icon="inline-start"
-                        className={({
-                            'queued': 'fill-chart-3',
-                            'started': 'fill-chart-1',
-                            'completed': 'fill-chart-2',
-                            'cancelled': 'fill-chart-5',
-                            'failed': 'fill-chart-5'
-                        })[scanInfo.status]}
-                    />
-                    {scanInfo.status.toUpperCase()}
-                </Badge>
+                <Stack direction="row" justify="between">
+                    <Badge
+                        className={cn(
+                            'leading-normal font-semibold',
+                            ({
+                                'queued': 'bg-chart-3/20 text-chart-3',
+                                'started': 'bg-chart-1/20 text-chart-1',
+                                'completed': 'bg-chart-2/20 text-chart-2',
+                                'cancelled': 'bg-chart-5/20 text-chart-5',
+                                'failed': 'bg-chart-5/20 text-chart-5'
+                            })[scanInfo.status]
+                        )}
+                    >
+                        <CircleSmall
+                            data-icon="inline-start"
+                            className={({
+                                'queued': 'fill-chart-3',
+                                'started': 'fill-chart-1',
+                                'completed': 'fill-chart-2',
+                                'cancelled': 'fill-chart-5',
+                                'failed': 'fill-chart-5'
+                            })[scanInfo.status]}
+                        />
+                        {scanInfo.status.toUpperCase()}
+                    </Badge>
+                    <Link href={show(scanInfo.auditId)}>View Reports</Link>
+                </Stack>
             </CardHeader>
 
             <CardContent className="grid grid-cols-2 gap-2 min-h-24">

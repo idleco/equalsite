@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Audit\ReportController;
 use App\Http\Controllers\Audit\ScanningController;
 use App\Support\SpiderClient;
 use Illuminate\Support\Facades\Route;
@@ -23,5 +24,7 @@ Route::inertia('/audit/create', 'audit/scan-request')
 Route::post('/audit', [ScanningController::class, 'store'])->name('scanning.store');
 Route::delete('/audit/{id}', [ScanningController::class, 'cancel'])->name('scanning.cancel');
 Route::get('/audit/{id}', [ScanningController::class, 'progress'])->name('scanning.progress');
+
+Route::get('/audit/{id}/report', [ReportController::class, 'show'])->name('audit.report');
 
 require __DIR__ . '/settings.php';
