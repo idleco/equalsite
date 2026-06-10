@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Value\Impact;
 use Illuminate\Database\Eloquent\Model;
 
 class Violation extends Model
@@ -22,7 +23,7 @@ class Violation extends Model
 
     protected $casts = [
         'nodes' => 'array',
-        'impact_level' => 'string',
+        'impact_level' => Impact::class,
     ];
 
     public function translated(): bool

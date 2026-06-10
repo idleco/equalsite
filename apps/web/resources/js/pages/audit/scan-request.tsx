@@ -11,19 +11,11 @@ import { store } from '@/actions/App/Http/Controllers/Audit/ScanningController';
 import type { ChangeEventHandler, SubmitEventHandler} from 'react';
 import InputError from '@/components/input-error';
 import { Label } from '@/components/ui/label';
-import { useEchoPublic } from '@laravel/echo-react';
 
 export default function ScanRequest() {
     const form = useForm({
         url: ''
     });
-    useEchoPublic(
-        `audit`,
-        '.sample-event',
-        (e) => {
-            console.log(e)
-        }
-    );
     const handleChange: ChangeEventHandler<HTMLInputElement> = (e) => {
         const key = e.target.id;
         const value = e.target.value;

@@ -2,12 +2,19 @@
 
 namespace App\Providers;
 
+use App\Contracts\HealthScoreCalculator;
+use App\Services\ScoreCalculator;
 use App\Support\SpiderClient;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\ServiceProvider;
 
 class SpiderServiceProvider extends ServiceProvider
 {
+    public function register(): void
+    {
+        $this->app->bind(HealthScoreCalculator::class, ScoreCalculator::class);
+    }
+
     public function boot(): void
     {
         $config = $this->app->make('config');

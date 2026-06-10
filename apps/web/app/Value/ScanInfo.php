@@ -25,10 +25,10 @@ class ScanInfo implements Arrayable
             'siteUrl' => $audit->url,
             'status' => $audit->status->value,
             'failureReason' => $audit->failure_reason,
-            'startedAt' => $audit->started_at?->toDateTimeString(),
-            'completedAt' => $audit->completed_at?->toDateTimeString(),
-            'cancelledAt' => $audit->cancelled_at?->toDateTimeString(),
-            'createdAt' => $audit->created_at->toDateTimeString()
+            'startedAt' => $audit->started_at?->toIso8601String(),
+            'completedAt' => $audit->completed_at?->toIso8601String(),
+            'cancelledAt' => $audit->cancelled_at?->toIso8601String(),
+            'createdAt' => $audit->created_at->toIso8601String()
         ]);
     }
 

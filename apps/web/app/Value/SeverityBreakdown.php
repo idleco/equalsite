@@ -2,6 +2,7 @@
 
 namespace App\Value;
 
+use App\Models\Audit;
 use Illuminate\Contracts\Support\Arrayable;
 
 class SeverityBreakdown implements Arrayable
@@ -12,6 +13,17 @@ class SeverityBreakdown implements Arrayable
         public readonly int $moderate,
         public readonly int $minor
     ) {}
+
+    public static function fromAudit(Audit $audit): static
+    {
+        return static::fromArray(
+            collect(Impact::cases())
+                ->mapWithKeys(function (Impact $impact) use ($audit) {
+                    return [$impact->value => $audit->violations->where('impact_level', $impact->value)->count()];
+                })
+                ->toArray()
+        );
+    }
 
     public static function default(): static
     {

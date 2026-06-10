@@ -24,14 +24,17 @@ class CreateAuditViolation
             'failure_summary' => array_first($violation->nodes)->failureSummary,
         ]);
 
-        $nodes = collect($violation->nodes)
-            ->map(fn(CrawlerViolationNode $node) => [
+        $nodes = $model->nodes ?? [];
+
+        foreach ($violation->nodes as $node) {
+            $target = array_first($node->target);
+            $nodes[] = [
                 'url' => $url,
                 'html' => $node->html,
-                'target' => array_first($node->target),
-            ])->map(fn(array $node) => array_merge($node, [
-                'fingerprint' => md5($node['target'] . $node['html'])
-            ]))->all();
+                'target' => $target,
+                'fingerprint' => md5($target . $node->html)
+            ];
+        }
 
         $model->update([
             'nodes' => $nodes

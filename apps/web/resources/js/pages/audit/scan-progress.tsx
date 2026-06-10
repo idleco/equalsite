@@ -6,7 +6,6 @@ import ScanOverview from '@/components/scanning/scan-overview';
 import ProcessedUrls from '@/components/scanning/processed-urls';
 import { useEchoPublic } from '@laravel/echo-react';
 import type { ScanInfo, ScanProgress, ScanQueue, ScannedUrl } from '@/types';
-import { memo } from 'react';
 import type { CompletedWsEvent, FailedWsEvent, PageCompletedWsEvent, PageFailedWsEvent, PageSkippedWsEvent, PageStartedWsEvent, ProgressWsEvent, QueuedWsEvent, StartedWsEvent} from '@equalsite/types';
 import { omit } from '@/lib/obj';
 
@@ -46,25 +45,6 @@ function Breadcrumbs() {
         </Breadcrumb>
     );
 }
-
-const ScanDetailsPanel = memo<{
-    scanInfo: ScanProgressPageProps['scanInfo'];
-    scanQueue: ScanProgressPageProps['scanQueue'];
-}>(({ scanInfo, scanQueue }) => {
-    return <ScanDetails scanInfo={scanInfo} scanQueue={scanQueue}  />
-})
-
-const ScanOverviewPanel = memo<{
-    scanProgress: ScanProgressPageProps['scanProgress'];
-}>(({ scanProgress }) => {
-    return <ScanOverview scanProgress={scanProgress} />
-});
-
-const ScannedUrlsPanel = memo<{
-    scanUrls: ScanProgressPageProps['scanUrls'];
-}>(({ scanUrls }) => {
-    return <ProcessedUrls scanUrls={scanUrls} />
-});
 
 export default function ScanProgress({
     scanUrls,
@@ -224,9 +204,9 @@ export default function ScanProgress({
             <Head title="Welcome" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <Breadcrumbs />
-                <ScanDetailsPanel scanInfo={scanInfo} scanQueue={scanQueue} />
-                <ScanOverviewPanel scanProgress={scanProgress} />
-                <ScannedUrlsPanel scanUrls={scanUrls} />
+                <ScanDetails scanInfo={scanInfo} scanQueue={scanQueue} />
+                <ScanOverview scanProgress={scanProgress} />
+                <ProcessedUrls scanUrls={scanUrls} />
                 <ScanTimeline />
             </div>
         </>

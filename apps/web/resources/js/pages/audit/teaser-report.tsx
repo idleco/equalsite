@@ -5,10 +5,31 @@ import ScoreGuage from '@/components/reporting/score-guage';
 import { Stack } from '@/components/stack';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import type { ServerityBreakdown } from '@equalsite/types';
+import type { RemediationGroup, ReportPages, ScannedUrl } from '@/types';
+import { RemediationClusters } from '@/components/reporting/remediation-clusters';
+import { useState } from 'react';
+import { DiscoveredPages } from '@/components/reporting/discovered-pages';
+import { DeveloperTargets } from '@/components/reporting/developer-targets';
+
+export const REPORT_TABS = [
+    'Fix priorities',
+    'By page',
+    'Developer targets',
+] as const;
 
 type TeaserReportProps = {
     report: {
         auditId: string;
+        siteUrl: string;
+        healthScore: number;
+        severityBreakdown: ServerityBreakdown;
+        scannedUrls: Record<string, ScannedUrl>;
+        remediation: {
+            groups: RemediationGroup[];
+            groupsCount: number;
+        };
+        pages: ReportPages;
     };
 }
 
@@ -39,6 +60,8 @@ function Breadcrumbs({ auditId }: { auditId: string }) {
 export default function TeaserReport({
     report,
 }: TeaserReportProps) {
+    console.log(report)
+    const [activeTab, setActiveTab] = useState<(typeof REPORT_TABS)[number]>('Fix priorities');
     return (
         <>
             <Head title="Welcome" />
@@ -48,11 +71,11 @@ export default function TeaserReport({
                     <CardContent>
                         <Stack direction="row" gap="md">
                             <ScoreGuage
-                                value={80}
+                                value={report.healthScore}
                                 min={0}
                                 max={100}
                                 className="border rounded-xl"
-                                aria-label={`Accessibility score: ${50} out of 100`}
+                                aria-label={`Accessibility score: ${report.healthScore} out of 100`}
                             />
                             <div className="flex-1 grid grid-cols-4 gap-4">
                                 <div className="col-span-3 grid grid-cols-2 gap-4">
@@ -63,7 +86,7 @@ export default function TeaserReport({
                                             </div>
                                             <div className="flex">
                                                 <div className="text-4xl self-center flex-1 justify-center">
-                                                    5
+                                                    {report.severityBreakdown.critical}
                                                 </div>
                                             </div>
                                         </div>
@@ -73,7 +96,7 @@ export default function TeaserReport({
                                             </div>
                                             <div className="flex">
                                                 <div className="text-4xl self-center flex-1 justify-center">
-                                                    5
+                                                    {report.severityBreakdown.serious}
                                                 </div>
                                             </div>
                                         </div>
@@ -85,7 +108,7 @@ export default function TeaserReport({
                                             </div>
                                             <div className="flex">
                                                 <div className="text-4xl self-center flex-1 justify-center">
-                                                    5
+                                                    {report.severityBreakdown.moderate}
                                                 </div>
                                             </div>
                                         </div>
@@ -95,7 +118,7 @@ export default function TeaserReport({
                                             </div>
                                             <div className="flex">
                                                 <div className="text-4xl self-center flex-1 justify-center">
-                                                    5
+                                                    {report.severityBreakdown.minor}
                                                 </div>
                                             </div>
                                         </div>
@@ -115,19 +138,52 @@ export default function TeaserReport({
                 </Card>
                 <Card>
                     <CardHeader>
-                        <CardTitle>Remediation Workflow</CardTitle>
+                        <CardTitle>Remediation workspace</CardTitle>
                         <CardDescription>
-                            Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                            Use the paid report lenses below to fix shared issues first, then verify the affected pages.
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <Tabs defaultValue="overview" className="flex flex-col">
-                            <TabsList variant="line" className="">
-                                <TabsTrigger value="overview">All</TabsTrigger>
-                                <TabsTrigger value="analytics">Analytics</TabsTrigger>
+                        <Tabs
+                            value={activeTab}
+                            onValueChange={(nextTab) => {
+                                const typed =
+                                nextTab as (typeof REPORT_TABS)[number];
+
+                                if (!REPORT_TABS.includes(typed)) {
+                                    return;
+                                }
+
+                                setActiveTab(typed);
+                            }}
+                            className="flex flex-col"
+                        >
+                            <TabsList variant="line">
+                                {REPORT_TABS.map((tab) => (
+                                    <TabsTrigger
+                                        key={tab}
+                                        value={tab}
+                                    >
+                                        {tab}
+                                    </TabsTrigger>
+                                ))}
                             </TabsList>
-                            <TabsContent value="overview">Make changes to your account here.</TabsContent>
-                            <TabsContent value="analytics">Change your password here.</TabsContent>
+                            <TabsContent value="Fix priorities">
+                                <RemediationClusters groups={report.remediation.groups} />
+                            </TabsContent>
+                            <TabsContent value="By page">
+                                <DiscoveredPages
+                                    title="Detailed findings by page"
+                                    subtitle="Use this view to confirm which URLs should improve after a shared fix ships."
+                                    pageUrls={report.pages.discovered}
+                                    emptyLabel="No pages discovered yet."
+                                />
+                            </TabsContent>
+                            <TabsContent value="Developer targets">
+                                <DeveloperTargets
+                                    groups={report.remediation.groups}
+                                />
+                            </TabsContent>
                         </Tabs>
                     </CardContent>
                 </Card>

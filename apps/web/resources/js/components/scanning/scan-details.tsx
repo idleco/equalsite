@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Link, usePoll } from "@inertiajs/react";
 import { useEffect } from "react";
 import TimeElapsed from "./time-elapsed";
-import { cn, str } from "@/lib/utils";
+import { cn, humanReadableDateTime, str } from "@/lib/utils";
 import type { ScanInfo, ScanQueue } from "@/types";
 import { Stack } from "../stack";
 import { show } from '@/actions/App/Http/Controllers/Audit/ReportController';
@@ -47,23 +47,6 @@ function QueuePosition({
             </ItemContent>
         </Item>
     )
-}
-
-function formatDate(dateString?: string): string {
-    if (!dateString) {
-        return '-';
-    }
-    const date = new Date(dateString);
-    // const today = new Date();
-    // const includeYear = date.getFullYear() !== today.getFullYear();
-    return date.toLocaleString('default', {
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        year: 'numeric'
-    });
 }
 
 type ScanDetailsProps = {
@@ -160,7 +143,7 @@ export default function ScanDetails({
                     <ItemContent>
                         <ItemTitle>Created At</ItemTitle>
                         <ItemDescription>
-                            {formatDate(scanInfo.createdAt)}
+                            {humanReadableDateTime(scanInfo.createdAt)}
                         </ItemDescription>
                     </ItemContent>
                 </Item>
@@ -171,7 +154,7 @@ export default function ScanDetails({
                     <ItemContent>
                         <ItemTitle>Started At</ItemTitle>
                         <ItemDescription>
-                            {formatDate(scanInfo.startedAt)}
+                            {humanReadableDateTime(scanInfo.startedAt)}
                         </ItemDescription>
                     </ItemContent>
                 </Item>
@@ -182,7 +165,7 @@ export default function ScanDetails({
                     <ItemContent>
                         <ItemTitle>Completed At</ItemTitle>
                         <ItemDescription>
-                            {formatDate(scanInfo.completedAt)}
+                            {humanReadableDateTime(scanInfo.completedAt)}
                         </ItemDescription>
                     </ItemContent>
                 </Item>
@@ -193,7 +176,7 @@ export default function ScanDetails({
                     <ItemContent>
                         <ItemTitle>Cancelled At</ItemTitle>
                         <ItemDescription>
-                            {formatDate(scanInfo.cancelledAt)}
+                            {humanReadableDateTime(scanInfo.cancelledAt)}
                         </ItemDescription>
                     </ItemContent>
                 </Item>

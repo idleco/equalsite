@@ -57,7 +57,7 @@ abstract class BaseEvent implements ShouldBroadcast
             'type' => $this->streamData->type,
             'version' => $this->streamData->version,
             'data' => $this->broadcastData($this->streamData),
-            'timestamp' => $carbonTimestamp->toDateTimeString(),
+            'timestamp' => $carbonTimestamp->toIso8601String(),
         ];
     }
 }

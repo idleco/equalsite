@@ -10,31 +10,35 @@ type Props = {
 function formatElapsed(ms: number) {
     const totalSeconds = Math.floor(ms / 1000);
 
-  const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
-  const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
-  const seconds = String(totalSeconds % 60).padStart(2, '0');
+    const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+    const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+    const seconds = String(totalSeconds % 60).padStart(2, '0');
 
-  return `${hours}:${minutes}:${seconds}`;
+    return `${hours}:${minutes}:${seconds}`;
 }
+
+const parseDate = (dateString: string | null) => {
+    if (!dateString) {
+        return Date.now();
+    }
+    return new Date(dateString).getTime();
+};
 
 export default function TimeElapsed({
     createdAt,
     startedAt
 }: Props) {
-    const since = new Date(createdAt).getTime();
-    const until = startedAt ? new Date(startedAt).getTime() : Date.now();
-    const [elapsed, setElapsed] = useState(until - since);
+    const since = parseDate(createdAt);
+    const [until, setUntil] = useState(startedAt ? parseDate(startedAt) : Date.now());
     useEffect(() => {
-        if (startedAt) {
-            return;
-        }
         const interval = setInterval(() => {
-            setElapsed(until - since);
+            setUntil(startedAt ? parseDate(startedAt) : Date.now());
         }, 1000);
         return () => {
             clearInterval(interval);
         }
-    }, [since, until, startedAt]);
+    }, [startedAt]);
+    const elapsedMs = until - since;
     return (
         <Item variant="outline">
             <ItemMedia variant="icon">
@@ -42,7 +46,7 @@ export default function TimeElapsed({
             </ItemMedia>
             <ItemContent>
                 <ItemTitle>Time Elapsed</ItemTitle>
-                <ItemDescription>{formatElapsed(elapsed)}</ItemDescription>
+                <ItemDescription>{formatElapsed(elapsedMs)}</ItemDescription>
             </ItemContent>
         </Item>
     )
