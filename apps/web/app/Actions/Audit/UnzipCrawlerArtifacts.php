@@ -2,23 +2,27 @@
 
 namespace App\Actions\Audit;
 
-use App\Support\CrawlerArtifacts;
+use App\Contracts\ArtifactRepository;
 use Illuminate\Support\Facades\File;
 use ZipArchive;
 
 class UnzipCrawlerArtifacts
 {
+    public function __construct(
+        protected ArtifactRepository $repository
+    ) {}
+
     public function unzip(string $crawlId, string $zipFilePath)
     {
         $zip = new ZipArchive();
-        $artifacts = new CrawlerArtifacts($crawlId);
+        $destination = $this->repository->getPath($crawlId);
 
-        if (! is_dir($artifacts->path())) {
-            File::makeDirectory($artifacts->path(), 0755, true);
+        if (! is_dir($destination)) {
+            File::makeDirectory($destination, 0755, true);
         }
 
         if ($zip->open($zipFilePath) === true) {
-            $zip->extractTo($artifacts->path());
+            $zip->extractTo($destination);
             $zip->close();
         }
     }

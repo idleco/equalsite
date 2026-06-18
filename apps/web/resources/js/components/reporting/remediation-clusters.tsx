@@ -3,6 +3,7 @@ import type React from 'react';
 import { impactToneClasses } from './reportColors';
 import type { Remediation } from '@/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { CodeBlock } from '../code-block';
 
 type RemediationGroup = NonNullable<Remediation>['groups'][number];
 
@@ -142,14 +143,13 @@ export function RemediationClusters({
                                                 HTML evidence
                                             </div>
                                             {group.sampleNodes[0] ? (
-                                                <Card>
-                                                    <CardHeader>
-                                                        <CardTitle>HTML evidence</CardTitle>
-                                                    </CardHeader>
-                                                    <CardContent>
-                                                        {group.sampleNodes[0].html}
-                                                    </CardContent>
-                                                </Card>
+                                                <CodeBlock
+                                                    code={group.sampleNodes[0].html}
+                                                    label="HTML evidence"
+                                                    maxHeightClassName="max-h-44"
+                                                    enableHorizontalScroll={false}
+                                                    className="bg-black dark:bg-slate-950 text-slate-100"
+                                                />
                                             ) : (
                                                 <p className="text-sm dark:text-slate-600 text-slate-300">
                                                     No HTML evidence available yet.

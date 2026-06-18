@@ -28,8 +28,7 @@ export default function ScanRequest() {
     return (
         <>
             <Head title="Scan Request" />
-
-            <div className="space-y-6">
+            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <Card className="max-w-5xl mx-auto my-10">
                     <CardHeader>
                         <Stack direction="row" align="center">
@@ -44,8 +43,8 @@ export default function ScanRequest() {
                             </div>
                         </Stack>
                     </CardHeader>
-                    <Stack direction="row" gap="xs">
-                        <CardContent className="flex-1 space-y-4">
+                    <div className="flex flex-col gap-2 md:flex-row">
+                        <CardContent className="flex-1 space-y-4 min-w-md">
                             <form onSubmit={handleSubmit} className="space-y-8">
                                 <div className="grid gap-2">
                                     <Label htmlFor="url">Website URL</Label>
@@ -92,22 +91,20 @@ export default function ScanRequest() {
                                     Start Scan
                                 </Button>
                             </form>
-
-                            <Stack direction="row" align="center" gap="xs">
+                            <div className="flex flex-row gap-1 items-center justify-center">
                                 <Shield className="size-4" />
                                 <span className="text-sm">No account required</span>
                                 <Dot className="size-3" />
                                 <span className="text-sm">Free to try</span>
                                 <Dot className="size-3" />
                                 <span className="text-sm">Results in minutes</span>
-                            </Stack>
+                            </div>
                         </CardContent>
-
-                        <div>
-                            <Separator orientation="vertical" />
+                        <div className="w-full md:w-auto md:self-stretch py-4 md:py-0">
+                            <Separator orientation="horizontal" className="mx-auto max-w-lg md:hidden" />
+                            <Separator orientation="vertical" className="hidden h-full md:block" />
                         </div>
-
-                        <CardContent className="space-y-6 max-w-md">
+                        <CardContent className="space-y-6 md:max-w-md">
                             <CardTitle>What happens next?</CardTitle>
                             <Stack direction="col" gap="xs">
                                 <Item>
@@ -157,7 +154,7 @@ export default function ScanRequest() {
                                 </ItemContent>
                             </Item>
                         </CardContent>
-                    </Stack>
+                    </div>
                 </Card>
             </div>
         </>

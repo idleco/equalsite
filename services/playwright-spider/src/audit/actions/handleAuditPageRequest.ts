@@ -1,14 +1,16 @@
 import type { PlaywrightCrawlerOptions } from "crawlee";
-import { EnqueueStrategy } from "crawlee";
+import type { EnqueueStrategy } from "crawlee";
 import { pageStartedEvent } from "../events/pageStartedEvent";
 import type { EventPublisher } from "../repositories/eventPublisher";
 import { createProcessAxeResultAction } from "./processAxeResult";
 import AxeBuilder from "@axe-core/playwright";
 import { progressEvent } from "../events/progressEvent";
+import type { AuditOptions } from "@equalsite/types";
 
 export const createAuditPageRequestHandler = (
     auditId: string,
     eventPublisher: EventPublisher,
+    options: AuditOptions
 ): PlaywrightCrawlerOptions['requestHandler'] => async ({
     request,
     page,
@@ -26,6 +28,7 @@ export const createAuditPageRequestHandler = (
 
     const axeResults = await new AxeBuilder({ page })
         .withTags(['wcag2a', 'wcag2aa', 'wcag22aa'])
+        .options({ resultTypes: ['violations'] }) // @todo customizable by request
         .analyze();
 
     await processAxeResultAction.run({
@@ -44,8 +47,10 @@ export const createAuditPageRequestHandler = (
         totalRequests: info?.totalRequestCount ?? 0,
     }));
 
-    await enqueueLinks({
-        strategy: EnqueueStrategy.SameDomain,
-        selector: 'a',
-    });
+    if (options.enqueueLinks) {
+        await enqueueLinks({
+            strategy: options.enqueueStrategy as  EnqueueStrategy,
+            selector: 'a',
+        });
+    }
 }

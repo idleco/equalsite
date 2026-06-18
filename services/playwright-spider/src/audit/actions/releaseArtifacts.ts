@@ -2,11 +2,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import type { AuditRepository } from '../repositories/auditRepository';
 import type AuditEntity from '../entities/audit';
-import { deleteDirectoryIfExists, deleteFileIfExists, zipDirectory } from '../utils/fsDirectory';
-import { crawlerMap } from '../services/crawlerMap';
+import { deleteDirectoryIfExists, zipDirectory } from '../utils/fsDirectory';
 
 export interface IReleaseArtifactsAction {
-    run: (auditId: string) =>  Promise<void>;
+    run: (auditId: string) =>  Promise<string>;
 }
 
 export const createReleaseArtifactsAction = (
@@ -15,33 +14,19 @@ export const createReleaseArtifactsAction = (
     archiveDirectory: string,
     secretKey: string
 ): IReleaseArtifactsAction => {
-    async function performAuditCleanup(audit: AuditEntity, zipPath: string) {
-        console.log('Performing audit cleanup...');
-        try  {
-            await crawlerMap.get(audit.id)?.teardown();
-            crawlerMap.delete(audit.id);
-            await auditRepository.delete(audit.id);
-            // deleteFileIfExists(zipPath);
-            console.log('Cleanup successfully!');
-        } catch (err) {
-            console.log('Clean up failed: ', err);
-        }
-    }
     return {
         run: async (auditId) => {
             const audit = await auditRepository.findOrFail(auditId);
             const zipPath = await extractAndCompressArtifacts(audit, artifactDirectory, archiveDirectory);
-            console.log(`Releasing audit (${auditId}) artifacts...`);
+
             try {
                 await sendHttpRequest(audit, zipPath, secretKey);
                 console.log(`Audit ${auditId} artifacts sent!`);
             } catch (err) {
                 console.error('Audit artifacts could\'nt release: ', err);
-            } finally {
-                // Regardless of what http response could be,
-                // we return the zipPath here for audit clean up later.
-                await performAuditCleanup(audit, zipPath);
             }
+
+            return zipPath;
         }
     }
 }

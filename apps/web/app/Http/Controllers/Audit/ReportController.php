@@ -2,21 +2,16 @@
 
 namespace App\Http\Controllers\Audit;
 
-use App\Contracts\HealthScoreCalculator;
 use App\Http\Controllers\Controller;
 use App\Models\Audit;
+use App\Services\HealthScoreCalculator;
 use App\Services\ReportPresenter;
 use App\Value\ScannedUrl;
 use App\Value\SeverityBreakdown;
-use App\Value\TeaserReport;
 use Inertia\Inertia;
 
 class ReportController extends Controller
 {
-    public function __construct(
-        protected HealthScoreCalculator $healthScoreCalculator
-    ) {}
-
     public function show(string $id)
     {
         $audit = Audit::where('crawler_id', $id)->firstOrFail();
@@ -29,11 +24,14 @@ class ReportController extends Controller
 
         $presenter = new ReportPresenter($audit);
 
+        // $calculator = new HealthScoreCalculator;
+
         return Inertia::render('audit/teaser-report', [
             'report' => [
                 'auditId' => $audit->crawler_id,
                 'siteUrl' => $audit->url,
-                'healthScore' => $this->healthScoreCalculator->calculate($audit),
+                'healthScore' => $presenter->healthScore(),
+                // 'healthScore' => $calculator->calculateScore($audit),
                 'severityBreakdown' => SeverityBreakdown::fromAudit($audit),
                 'scannedUrls' => ScannedUrl::mapFromAudit($audit),
                 'summary' => $presenter->summary($presenter->scannedUrls()),

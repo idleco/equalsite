@@ -1,0 +1,28 @@
+type ResponseError = {
+    error: string;
+    message: string;
+}
+
+export type AuditOptions = {
+    maxPages: number;
+    enqueueLinks: boolean;
+    enqueueStrategy: string;
+}
+
+export type CreateAuditRequestBody = {
+    urls: string[];
+    callbackUrl: string;
+    options: AuditOptions;
+}
+
+export interface CreateAuditResponseBody {
+    id: string;
+    options: AuditOptions;
+}
+export type CreateAuditResponseData = CreateAuditResponseBody | ResponseError;
+
+export type CancelAuditRequestParams = {
+    auditId: string;
+}
+
+export type CancelAuditResponseData = CancelAuditRequestParams | ResponseError;

@@ -85,7 +85,8 @@ interface PageFailedPayload extends BasePayload {
 }
 interface PageCompletedPayload extends BasePayload {
     pageUrl: string;
-    accessibilityViolationsCount: number;
+    violationsCount: number;
+    passesCount?: number;
     severityBreakdown: ServerityBreakdown;
 }
 interface ProgressPayload extends BasePayload, ProgressState {
@@ -187,6 +188,21 @@ type PageSkippedWsEvent = WsEvent<PageSkippedWsData>;
 type PageCompletedWsEvent = WsEvent<PageCompletedWsData>;
 type ProgressWsEvent = WsEvent<ProgressWsData>;
 
+type AuditOptions = {
+    maxPages: number;
+    enqueueLinks: boolean;
+    enqueueStrategy: string;
+};
+type CreateAuditRequestBody = {
+    urls: string[];
+    callbackUrl: string;
+    options: AuditOptions;
+};
+type CreatedAuditResponseData = {
+    id: string;
+    options: AuditOptions;
+};
+
 interface StreamData<T> {
     data: T;
 }
@@ -201,5 +217,19 @@ type CompletedStream = StreamData<CompletedEvent>;
 type StartedStream = StreamData<StartedEvent>;
 type CancelledStream = StreamData<CancelledEvent>;
 type TelemetryStream = StreamData<TelemetryEvent>;
+interface CreateAuditRequest<S extends string> {
+    body: {
+        urls: string[];
+        callbackUrl: string;
+        options: {
+            maxPages: number;
+            enqueueLinks: boolean;
+            enqueueStrategy: S;
+        };
+    };
+}
+interface CreateAuditResponse {
+    auditId: string;
+}
 
-export { type CancelledEvent, type CancelledPayload, type CancelledStream, type CancelledWsData, type CancelledWsEvent, type CompletedEvent, type CompletedPayload, type CompletedStream, type CompletedWsData, type CompletedWsEvent, EventEnum, type EventEnumKeys, type EventPayloadMap, type EventType, type FailedEvent, type FailedPayload, type FailedStream, type FailedWsData, type FailedWsEvent, type ImpactKey, type ImpactLevel, type PageCompletedEvent, type PageCompletedPayload, type PageCompletedStream, type PageCompletedWsData, type PageCompletedWsEvent, type PageFailedEvent, type PageFailedPayload, type PageFailedStream, type PageFailedWsData, type PageFailedWsEvent, type PageSkippedEvent, type PageSkippedPayload, type PageSkippedStream, type PageSkippedWsData, type PageSkippedWsEvent, type PageStartedEvent, type PageStartedPayload, type PageStartedStream, type PageStartedWsData, type PageStartedWsEvent, type ProgressEvent, type ProgressPayload, type ProgressState, type ProgressStream, type ProgressWsData, type ProgressWsEvent, type PublishedEvent, type QueueStatus, type QueuedEvent, type QueuedPayload, type QueuedStream, type QueuedWsData, type QueuedWsEvent, type ServerityBreakdown, type StartedEvent, type StartedPayload, type StartedStream, type StartedWsData, type StartedWsEvent, type StatisticState, type Stats, StatusEnum, type StatusEnumKeys, type TelemetryEvent, type TelemetryPayload, type TelemetryStream, type WsEvent };
+export { type AuditOptions, type CancelledEvent, type CancelledPayload, type CancelledStream, type CancelledWsData, type CancelledWsEvent, type CompletedEvent, type CompletedPayload, type CompletedStream, type CompletedWsData, type CompletedWsEvent, type CreateAuditRequest, type CreateAuditRequestBody, type CreateAuditResponse, type CreatedAuditResponseData, EventEnum, type EventEnumKeys, type EventPayloadMap, type EventType, type FailedEvent, type FailedPayload, type FailedStream, type FailedWsData, type FailedWsEvent, type ImpactKey, type ImpactLevel, type PageCompletedEvent, type PageCompletedPayload, type PageCompletedStream, type PageCompletedWsData, type PageCompletedWsEvent, type PageFailedEvent, type PageFailedPayload, type PageFailedStream, type PageFailedWsData, type PageFailedWsEvent, type PageSkippedEvent, type PageSkippedPayload, type PageSkippedStream, type PageSkippedWsData, type PageSkippedWsEvent, type PageStartedEvent, type PageStartedPayload, type PageStartedStream, type PageStartedWsData, type PageStartedWsEvent, type ProgressEvent, type ProgressPayload, type ProgressState, type ProgressStream, type ProgressWsData, type ProgressWsEvent, type PublishedEvent, type QueueStatus, type QueuedEvent, type QueuedPayload, type QueuedStream, type QueuedWsData, type QueuedWsEvent, type ServerityBreakdown, type StartedEvent, type StartedPayload, type StartedStream, type StartedWsData, type StartedWsEvent, type StatisticState, type Stats, StatusEnum, type StatusEnumKeys, type TelemetryEvent, type TelemetryPayload, type TelemetryStream, type WsEvent };

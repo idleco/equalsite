@@ -24,7 +24,7 @@ const parseDate = (dateString: string | null) => {
     return new Date(dateString).getTime();
 };
 
-export default function TimeElapsed({
+export function TimeElapsed({
     createdAt,
     startedAt
 }: Props) {

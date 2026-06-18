@@ -54,7 +54,8 @@ export interface PageFailedPayload extends BasePayload {
 
 export interface PageCompletedPayload extends BasePayload {
     pageUrl: string;
-    accessibilityViolationsCount: number;
+    violationsCount: number;
+    passesCount?: number;
     severityBreakdown: ServerityBreakdown;
 }
 

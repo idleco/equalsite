@@ -44,10 +44,9 @@ class ConsumeCrawlerStreams extends Command
             consumer: $consumer,
             handler: function ($data) {
                 $this->info(sprintf(
-                    '%s - [%s] %s',
+                    '%s [Redis Stream] Message received: %s',
                     Carbon::createFromTimestampMs($data->timestamp)->toDateTimeString(),
-                    $data->type,
-                    json_encode($data->payload),
+                    json_encode(['type' => $data->type, 'payload' => $data->payload])
                 ));
 
                 event(match ($data->type) {

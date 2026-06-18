@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Support\CrawlerArtifacts;
 use App\Value\Status;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
@@ -30,10 +29,11 @@ class Audit extends Model
         'started_at' => 'datetime'
     ];
 
-    public function artifacts(): CrawlerArtifacts
+    public static function findById(string $crawlerId): ?Audit
     {
-        return new CrawlerArtifacts($this->crawler_id);
+        return static::where('crawler_id', $crawlerId)->first();
     }
+
 
     public function getCustomData(string $key, $default = null)
     {

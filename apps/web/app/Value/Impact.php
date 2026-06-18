@@ -9,6 +9,11 @@ enum Impact: string
     case Moderate = 'moderate';
     case Minor = 'minor';
 
+    public function is(self $compare): bool
+    {
+        return $this->value === $compare->value;
+    }
+
     public function weight(): int
     {
         return match ($this) {

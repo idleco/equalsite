@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Value\Impact;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Violation extends Model
 {
@@ -26,9 +27,9 @@ class Violation extends Model
         'impact_level' => Impact::class,
     ];
 
-    public function translated(): bool
+    public function audit(): BelongsTo
     {
-        return filled($this->plain_english_summary) && filled($this->fix_instruction);
+        return $this->belongsTo(Audit::class);
     }
 
     public function addNode(array $node): void

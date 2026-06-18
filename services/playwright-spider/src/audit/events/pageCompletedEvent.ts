@@ -5,7 +5,8 @@ import type { EventPublisherParams } from "../repositories/eventPublisher";
 export const pageCompletedEvent = (payload: {
     auditId: string;
     pageUrl: string;
-    accessibilityViolationsCount: number;
+    violationsCount: number;
+    passesCount?: number;
     severityBreakdown: ServerityBreakdown
 }): EventPublisherParams<typeof EventEnum.PageCompleted> => ({
     type: EventEnum.PageCompleted,

@@ -11,6 +11,7 @@ import { RemediationClusters } from '@/components/reporting/remediation-clusters
 import { useState } from 'react';
 import { DiscoveredPages } from '@/components/reporting/discovered-pages';
 import { DeveloperTargets } from '@/components/reporting/developer-targets';
+import RemediationGroups from '@/components/reporting/remediation';
 
 export const REPORT_TABS = [
     'Fix priorities',
@@ -169,6 +170,7 @@ export default function TeaserReport({
                                 ))}
                             </TabsList>
                             <TabsContent value="Fix priorities">
+                                <RemediationGroups />
                                 <RemediationClusters groups={report.remediation.groups} />
                             </TabsContent>
                             <TabsContent value="By page">

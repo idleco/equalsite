@@ -395,6 +395,15 @@ async function deleteDirectoryIfExists(dir) {
     );
   }
 }
+function deleteFileIfExists(path3) {
+  if (fs.existsSync(path3)) {
+    try {
+      fs.unlinkSync(path3);
+    } catch (err) {
+      console.error("Error deleting file:", err);
+    }
+  }
+}
 function ensureDirectoryExistence(targetPath) {
   const dirname = path2.dirname(targetPath);
   if (!fs.existsSync(dirname)) {
@@ -436,6 +445,7 @@ export {
   createAuditService,
   crawlerMap,
   deleteDirectoryIfExists,
+  deleteFileIfExists,
   zipDirectory,
   publishEvent
 };

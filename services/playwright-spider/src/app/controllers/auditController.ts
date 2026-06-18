@@ -1,45 +1,33 @@
-import type { RequestHandler } from "express";
+import type { Request, Response } from "express";
 import { createAuditAction as createAuditFactory } from "../../audit/actions/createAudit";
 import { auditRepository } from "../adapters/redisAuditRepository";
 import * as Config from '../../config';
 import { crawlerQueue } from "../services/queue";
 import { createCancelAuditAction } from "../../audit/actions/cancelAudit";
 import { publishEvent } from "../adapters/redisStreamPublisher";
+import type { CancelAuditRequestParams, CancelAuditResponseData, CreateAuditRequestBody, CreateAuditResponseData } from "@equalsite/types";
 
 const {
     artifactDirectory,
-    maxRequestsPerCrawl
 } = Config.crawler;
-
-type CreateAuditRequest = RequestHandler<
-    unknown,
-    unknown,
-    {
-        url: string;
-        options?: {
-            maxPages: number;
-        }
-    },
-    { callback: string; }
->;
 
 const createAuditAction = createAuditFactory(
     auditRepository,
     Config.secretKey
 );
 
-export const CreateAudit: CreateAuditRequest = async (
-    request,
-    response
+export const CreateAudit = async (
+    request: Request<unknown, unknown, CreateAuditRequestBody>,
+    response: Response<CreateAuditResponseData>
 ) => {
-    const siteUrl = request.body.url;
+    const urls = request.body.urls;
     const options = request.body.options;
-    const urlCallback = request.query.callback;
+    const urlCallback = request.body.callbackUrl;
 
-    if (!siteUrl || typeof siteUrl !== 'string') {
+    if (!urls || ! Array.isArray(urls)) {
         return response.status(400).json({
             error: 'Invalid request body',
-            message: 'JSON body with a string "url" field is required',
+            message: 'JSON body with a array of string "url" field is required',
         });
     }
 
@@ -51,31 +39,18 @@ export const CreateAudit: CreateAuditRequest = async (
     }
 
     const auditId = await createAuditAction.run({
-        url: siteUrl,
+        urls,
         urlCallback,
-        options: {
-            maxPages: options?.maxPages || maxRequestsPerCrawl
-        }
+        options
     });
 
-    const auditJob = await crawlerQueue.add('audit', { auditId }, { jobId: auditId });
+    await crawlerQueue.add('audit', { auditId }, { jobId: auditId });
 
     return response.status(202).json({
-        accepted: true,
-        data: {
-            auditId: auditJob.id,
-            auditRequest: {
-                siteUrl,
-                options,
-                urlCallback
-            }
-        }
+        id: auditId,
+        options,
     });
 }
-
-type CancelAuditRequest = RequestHandler<
-    { auditId: string; }
->;
 
 const cancelAuditAction = createCancelAuditAction(
     auditRepository,
@@ -83,9 +58,9 @@ const cancelAuditAction = createCancelAuditAction(
     artifactDirectory
 );
 
-export const CancelAudit: CancelAuditRequest = async (
-    request,
-    response
+export const CancelAudit = async (
+    request: Request<CancelAuditRequestParams>,
+    response: Response<CancelAuditResponseData>
 ) => {
     const auditId = request.params.auditId;
 
@@ -101,7 +76,6 @@ export const CancelAudit: CancelAuditRequest = async (
     }
 
     return response.json({
-        cancelled: true,
         auditId,
     });
 }

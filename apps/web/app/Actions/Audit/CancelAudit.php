@@ -3,13 +3,13 @@
 namespace App\Actions\Audit;
 
 use App\Models\Audit;
-use App\Support\SpiderClient;
+use App\Contracts\Spider;
 use App\Value\Status;
 
 class CancelAudit
 {
     public function __construct(
-        protected SpiderClient $spider,
+        protected Spider $spider,
     ) {}
 
     public function cancel(Audit $audit): void

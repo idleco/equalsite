@@ -24,8 +24,12 @@ export default function usePagination<T = unknown>(data: T[], perPage: number = 
     const prevPage = () => goToPage(currentPage - 1);
 
     const totalItems = data.length;
+    const lastPage = currentPage === totalPages;
+    const firstPage = currentPage === 1;
 
     return {
+        lastPage,
+        firstPage,
         totalItems,
         currentItems,
         currentPage,

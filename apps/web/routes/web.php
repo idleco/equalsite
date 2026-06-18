@@ -1,8 +1,8 @@
 <?php
 
+use App\Contracts\Spider;
 use App\Http\Controllers\Audit\ReportController;
 use App\Http\Controllers\Audit\ScanningController;
-use App\Support\SpiderClient;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
@@ -14,7 +14,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'dashboard')->name('dashboard');
 });
 
-Route::get('/ping', function (SpiderClient $spider) {
+Route::get('/ping', function (Spider $spider) {
     dd($spider->ping());
 });
 

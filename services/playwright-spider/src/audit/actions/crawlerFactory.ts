@@ -6,14 +6,13 @@ import type { EventPublisher } from '../repositories/eventPublisher';
 import { pageFailedEvent } from '../events/pageFailedEvent';
 import { pageSkippedEvent } from '../events/pageSkippedEvent';
 import { createAuditPageRequestHandler } from './handleAuditPageRequest';
+import type { AuditOptions } from '@equalsite/types';
 
 type CrawlerFactoryParams = {
     auditId: string;
     eventPublisher: EventPublisher;
     artifactDirectory: string;
-    options: {
-        maxPages: number
-    }
+    options: AuditOptions
 }
 
 export default function createPlaywrightCrawler({
@@ -33,7 +32,7 @@ export default function createPlaywrightCrawler({
 
     return new PlaywrightCrawler(
         {
-            requestHandler: createAuditPageRequestHandler(auditId, eventPublisher),
+            requestHandler: createAuditPageRequestHandler(auditId, eventPublisher, options),
             failedRequestHandler: async ({ request }, error) => {
                 await eventPublisher(pageFailedEvent({
                     auditId,
@@ -51,7 +50,7 @@ export default function createPlaywrightCrawler({
             // },
             minConcurrency: 1,
             maxConcurrency: 2,
-            maxRequestsPerCrawl: options.maxPages,
+            maxRequestsPerCrawl: Math.max(options.maxPages, 200), // Safety max audit page limit
             maxRequestRetries: 2,
             requestHandlerTimeoutSecs: 120,
             navigationTimeoutSecs: 45,

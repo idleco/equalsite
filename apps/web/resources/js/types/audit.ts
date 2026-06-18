@@ -28,16 +28,17 @@ export type ScanInfo = {
 }
 
 export type ScannedUrl = {
-    status: UrlStatus;
-    attemptsCount: number;
-    startedAt: string;
-    skippedAt?: string;
-    failedAt?: string;
-    completedAt?: string;
-    errorMessage?: string;
-    skippingReason?: string;
-    accessibilityViolationsCount?: number;
-    severityBreakdown?: ServerityBreakdown;
+    status?: UrlStatus | undefined;
+    attemptsCount?: number | undefined;
+    startedAt?: string | undefined;
+    skippedAt?: string | undefined;
+    failedAt?: string | undefined;
+    completedAt?: string | undefined;
+    errorMessage?: string | undefined;
+    skippingReason?: string | undefined;
+    violationsCount?: number | undefined;
+    passesCount?: number | undefined;
+    severityBreakdown?: ServerityBreakdown | undefined;
 }
 
 export interface RemediationSampleNode {

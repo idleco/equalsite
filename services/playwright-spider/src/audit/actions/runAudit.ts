@@ -4,6 +4,7 @@ import type { EventPublisher } from "../repositories/eventPublisher";
 import { createReleaseArtifactsAction } from "./releaseArtifacts";
 import { crawlerMap } from "../services/crawlerMap";
 import { createAuditService } from "../services/auditService";
+import { createPerformCleanUpAction } from "./performCleanUp";
 
 export interface IRunAuditAction {
     run: (auditId: string) =>  Promise<void>;
@@ -24,6 +25,7 @@ export const createRunAuditAction = (
         secretKey
     } = config;
     const auditService = createAuditService(auditRepository, eventPublisher);
+    const performCleanUpAction = createPerformCleanUpAction(auditRepository);
     const releaseArtifactsAction = createReleaseArtifactsAction(auditRepository, artifactDirectory, archiveDirectory, secretKey);
     return {
         run: async (auditId) => {
@@ -44,7 +46,7 @@ export const createRunAuditAction = (
 
             try {
                 await auditService.startAudit(audit)
-                await crawler.run([audit.url]);
+                await crawler.run(audit.urls);
                 await auditService.completeAudit(audit, crawler);
             } catch (err) {
                 console.error(err);
@@ -53,7 +55,8 @@ export const createRunAuditAction = (
             } finally {
                 // Regardless of audit status (failed, cancelled, completed) we release
                 // the audit artifacts and cleanup everything. NO AUDIT HISTORY HERE!
-                await releaseArtifactsAction.run(audit.id);
+                const zipPath = await releaseArtifactsAction.run(audit.id);
+                await performCleanUpAction.run(audit, zipPath);
             }
         }
     }

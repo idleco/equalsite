@@ -2,9 +2,12 @@
 
 namespace App\Providers;
 
-use App\Contracts\HealthScoreCalculator;
-use App\Services\ScoreCalculator;
-use App\Support\SpiderClient;
+use App\Contracts\ArtifactRepository as ArtifactRepositoryContract;
+use App\Contracts\ScoreCalculator;
+use App\Contracts\Spider;
+use App\Services\ArtifactRepository;
+use App\Services\HealthScoreCalculator;
+use App\Support\Spider\SpiderClient;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\ServiceProvider;
 
@@ -12,7 +15,8 @@ class SpiderServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->bind(HealthScoreCalculator::class, ScoreCalculator::class);
+        $this->app->bind(ArtifactRepositoryContract::class, ArtifactRepository::class);
+        $this->app->bind(ScoreCalculator::class, HealthScoreCalculator::class);
     }
 
     public function boot(): void
@@ -22,18 +26,13 @@ class SpiderServiceProvider extends ServiceProvider
         Http::macro('spider', function () use ($config) {
             $crawler = $config->get('services.crawler');
             $hostname = $crawler['host'] . ':' . $crawler['port'];
+
             return Http::withToken($crawler['secret'])
                 ->baseUrl("http://{$hostname}/api/v1")
+                ->throw()
                 ->asJson();
         });
 
-        $this->app->singleton(SpiderClient::class, function ($app) {
-            $config = $app->make('config')->get('services.crawler');
-            return new SpiderClient(
-                host: $config['host'],
-                port: $config['port'],
-                secret: $config['secret']
-            );
-        });
+        $this->app->singleton(Spider::class, SpiderClient::class);
     }
 }

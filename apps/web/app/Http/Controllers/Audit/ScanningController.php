@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Audit;
 use App\Actions\Audit\CancelAudit;
 use App\Actions\Audit\CreateAudit;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Audit\AuditCreateRequest;
 use App\Models\Audit;
 use App\Value\ScanInfo;
 use App\Value\ScannedUrl;
@@ -15,19 +16,9 @@ use Inertia\Inertia;
 
 class ScanningController extends Controller
 {
-    public function store(Request $request, CreateAudit $creator)
+    public function store(AuditCreateRequest $request, CreateAudit $creator)
     {
-        $validated = $request->validate([
-            'url' => ['required', 'active_url']
-        ]);
-
-        $audit = $creator->create(
-            url: $validated['url'],
-            callback: 'http://web' . route('api.crawler.callback', absolute: false),
-            options: [
-                'maxPages' => 50
-            ]
-        );
+        $audit = $creator->create($request->url);
 
         return redirect()->route('scanning.progress', [
             'id' => $audit->crawler_id

@@ -16,7 +16,7 @@ class ScannedUrl implements Arrayable
         public readonly ?string $completedAt,
         public readonly ?string $errorMessage,
         public readonly ?string $skippingReason,
-        public readonly ?int $accessibilityViolationsCount,
+        public readonly ?int $violationsCount,
         public readonly ?SeverityBreakdown $severityBreakdown
     ) {}
 
@@ -43,7 +43,7 @@ class ScannedUrl implements Arrayable
             completedAt: $array['completedAt'] ?? null,
             errorMessage: $array['errorMessage'] ?? null,
             skippingReason: $array['skippingReason'] ?? null,
-            accessibilityViolationsCount: $array['accessibilityViolationsCount'],
+            violationsCount: $array['violationsCount'] ?? null,
             severityBreakdown: isset($array['severityBreakdown'])
                 ? SeverityBreakdown::fromArray($array['severityBreakdown'])
                 : null,
@@ -61,8 +61,8 @@ class ScannedUrl implements Arrayable
             'completedAt' => $this->completedAt,
             'errorMessage' => $this->errorMessage,
             'skippingReason' => $this->skippingReason,
-            'accessibilityViolationsCount' => $this->accessibilityViolationsCount,
-            'severityBreakdown' => $this->severityBreakdown->toArray()
+            'violationsCount' => $this->violationsCount,
+            'severityBreakdown' => $this->severityBreakdown?->toArray()
         ];
     }
 }

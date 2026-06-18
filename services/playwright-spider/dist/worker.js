@@ -6,11 +6,12 @@ import {
   crawlerMap,
   createAuditService,
   deleteDirectoryIfExists,
+  deleteFileIfExists,
   progressEvent,
   publishEvent,
   secretKey,
   zipDirectory
-} from "./chunk-NXGFBMWD.js";
+} from "./chunk-5Z4X4O5W.js";
 
 // src/worker.ts
 import { Worker } from "bullmq";
@@ -50,13 +51,14 @@ var createProcessAxeResultAction = (pushData, eventPublisher) => ({
     pageUrl,
     axeResults
   }) => {
-    const accessibilityViolations = axeResults.violations;
+    const violations = axeResults.violations;
     await pushData({
       auditId,
       pageUrl,
-      accessibilityViolations
+      violations
+      // passes: axeResults.passes // @todo customizable by request
     });
-    const severityBreakdown = accessibilityViolations.reduce(
+    const severityBreakdown = violations.reduce(
       (prev, curr) => {
         if (curr.impact) {
           prev[curr.impact] = prev[curr.impact] + 1;
@@ -74,7 +76,8 @@ var createProcessAxeResultAction = (pushData, eventPublisher) => ({
       auditId,
       pageUrl,
       severityBreakdown,
-      accessibilityViolationsCount: accessibilityViolations.length
+      violationsCount: violations.length
+      // passesCount: passes.length, // @todo customizable by request
     }));
   }
 });
@@ -94,7 +97,7 @@ var createAuditPageRequestHandler = (auditId, eventPublisher) => async ({
     attemptsCount: request.retryCount
   }));
   const processAxeResultAction = createProcessAxeResultAction(pushData, eventPublisher);
-  const axeResults = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag22aa"]).analyze();
+  const axeResults = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag22aa"]).options({ resultTypes: ["violations", "passes"] }).analyze();
   await processAxeResultAction.run({
     pageUrl: request.url,
     auditId,
@@ -208,30 +211,17 @@ var resourceBlockingHook = async ({ page }) => {
 import fs from "fs";
 import path2 from "path";
 var createReleaseArtifactsAction = (auditRepository2, artifactDirectory, archiveDirectory, secretKey2) => {
-  async function performAuditCleanup(audit, zipPath) {
-    console.log("Performing audit cleanup...");
-    try {
-      await crawlerMap.get(audit.id)?.teardown();
-      crawlerMap.delete(audit.id);
-      await auditRepository2.delete(audit.id);
-      console.log("Cleanup successfully!");
-    } catch (err) {
-      console.log("Clean up failed: ", err);
-    }
-  }
   return {
     run: async (auditId) => {
       const audit = await auditRepository2.findOrFail(auditId);
       const zipPath = await extractAndCompressArtifacts(audit, artifactDirectory, archiveDirectory);
-      console.log(`Releasing audit (${auditId}) artifacts...`);
       try {
         await sendHttpRequest(audit, zipPath, secretKey2);
         console.log(`Audit ${auditId} artifacts sent!`);
       } catch (err) {
         console.error("Audit artifacts could'nt release: ", err);
-      } finally {
-        await performAuditCleanup(audit, zipPath);
       }
+      return zipPath;
     }
   };
 };
@@ -257,6 +247,21 @@ async function extractAndCompressArtifacts(audit, artifactDirectory, archiveDire
   return result.path;
 }
 
+// src/audit/actions/performCleanUp.ts
+var createPerformCleanUpAction = (auditRepository2) => ({
+  run: async (audit, zipPath) => {
+    try {
+      await crawlerMap.get(audit.id)?.teardown();
+      crawlerMap.delete(audit.id);
+      await auditRepository2.delete(audit.id);
+      deleteFileIfExists(zipPath);
+      console.log("Cleanup successfully!");
+    } catch (err) {
+      console.log("Clean up failed: ", err);
+    }
+  }
+});
+
 // src/audit/actions/runAudit.ts
 var createRunAuditAction = (auditRepository2, eventPublisher, config) => {
   const {
@@ -265,6 +270,7 @@ var createRunAuditAction = (auditRepository2, eventPublisher, config) => {
     secretKey: secretKey2
   } = config;
   const auditService = createAuditService(auditRepository2, eventPublisher);
+  const performCleanUpAction = createPerformCleanUpAction(auditRepository2);
   const releaseArtifactsAction = createReleaseArtifactsAction(auditRepository2, artifactDirectory, archiveDirectory, secretKey2);
   return {
     run: async (auditId) => {
@@ -288,7 +294,8 @@ var createRunAuditAction = (auditRepository2, eventPublisher, config) => {
         await auditService.failAudit(audit, err);
         throw err;
       } finally {
-        await releaseArtifactsAction.run(audit.id);
+        const zipPath = await releaseArtifactsAction.run(audit.id);
+        await performCleanUpAction.run(audit, zipPath);
       }
     }
   };

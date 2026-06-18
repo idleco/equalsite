@@ -2,15 +2,22 @@
 
 namespace App\Services;
 
+use App\Contracts\ScoreCalculator;
 use App\Models\Audit;
 use App\Models\Violation;
 use App\Value\Impact;
 
 class ReportPresenter
 {
-    public function __construct(
-        public Audit $audit,
-    ) {}
+    protected Audit $audit;
+
+    protected ScoreCalculator $calculator;
+
+    public function __construct(Audit $audit)
+    {
+        $this->audit = $audit;
+        $this->calculator = new HealthScoreCalculator;
+    }
 
     public function pages(array $discoveredPageUrls): array
     {

@@ -24,7 +24,7 @@ export default function ScanOverview({
                 <CardTitle>Crawl Overview</CardTitle>
                 <CardDescription>Real-time statistics about this crawl job.</CardDescription>
             </CardHeader>
-            <CardContent className="grid grid-cols-4 gap-2">
+            <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
                 <Item variant="outline">
                     <ItemMedia variant="icon">
                         <Globe className="size-4 text-blue-500" />

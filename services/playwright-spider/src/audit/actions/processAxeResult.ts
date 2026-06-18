@@ -21,15 +21,15 @@ export const createProcessAxeResultAction = (
         pageUrl,
         axeResults
     }) => {
-        const accessibilityViolations = axeResults.violations;
-
+        const violations = axeResults.violations;
         await pushData({
             auditId,
             pageUrl,
-            accessibilityViolations
+            violations,
+            // passes: axeResults.passes // @todo customizable by request
         });
 
-        const severityBreakdown = accessibilityViolations
+        const severityBreakdown = violations
             .reduce<ServerityBreakdown>(
                 (prev, curr) => {
                     if (curr.impact) {
@@ -49,7 +49,8 @@ export const createProcessAxeResultAction = (
             auditId,
             pageUrl,
             severityBreakdown,
-            accessibilityViolationsCount: accessibilityViolations.length,
+            violationsCount: violations.length,
+            // passesCount: passes.length, // @todo customizable by request
         }));
     }
 })

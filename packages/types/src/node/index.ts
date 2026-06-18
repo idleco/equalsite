@@ -10,7 +10,7 @@ import type {
     StartedEvent,
     TelemetryEvent,
     PageSkippedEvent
-} from "./events";
+} from "../events";
 
 interface StreamData<T> {
     data: T
@@ -27,3 +27,5 @@ export type CompletedStream = StreamData<CompletedEvent>;
 export type StartedStream = StreamData<StartedEvent>;
 export type CancelledStream = StreamData<CancelledEvent>;
 export type TelemetryStream = StreamData<TelemetryEvent>;
+
+export type * from './api';

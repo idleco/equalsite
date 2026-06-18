@@ -1,30 +1,28 @@
+import type { AuditOptions } from "@equalsite/types";
 import Status from "../value/status";
 
-type Options = {
-    maxPages: number;
-}
 
-type Attributes = {
+interface Attributes {
     id: string;
-    url: string;
+    urls: string[];
     status: Status;
     urlCallback: string;
-    options: Options;
+    options: AuditOptions;
     createdAt: number;
 };
 
 class AuditEntity {
     id: string;
-    url: string;
+    urls: string[];
     status: Status;
     error?: string;
     urlCallback: string;
-    options: Options;
+    options: AuditOptions;
     createdAt: number;
 
     constructor(attributes: Attributes) {
         this.id = attributes.id;
-        this.url = attributes.url;
+        this.urls = attributes.urls;
         this.status = attributes.status;
         this.urlCallback = attributes.urlCallback;
         this.createdAt = attributes.createdAt;
@@ -34,7 +32,7 @@ class AuditEntity {
     toString(): string {
         return JSON.stringify({
             id: this.id,
-            url: this.url,
+            urls: this.urls,
             status: this.status,
             urlCallback: this.urlCallback,
             createdAt: this.createdAt,

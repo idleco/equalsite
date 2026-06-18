@@ -1,12 +1,11 @@
+import type { AuditOptions } from "@equalsite/types";
 import type { AuditRepository } from "../repositories/auditRepository";
 
 export interface ICreatedAuditAction {
     run: (params: {
-        url: string;
+        urls: string[];
         urlCallback: string;
-        options: {
-            maxPages: number;
-        }
+        options: AuditOptions
     }) => Promise<string>;
 }
 
@@ -15,13 +14,13 @@ export const createAuditAction = (
     secretKey: string
 ): ICreatedAuditAction => ({
     run: async ({
-        url,
+        urls,
         urlCallback,
         options
     }) => {
         await validateCallbackUrl(urlCallback, secretKey);
         const audit = await auditRepository.create({
-            url,
+            urls,
             urlCallback,
             options
         });

@@ -3,11 +3,11 @@ import ScanTimeline from '@/components/scanning/scan-timeline';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 import ScanDetails from '@/components/scanning/scan-details';
 import ScanOverview from '@/components/scanning/scan-overview';
-import ProcessedUrls from '@/components/scanning/processed-urls';
 import { useEchoPublic } from '@laravel/echo-react';
 import type { ScanInfo, ScanProgress, ScanQueue, ScannedUrl } from '@/types';
 import type { CompletedWsEvent, FailedWsEvent, PageCompletedWsEvent, PageFailedWsEvent, PageSkippedWsEvent, PageStartedWsEvent, ProgressWsEvent, QueuedWsEvent, StartedWsEvent} from '@equalsite/types';
 import { omit } from '@/lib/obj';
+import ScannedUrls from '@/components/scanning/scanned-urls';
 
 type ScanProgressPageProps = {
     scanInfo: ScanInfo;
@@ -189,7 +189,8 @@ export default function ScanProgress({
                             ...({[data.pageUrl]: {
                                 ...current.scanUrls[data.pageUrl],
                                 status: 'completed',
-                                accessibilityViolationsCount: data.accessibilityViolationsCount,
+                                violationsCount: data.violationsCount,
+                                passesCount: data.passesCount,
                                 severityBreakdown: data.severityBreakdown,
                                 completedAt: timestamp,
                             }})
@@ -206,7 +207,7 @@ export default function ScanProgress({
                 <Breadcrumbs />
                 <ScanDetails scanInfo={scanInfo} scanQueue={scanQueue} />
                 <ScanOverview scanProgress={scanProgress} />
-                <ProcessedUrls scanUrls={scanUrls} />
+                <ScannedUrls urls={scanUrls} />
                 <ScanTimeline />
             </div>
         </>

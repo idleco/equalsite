@@ -78,7 +78,7 @@ class AuditPageSubscriber implements ShouldQueue
 
         $this->updatePage($event->crawlerId(), $payload['pageUrl'], [
             'status' => 'completed',
-            'accessibilityViolationsCount' => $payload['accessibilityViolationsCount'],
+            'violationsCount' => $payload['violationsCount'],
             'severityBreakdown' => $payload['severityBreakdown'],
             'completedAt' => $timestamp->toDateTimeString()
         ]);

@@ -9,7 +9,7 @@ import {
   deleteDirectoryIfExists,
   publishEvent,
   secretKey
-} from "./chunk-NXGFBMWD.js";
+} from "./chunk-5Z4X4O5W.js";
 
 // src/app.ts
 import express from "express";
