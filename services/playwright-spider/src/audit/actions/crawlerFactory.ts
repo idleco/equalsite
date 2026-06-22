@@ -50,7 +50,7 @@ export default function createPlaywrightCrawler({
             // },
             minConcurrency: 1,
             maxConcurrency: 2,
-            maxRequestsPerCrawl: Math.max(options.maxPages, 200), // Safety max audit page limit
+            maxRequestsPerCrawl: Math.min(options.maxPages, 200), // Safety max audit page limit
             maxRequestRetries: 2,
             requestHandlerTimeoutSecs: 120,
             navigationTimeoutSecs: 45,

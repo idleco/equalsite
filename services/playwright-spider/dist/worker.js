@@ -11,7 +11,7 @@ import {
   publishEvent,
   secretKey,
   zipDirectory
-} from "./chunk-5Z4X4O5W.js";
+} from "./chunk-TEUD2NZP.js";
 
 // src/worker.ts
 import { Worker } from "bullmq";
@@ -26,9 +26,6 @@ var pageFailedEvent = (payload) => ({
   type: EventEnum.PageFailed,
   payload
 });
-
-// src/audit/actions/handleAuditPageRequest.ts
-import { EnqueueStrategy } from "crawlee";
 
 // src/audit/events/pageStartedEvent.ts
 import { EventEnum as EventEnum2 } from "@equalsite/types";
@@ -84,7 +81,7 @@ var createProcessAxeResultAction = (pushData, eventPublisher) => ({
 
 // src/audit/actions/handleAuditPageRequest.ts
 import AxeBuilder from "@axe-core/playwright";
-var createAuditPageRequestHandler = (auditId, eventPublisher) => async ({
+var createAuditPageRequestHandler = (auditId, eventPublisher, options) => async ({
   request,
   page,
   pushData,
@@ -97,7 +94,7 @@ var createAuditPageRequestHandler = (auditId, eventPublisher) => async ({
     attemptsCount: request.retryCount
   }));
   const processAxeResultAction = createProcessAxeResultAction(pushData, eventPublisher);
-  const axeResults = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag22aa"]).options({ resultTypes: ["violations", "passes"] }).analyze();
+  const axeResults = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag22aa"]).options({ resultTypes: ["violations"] }).analyze();
   await processAxeResultAction.run({
     pageUrl: request.url,
     auditId,
@@ -111,10 +108,12 @@ var createAuditPageRequestHandler = (auditId, eventPublisher) => async ({
     pendingRequests: info?.pendingRequestCount ?? 0,
     totalRequests: info?.totalRequestCount ?? 0
   }));
-  await enqueueLinks({
-    strategy: EnqueueStrategy.SameDomain,
-    selector: "a"
-  });
+  if (options.enqueueLinks) {
+    await enqueueLinks({
+      strategy: options.enqueueStrategy,
+      selector: "a"
+    });
+  }
 };
 
 // src/audit/actions/crawlerFactory.ts
@@ -133,7 +132,7 @@ function createPlaywrightCrawler({
   });
   return new PlaywrightCrawler(
     {
-      requestHandler: createAuditPageRequestHandler(auditId, eventPublisher),
+      requestHandler: createAuditPageRequestHandler(auditId, eventPublisher, options),
       failedRequestHandler: async ({ request }, error) => {
         await eventPublisher(pageFailedEvent({
           auditId,
@@ -151,7 +150,8 @@ function createPlaywrightCrawler({
       // },
       minConcurrency: 1,
       maxConcurrency: 2,
-      maxRequestsPerCrawl: options.maxPages,
+      maxRequestsPerCrawl: Math.min(options.maxPages, 200),
+      // Safety max audit page limit
       maxRequestRetries: 2,
       requestHandlerTimeoutSecs: 120,
       navigationTimeoutSecs: 45,
@@ -287,7 +287,7 @@ var createRunAuditAction = (auditRepository2, eventPublisher, config) => {
       crawlerMap.set(audit.id, crawler2);
       try {
         await auditService.startAudit(audit);
-        await crawler2.run([audit.url]);
+        await crawler2.run(audit.urls);
         await auditService.completeAudit(audit, crawler2);
       } catch (err) {
         console.error(err);

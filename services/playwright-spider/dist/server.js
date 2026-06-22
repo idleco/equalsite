@@ -9,7 +9,7 @@ import {
   deleteDirectoryIfExists,
   publishEvent,
   secretKey
-} from "./chunk-5Z4X4O5W.js";
+} from "./chunk-TEUD2NZP.js";
 
 // src/app.ts
 import express from "express";
@@ -20,13 +20,13 @@ import { Router } from "express";
 // src/audit/actions/createAudit.ts
 var createAuditAction = (auditRepository2, secretKey2) => ({
   run: async ({
-    url,
+    urls,
     urlCallback,
     options
   }) => {
     await validateCallbackUrl(urlCallback, secretKey2);
     const audit = await auditRepository2.create({
-      url,
+      urls,
       urlCallback,
       options
     });
@@ -108,21 +108,17 @@ var createCancelAuditAction = (auditRepository2, eventPublisher, artifactDirecto
 
 // src/app/controllers/auditController.ts
 var {
-  artifactDirectory,
-  maxRequestsPerCrawl
+  artifactDirectory
 } = crawler;
-var createAuditAction2 = createAuditAction(
-  auditRepository,
-  secretKey
-);
+var createAuditAction2 = createAuditAction(auditRepository, secretKey);
 var CreateAudit = async (request, response) => {
-  const siteUrl = request.body.url;
+  const urls = request.body.urls;
   const options = request.body.options;
-  const urlCallback = request.query.callback;
-  if (!siteUrl || typeof siteUrl !== "string") {
+  const urlCallback = request.body.callbackUrl;
+  if (!urls || !Array.isArray(urls)) {
     return response.status(400).json({
       error: "Invalid request body",
-      message: 'JSON body with a string "url" field is required'
+      message: 'JSON body with a array of string "url" field is required'
     });
   }
   if (!urlCallback || typeof urlCallback !== "string") {
@@ -132,23 +128,14 @@ var CreateAudit = async (request, response) => {
     });
   }
   const auditId = await createAuditAction2.run({
-    url: siteUrl,
+    urls,
     urlCallback,
-    options: {
-      maxPages: options?.maxPages || maxRequestsPerCrawl
-    }
+    options
   });
-  const auditJob = await crawlerQueue.add("audit", { auditId }, { jobId: auditId });
+  await crawlerQueue.add("audit", { auditId }, { jobId: auditId });
   return response.status(202).json({
-    accepted: true,
-    data: {
-      auditId: auditJob.id,
-      auditRequest: {
-        siteUrl,
-        options,
-        urlCallback
-      }
-    }
+    id: auditId,
+    options
   });
 };
 var cancelAuditAction = createCancelAuditAction(
@@ -165,7 +152,6 @@ var CancelAudit = async (request, response) => {
     await job?.remove();
   }
   return response.json({
-    cancelled: true,
     auditId
   });
 };

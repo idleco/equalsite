@@ -1,14 +1,13 @@
 import type React from 'react';
 
 import { impactToneClasses } from './reportColors';
-import type { Remediation } from '@/types';
+import type { IViolation } from '@/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { CodeBlock } from '../code-block';
-
-type RemediationGroup = NonNullable<Remediation>['groups'][number];
+import { ClusterShell } from './cluster-shell';
 
 type RemediationClustersProps = {
-    groups: RemediationGroup[];
+    violations: IViolation[];
 };
 
 function titleForScope(scope: string): string {
@@ -63,12 +62,12 @@ function renderBoldSegments(
 }
 
 export function RemediationClusters({
-    groups,
+    violations,
 }: RemediationClustersProps) {
     return (
         <div className="grid gap-4 grid-cols-0">
-            <div className="space-y-4">
-                {groups.length === 0 ? (
+            <div className="space-y-2">
+                {violations.length === 0 ? (
                     <Card>
                         <CardHeader>
                             <CardTitle>Fix priorities</CardTitle>
@@ -80,37 +79,37 @@ export function RemediationClusters({
                         </CardContent>
                     </Card>
                 ) : (
-                    groups.map((group) => (
-                        <Card key={`cluster-${group.violationId}`}>
-                            <CardHeader>
-                                <CardTitle>
-                                    <div className="min-w-0">
-                                        <div className="flex flex-wrap items-center gap-2">
-                                            <span className="min-w-0 wrap-break-words whitespace-normal">
-                                                {group.summary}
-                                            </span>
-                                            <span
-                                                className={`inline-flex rounded-full px-2 py-0.5 text-xs font-semibold tracking-wide uppercase ring-1 ${impactToneClasses(group.impact)}`}
-                                            >
-                                                {group.impactLabel}
-                                            </span>
-                                        </div>
-                                        <div className="mt-1 text-sm dark:text-slate-600 text-slate-300">
-                                            {titleForScope(group.remediationScope)}
-                                        </div>
+                    violations.map((i) => (
+                        <ClusterShell
+                            key={`cluster-${i.ruleId}`}
+                            title={
+                                <div className="min-w-0">
+                                    <div className="flex flex-wrap items-center gap-2">
+                                        <span className="min-w-0 wrap-break-words whitespace-normal">
+                                            {i.summary}
+                                        </span>
+                                        <span
+                                            className={`inline-flex rounded-full px-2 py-0.5 text-xs font-semibold tracking-wide uppercase ring-1 ${impactToneClasses(i.impact)}`}
+                                        >
+                                            {i.impact.toUpperCase()}
+                                        </span>
                                     </div>
-                                </CardTitle>
-                                <CardDescription>{`${group.affectedPagesCount} pages impacted · ${group.instancesCount} unique instances`}</CardDescription>
-                            </CardHeader>
+                                    <div className="mt-1 text-sm dark:text-slate-600 text-slate-300">
+                                        {titleForScope(i.remediationScope)}
+                                    </div>
+                                </div>
+                            }
+                            description={`${i.affectedPagesCount} pages impacted · ${i.instancesCount} unique instances`}
+                        >
                             <CardContent className="text-sm dark:text-slate-600 text-slate-300">
                                 <div className="space-y-4">
                                     <div className="text-sm dark:text-slate-600 text-slate-300">
-                                        {renderBoldSegments(group.clusterReason)}
+                                        {renderBoldSegments(i.clusterReason)}
                                     </div>
 
-                                    {group.failureSummary ? (
+                                    {i.failureSummary ? (
                                         <div className="rounded-lg bg-slate-50 px-3 py-2 text-sm text-slate-700 dark:bg-slate-800/70 dark:text-slate-200">
-                                            {renderBoldSegments(group.failureSummary)}
+                                            {renderBoldSegments(i.failureSummary)}
                                         </div>
                                     ) : null}
 
@@ -119,14 +118,14 @@ export function RemediationClusters({
                                             <div className="text-xs font-semibold tracking-wide dark:text-slate-500 uppercase text-slate-400">
                                                 Where to start
                                             </div>
-                                            {group.sampleTargets.length > 0 ? (
-                                                group.sampleTargets.map(
-                                                    (target) => (
+                                            {i.nodes.length > 0 ? (
+                                                i.nodes.map(
+                                                    (node) => (
                                                         <div
-                                                            key={`${group.violationId}-${target}`}
+                                                            key={`${i.ruleId}-${node.fingerprint}-target`}
                                                             className="rounded-md bg-slate-100 px-3 py-2 font-mono text-xs text-slate-700 dark:bg-slate-800 dark:text-slate-200"
                                                         >
-                                                            {target}
+                                                            {node.target}
                                                         </div>
                                                     ),
                                                 )
@@ -142,15 +141,18 @@ export function RemediationClusters({
                                             <div className="text-xs font-semibold tracking-wide dark:text-slate-500 text-slate-400 uppercase">
                                                 HTML evidence
                                             </div>
-                                            {group.sampleNodes[0] ? (
-                                                <CodeBlock
-                                                    code={group.sampleNodes[0].html}
-                                                    label="HTML evidence"
-                                                    maxHeightClassName="max-h-44"
-                                                    enableHorizontalScroll={false}
-                                                    className="bg-black dark:bg-slate-950 text-slate-100"
-                                                />
-                                            ) : (
+                                            {i.nodes.length > 0 ?
+                                                i.nodes.map(node => (
+                                                    <CodeBlock
+                                                        key={`${i.ruleId}-${node.fingerprint}-html`}
+                                                        code={node.html}
+                                                        label="HTML evidence"
+                                                        maxHeightClassName="max-h-44"
+                                                        enableHorizontalScroll={false}
+                                                        className="bg-black dark:bg-slate-950 text-slate-100"
+                                                    />
+                                                ))
+                                            : (
                                                 <p className="text-sm dark:text-slate-600 text-slate-300">
                                                     No HTML evidence available yet.
                                                 </p>
@@ -164,11 +166,11 @@ export function RemediationClusters({
                                                 Affected pages
                                             </div>
                                             <ul className="mt-2 space-y-2">
-                                                {group.affectedPages
+                                                {i.nodes.flatMap(v => v.urls)
                                                     .slice(0, 6)
-                                                    .map((page) => (
+                                                    .map((page, k) => (
                                                         <li
-                                                            key={`${group.violationId}-${page}`}
+                                                            key={`${i.ruleId}-${page}-${k}`}
                                                             className="truncate rounded-md border dark:border-slate-200 px-3 py-2 text-sm dark:text-slate-700 border-slate-800 text-slate-200"
                                                             title={page}
                                                         >
@@ -176,10 +178,10 @@ export function RemediationClusters({
                                                         </li>
                                                     ))}
                                             </ul>
-                                            {group.affectedPages.length > 6 ? (
+                                            {i.nodes.flatMap(v => v.urls).length > 6 ? (
                                                 <div className="mt-2 text-xs dark:text-slate-500 text-slate-400">
                                                     +
-                                                    {group.affectedPages.length - 6}{' '}
+                                                    {i.nodes.flatMap(v => v.urls).length - 6}{' '}
                                                     more pages affected
                                                 </div>
                                             ) : null}
@@ -189,14 +191,14 @@ export function RemediationClusters({
                                             <CardHeader>
                                                 <CardTitle>Fix instruction</CardTitle>
                                                 <CardDescription>
-                                                    {group.fixInstruction ?? 'AI-generated remediation guidance will turn this evidence into a developer-friendly fix brief.'}
+                                                    {i.fixInstruction ?? 'AI-generated remediation guidance will turn this evidence into a developer-friendly fix brief.'}
                                                 </CardDescription>
                                             </CardHeader>
                                         </Card>
                                     </div>
                                 </div>
                             </CardContent>
-                        </Card>
+                        </ClusterShell>
                     ))
                 )}
             </div>

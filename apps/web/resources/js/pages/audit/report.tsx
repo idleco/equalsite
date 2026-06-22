@@ -1,17 +1,16 @@
 import { Head, Link } from '@inertiajs/react';
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import ScoreGuage from '@/components/reporting/score-guage';
 import { Stack } from '@/components/stack';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { ServerityBreakdown } from '@equalsite/types';
-import type { RemediationGroup, ReportPages, ScannedUrl } from '@/types';
+import type { IViolation, RemediationGroup, ReportPages, ScannedUrl } from '@/types';
 import { RemediationClusters } from '@/components/reporting/remediation-clusters';
 import { useState } from 'react';
 import { DiscoveredPages } from '@/components/reporting/discovered-pages';
 import { DeveloperTargets } from '@/components/reporting/developer-targets';
-import RemediationGroups from '@/components/reporting/remediation';
+import { Breadcrumbs } from '@/components/reporting/breadcrumbs';
 
 export const REPORT_TABS = [
     'Fix priorities',
@@ -31,43 +30,19 @@ type TeaserReportProps = {
             groupsCount: number;
         };
         pages: ReportPages;
+        violations: IViolation[]
     };
 }
 
-function Breadcrumbs({ auditId }: { auditId: string }) {
-    return (
-        <Breadcrumb>
-            <BreadcrumbList>
-                <BreadcrumbItem>
-                    <BreadcrumbLink asChild>
-                        <Link href="/">Scan</Link>
-                    </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                    <BreadcrumbLink asChild>
-                        <Link href="/">{auditId}</Link>
-                    </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                    <BreadcrumbPage>Accessibility Report</BreadcrumbPage>
-                </BreadcrumbItem>
-            </BreadcrumbList>
-        </Breadcrumb>
-    );
-}
-
-export default function TeaserReport({
+export default function Report({
     report,
 }: TeaserReportProps) {
-    console.log(report)
     const [activeTab, setActiveTab] = useState<(typeof REPORT_TABS)[number]>('Fix priorities');
     return (
         <>
             <Head title="Welcome" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                <Breadcrumbs auditId={report.auditId} />
+                <Breadcrumbs />
                 <Card>
                     <CardContent>
                         <Stack direction="row" gap="md">
@@ -170,8 +145,7 @@ export default function TeaserReport({
                                 ))}
                             </TabsList>
                             <TabsContent value="Fix priorities">
-                                <RemediationGroups />
-                                <RemediationClusters groups={report.remediation.groups} />
+                                <RemediationClusters violations={report.violations} />
                             </TabsContent>
                             <TabsContent value="By page">
                                 <DiscoveredPages

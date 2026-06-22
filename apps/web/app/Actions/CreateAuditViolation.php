@@ -20,20 +20,14 @@ class CreateAuditViolation
             'failure_summary' => array_first($violation->nodes)?->failureSummary,
         ]);
 
-        $nodes = $model->nodes ?? [];
-
         foreach ($violation->nodes as $node) {
-            $target = array_first($node->target);
-            $nodes[] = [
+            $model->nodes->sync([
                 'url' => $url,
                 'html' => $node->html,
-                'target' => $target,
-                'fingerprint' => md5($target . $node->html)
-            ];
+                'target' => array_first($node->target),
+            ]);
         }
 
-        $model->update([
-            'nodes' => $nodes
-        ]);
+        $model->save();
     }
 }

@@ -91,3 +91,45 @@ export interface PageAtRisk {
     url: string;
     issuesFound: number;
 }
+
+export type ViolationInstance = {
+    fingerprint: string;
+    html: string;
+    target: string;
+    affectedUrls: string[];
+}
+
+
+export type Violation = {
+    auditId: string;
+    ruleId: string;
+    impactLevel: ImpactLevelKey;
+    description: string;
+    translatedDescription?: string;
+    failureSummary: string;
+    translatedFailureSummary?: string;
+    helpUrl: string;
+    totalAffectedUrls: number;
+    totalUniqueInstances: number;
+    instances: ViolationInstance[];
+}
+
+export interface IViolation {
+    auditId: string;
+    ruleId: string;
+    impact: string;
+    summary: string;
+    failureSummary: string;
+    helpUrl: string;
+    fixInstruction?: string;
+    remediationScope: string;
+    clusterReason: string;
+    affectedPagesCount: number;
+    instancesCount: number;
+    nodes: {
+        fingerprint: string;
+        html: string;
+        target: string;
+        urls: string[]
+    }[]
+}

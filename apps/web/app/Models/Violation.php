@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\AsNodeCollection;
 use App\Value\Impact;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -23,7 +24,7 @@ class Violation extends Model
     ];
 
     protected $casts = [
-        'nodes' => 'array',
+        'nodes' => AsNodeCollection::class,
         'impact_level' => Impact::class,
     ];
 

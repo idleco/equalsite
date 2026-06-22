@@ -78,7 +78,7 @@ var status_default = Status;
 // src/audit/entities/audit.ts
 var AuditEntity = class _AuditEntity {
   id;
-  url;
+  urls;
   status;
   error;
   urlCallback;
@@ -86,7 +86,7 @@ var AuditEntity = class _AuditEntity {
   createdAt;
   constructor(attributes) {
     this.id = attributes.id;
-    this.url = attributes.url;
+    this.urls = attributes.urls;
     this.status = attributes.status;
     this.urlCallback = attributes.urlCallback;
     this.createdAt = attributes.createdAt;
@@ -95,7 +95,7 @@ var AuditEntity = class _AuditEntity {
   toString() {
     return JSON.stringify({
       id: this.id,
-      url: this.url,
+      urls: this.urls,
       status: this.status,
       urlCallback: this.urlCallback,
       createdAt: this.createdAt,

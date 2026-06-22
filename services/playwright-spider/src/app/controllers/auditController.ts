@@ -11,10 +11,7 @@ const {
     artifactDirectory,
 } = Config.crawler;
 
-const createAuditAction = createAuditFactory(
-    auditRepository,
-    Config.secretKey
-);
+const createAuditAction = createAuditFactory(auditRepository, Config.secretKey);
 
 export const CreateAudit = async (
     request: Request<unknown, unknown, CreateAuditRequestBody>,

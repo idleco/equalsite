@@ -1,24 +1,25 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardAction, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import type { ReactNode} from "react";
 import { useState } from "react";
 
-type GroupShellProps = {
+type ClusterShellProps = {
     children: ReactNode;
-    title: string;
-    description: string;
+    title: ReactNode | string;
+    description: ReactNode | string;
 }
 
-export function GroupShell({
+export function ClusterShell({
     title,
     description,
-    children
-}: GroupShellProps) {
+    children,
+    ...props
+}: ClusterShellProps) {
     const [isOpen, setIsOpen] = useState(false);
     return (
-        <Card>
+        <Card {...props}>
             <Collapsible
                 open={isOpen}
                 onOpenChange={setIsOpen}
@@ -35,9 +36,7 @@ export function GroupShell({
                     </CardAction>
                 </CardHeader>
                 <CollapsibleContent className="mt-4">
-                    <CardContent>
-                        {children}
-                    </CardContent>
+                    {children}
                 </CollapsibleContent>
             </Collapsible>
         </Card>
