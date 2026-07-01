@@ -11,9 +11,9 @@ use App\Value\ScannedUrl;
 use App\Value\SeverityBreakdown;
 use Inertia\Inertia;
 
-class ReportController extends Controller
+class ResultController extends Controller
 {
-    public function show(string $id)
+    public function __invoke(string $id)
     {
         $audit = Audit::where('crawler_id', $id)->firstOrFail();
 
@@ -27,7 +27,7 @@ class ReportController extends Controller
 
         // $calculator = new HealthScoreCalculator;
 
-        return Inertia::render('audit/report', [
+        return Inertia::render('audit/result', [
             'report' => [
                 'auditId' => $audit->crawler_id,
                 'siteUrl' => $audit->url,

@@ -1,30 +1,16 @@
 <?php
 
-use App\Contracts\Spider;
-use App\Http\Controllers\Audit\ReportController;
-use App\Http\Controllers\Audit\ScanningController;
+use App\Http\Controllers\Audit\CancelController;
+use App\Http\Controllers\Audit\ProgressController;
+use App\Http\Controllers\Audit\RequestController;
+use App\Http\Controllers\Audit\ResultController;
 use Illuminate\Support\Facades\Route;
-use Laravel\Fortify\Features;
 
-Route::inertia('/', 'welcome', [
-    'canRegister' => Features::enabled(Features::registration()),
-])->name('home');
-
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('dashboard', 'dashboard')->name('dashboard');
-});
-
-Route::get('/ping', function (Spider $spider) {
-    dd($spider->ping());
-});
-
-Route::inertia('/audit/create', 'audit/scan-request')
-    ->name('audit.scan.create');
-
-Route::post('/audit', [ScanningController::class, 'store'])->name('scanning.store');
-Route::delete('/audit/{id}', [ScanningController::class, 'cancel'])->name('scanning.cancel');
-Route::get('/audit/{id}', [ScanningController::class, 'progress'])->name('scanning.progress');
-
-Route::get('/audit/{id}/report', [ReportController::class, 'show'])->name('audit.report');
-
-require __DIR__ . '/settings.php';
+// The MVP routes — also named 'home' so Fortify logout/redirect targets resolve
+Route::inertia('/', 'audit/index')->name('audit.create');
+Route::redirect('/dashboard', '/')->name('dashboard');
+Route::redirect('/home', '/')->name('home');
+Route::post('/audit', RequestController::class)->name('audit.store');
+Route::delete('/audit/{id}', CancelController::class)->name('audit.cancel');
+Route::get('/audit/{id}', ProgressController::class)->name('audit.progress');
+Route::get('/audit/{id}/result', ResultController::class)->name('audit.result');

@@ -6,7 +6,9 @@ import { twMerge } from 'tailwind-merge';
 export const str = {
     title: (v: string) => v.split(' ').map(word =>
         word.charAt(0).toUpperCase() + word.slice(1)
-      ).join(' ')
+      ).join(' '),
+
+    plural: (v: string, count: number) => v.concat(count !== 1 ? 's' : '')
 }
 
 export function cn(...inputs: ClassValue[]) {

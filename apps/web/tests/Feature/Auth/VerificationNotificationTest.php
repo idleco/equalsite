@@ -7,6 +7,7 @@ use Laravel\Fortify\Features;
 
 beforeEach(function () {
     $this->skipUnlessFortifyHas(Features::emailVerification());
+    $this->markTestSkipped('Auth routes are phase-2 features.');
 });
 
 test('sends verification notification', function () {

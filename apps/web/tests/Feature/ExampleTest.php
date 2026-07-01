@@ -1,7 +1,7 @@
 <?php
 
-test('returns a successful response', function () {
-    $response = $this->get(route('home'));
+test('home page returns a successful response', function () {
+    $response = $this->get(route('audit.create'));
 
     $response->assertOk();
 });

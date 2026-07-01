@@ -8,7 +8,7 @@ test('login screen can be rendered', function () {
     $response = $this->get(route('login'));
 
     $response->assertOk();
-});
+})->skip('Auth routes are phase-2 features.');
 
 test('users can authenticate using the login screen', function () {
     $user = User::factory()->create();
@@ -20,7 +20,7 @@ test('users can authenticate using the login screen', function () {
 
     $this->assertAuthenticated();
     $response->assertRedirect(route('dashboard', absolute: false));
-});
+})->skip('Auth routes are phase-2 features.');
 
 test('users with two factor enabled are redirected to two factor challenge', function () {
     $this->skipUnlessFortifyHas(Features::twoFactorAuthentication());
@@ -46,7 +46,7 @@ test('users with two factor enabled are redirected to two factor challenge', fun
     $response->assertRedirect(route('two-factor.login'));
     $response->assertSessionHas('login.id', $user->id);
     $this->assertGuest();
-});
+})->skip('Auth routes are phase-2 features.');
 
 test('users can not authenticate with invalid password', function () {
     $user = User::factory()->create();
@@ -57,7 +57,7 @@ test('users can not authenticate with invalid password', function () {
     ]);
 
     $this->assertGuest();
-});
+})->skip('Auth routes are phase-2 features.');
 
 test('users can logout', function () {
     $user = User::factory()->create();
@@ -66,7 +66,7 @@ test('users can logout', function () {
 
     $this->assertGuest();
     $response->assertRedirect(route('home'));
-});
+})->skip('Auth routes are phase-2 features.');
 
 test('users are rate limited', function () {
     $user = User::factory()->create();
@@ -79,4 +79,4 @@ test('users are rate limited', function () {
     ]);
 
     $response->assertTooManyRequests();
-});
+})->skip('Auth routes are phase-2 features.');

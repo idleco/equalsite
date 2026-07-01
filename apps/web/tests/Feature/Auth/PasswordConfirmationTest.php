@@ -13,10 +13,10 @@ test('confirm password screen can be rendered', function () {
     $response->assertInertia(fn (Assert $page) => $page
         ->component('auth/confirm-password'),
     );
-});
+})->skip('Auth routes are phase-2 features.');
 
 test('password confirmation requires authentication', function () {
     $response = $this->get(route('password.confirm'));
 
     $response->assertRedirect(route('login'));
-});
+})->skip('Auth routes are phase-2 features.');

@@ -70,7 +70,7 @@ export function ScanDetails({
                 </div>
 
                 <div className="grid grid-cols-2 gap-2">
-                    <QueuePosition scanQueue={scanQueue} />
+                    <QueuePosition status={scanInfo.status} scanQueue={scanQueue} />
                     <div className="rounded-md border text-center text-xs flex flex-col justify-center gap-2 py-2 px-3">
                         <div>
                             <Button variant="destructive">

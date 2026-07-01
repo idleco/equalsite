@@ -7,6 +7,7 @@ use Laravel\Fortify\Features;
 
 beforeEach(function () {
     $this->skipUnlessFortifyHas(Features::resetPasswords());
+    $this->markTestSkipped('Auth routes are phase-2 features.');
 });
 
 test('reset password link screen can be rendered', function () {

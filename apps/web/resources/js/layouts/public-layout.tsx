@@ -1,16 +1,7 @@
-import AppLayoutTemplate from '@/layouts/app/app-header-layout';
-import type { BreadcrumbItem } from '@/types';
-
-export default function PublicLayout({
-    breadcrumbs = [],
-    children,
-}: {
-    breadcrumbs?: BreadcrumbItem[];
-    children: React.ReactNode;
-}) {
+export default function PublicLayout({ children }: { children: React.ReactNode }) {
     return (
-        <AppLayoutTemplate breadcrumbs={breadcrumbs}>
+        <div className="min-h-screen bg-stone-50 dark:bg-[#0B0D12] text-slate-900 dark:text-slate-100 antialiased">
             {children}
-        </AppLayoutTemplate>
+        </div>
     );
 }
